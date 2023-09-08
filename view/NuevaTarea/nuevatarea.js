@@ -6,6 +6,7 @@ function init(){
 }
 
 $(document).ready(function() { 
+    console.log($('#usu_id').val())
     /* TODO: Inicializar SummerNote */
     $('#tarea_desc').summernote({
         height: 150,
@@ -37,10 +38,10 @@ $(document).ready(function() {
 
 function guardaryeditar(e){
     e.preventDefault();
-    /* TODO: Array del form ticket */
+    /* TODO: Array del form tarea */
     var formData = new FormData($("#tarea_form")[0]);
     /* TODO: validamos si los campos tienen informacion antes de guardar */
-    if ($('#tarea_desc').summernote('isEmpty') || $('#tick_id').val() == 0 || $('#tarea_titulo').val() == 0){
+    if ($('#tarea_desc').summernote('isEmpty') || $('#tick_id').val() == 0 || $('#usu_id').val() == 0 || $('#tarea_titulo').val() == 0){
         swal("Advertencia!", "Campos Vacios", "warning");
     }else{        
         /* TODO: Guardar Ticket */

@@ -46,10 +46,12 @@
 							<tr>
 								<th style="width: 5%;">#Tarea</th>
 								<th style="width: 5%;">#Ticket</th>
-								<th class="d-none d-sm-table-cell" style="width: 15%;">Fecha de creación</th>
-								<th class="d-none d-sm-table-cell" style="width: 5%;">Título</th>
-								<th class="d-none d-sm-table-cell" style="width: 50%;">Descripcion</th>
-								<th class="d-none d-sm-table-cell" style="width: 15%;">Fecha Finalización</th>
+								<th style="width: 5%;">Creador de tarea</th>
+								<th class="d-none d-sm-table-cell" style="width: 10%;">Fecha de creación</th>
+								<th class="d-none d-sm-table-cell" style="width: 10%;">Título</th>
+								<th class="d-none d-sm-table-cell" style="width: 35%;">Descripcion</th>
+								<th class="d-none d-sm-table-cell" style="width: 20%;">Fecha Finalización</th>
+								<th class="d-none d-sm-table-cell" style="width: 10%;">Tiempo de respuesta</th>
 							</tr>
 						</thead>
 						<tbody>

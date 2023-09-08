@@ -9,7 +9,7 @@ $tarea = new Tarea();
 switch($_GET["op"]){
     // Guardar/editar, si el id está vacío crea registro
     case "insert":
-        $tarea->insert_tarea($_POST["tick_id"], $_POST["tarea_titulo"], $_POST["tarea_desc"]);
+        $tarea->insert_tarea($_POST["usu_id"], $_POST["tick_id"], $_POST["tarea_titulo"], $_POST["tarea_desc"]);
         break;
 
     case "listar":

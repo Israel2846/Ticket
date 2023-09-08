@@ -9,6 +9,7 @@ $(document).ready(function(){
                 columns : [
                     { data: 'id_tarea' },
                     { data: 'id_ticket' },
+                    { data: 'usu_nom' },
                     { data: 'fecha_creacion' },
                     { data: 'tarea_titulo' },
                     { data: 'tarea_desc' },
@@ -23,6 +24,7 @@ $(document).ready(function(){
                             }
                         }
                     },
+                    { data: 'tiempo_transcurrido' }
                 ],
             })
         },
