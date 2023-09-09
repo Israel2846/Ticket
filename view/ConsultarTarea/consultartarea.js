@@ -13,18 +13,40 @@ $(document).ready(function(){
                     { data: 'fecha_creacion' },
                     { data: 'tarea_titulo' },
                     { data: 'tarea_desc' },
-                    {
-                        data: 'fecha_finalizacion',
+                    { 
+                        data: 'estado_tarea' ,
                         createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                            if (cellData === null) {
-                                // Si la fecha de finalización está vacía, agrega un botón rojo
-                                $(cell).html('<button class="btn btn-danger center-cell">Sin Finalizar</button>');
+                            if (cellData === 1) {
+                                // Si el estado es 1 significa que está abierto
+                                $(cell).html('<span class="label label-pill label-success">Abierto</span>');
                             }else{
                                 return data;
                             }
                         }
                     },
-                    { data: 'tiempo_transcurrido' }
+                    { data: 'tiempo_finalizacion' },
+                    {
+                        data: 'fecha_finalizacion',
+                        createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+                            if (cellData === null) {
+                                // Si la fecha de finalización está vacía, agrega un botón azul
+                                $(cell).html('<span class="label label-pill label-warning">Sin finalizar</span>');
+                            }else{
+                                return data;
+                            }
+                        }
+                    },
+                    { 
+                        data: 'usuario_asignado',
+                        createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+                            if (cellData === null) {
+                                // Si no se ah asignado, se agrega un botón rojo
+                                $(cell).html('<button class="btn btn-danger center-cell">Sin Asignar</button>');
+                            }else{
+                                return data;
+                            }
+                        }
+                    },
                 ],
             })
         },
