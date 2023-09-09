@@ -16,4 +16,13 @@ switch($_GET["op"]){
         $datos = $tarea->listar_tareas();        
         echo json_encode($datos);
         break;
+
+    case "obtener":
+        $datos = $tarea->get_tarea($_POST['id_tarea']);
+        echo json_encode($datos);
+        break;
+
+    case "asignar";
+        $datos = $tarea->assign_tarea($_POST['id_tarea'], $_POST['usu_asig']);
+        break;
 }

@@ -94,7 +94,7 @@ $(document).ready(function(){
 
 /* TODO: Link para poder ver el detalle de ticket en otra ventana */
 function ver(tick_id){
-    window.open('http://localhost:8080/gestor-de-tickets/view/DetalleTicket/?ID='+ tick_id +'');
+    window.open('http://localhost:80/gestor-de-tickets/view/DetalleTicket/?ID='+ tick_id +'');
 }
 
 /* TODO: Mostrar datos antes de asignar */
