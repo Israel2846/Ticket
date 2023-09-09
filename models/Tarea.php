@@ -75,10 +75,10 @@ class Tarea extends Conectar{
                     SET id_usuario_asignado = ?
                     WHERE id_tarea = ?";
             $sql = $conectar->prepare($sql);
-            $sql->bindValue(1, $id_tarea);
-            $sql->bindValue(2, $id_usuario);
+            $sql->bindValue(1, $id_usuario);
+            $sql->bindValue(2, $id_tarea);
             $sql->execute();
-            return true;
+            return $sql->fetchAll();
         } catch (Exception $e) {
             echo "Error: " . $e->getMessage();
             return false;

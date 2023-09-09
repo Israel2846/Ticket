@@ -112,6 +112,7 @@ function asignar(tick_id){
 function guardar(e){
     e.preventDefault();
 	var formData = new FormData($("#ticket_form")[0]);
+    console.log(formData);
     $.ajax({
         url: "../../controller/ticket.php?op=asignar",
         type: "POST",
