@@ -30,7 +30,7 @@ $(document).ready(function(){
                         // Si el estado es 1 significa que está abierto
                         $(cell).html('<span class="label label-pill label-success">Abierto</span>');
                     }else{
-                        return data;
+                        $(cell).html(cellData);
                     }
                 }
             },
@@ -42,7 +42,7 @@ $(document).ready(function(){
                         // Si la fecha de finalización está vacía, agrega un botón amarillo
                         $(cell).html('<span class="label label-pill label-warning">Sin finalizar</span>');
                     }else{
-                        return data;
+                        $(cell).html(cellData);
                     }
                 }
             },
