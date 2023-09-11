@@ -54,11 +54,15 @@ class Tarea extends Conectar{
         try {
             $conectar = parent::conexion();
             parent::set_names();
-            $sql = "SELECT * FROM tm_tarea where tm_tarea.id_tarea = ?";
+            $sql = "SELECT *
+                    FROM tm_tarea
+                    INNER JOIN tm_usuario ON tm_tarea.id_usuario = tm_usuario.usu_id 
+                    INNER JOIN tm_ticket on tm_ticket.tick_id = tm_tarea.id_ticket
+                    where tm_tarea.id_tarea = ?";
             $sql = $conectar->prepare($sql);
             $sql->bindValue(1, $id_tarea);
             $sql->execute();
-            return $sql->fetchAll();
+            return $sql->fetch();
         } catch (Exception $e) {
             echo "Error: " . $e->getMessage();
             return false;
@@ -72,7 +76,7 @@ class Tarea extends Conectar{
             $conectar = parent::conexion();
             parent::set_names();
             $sql = "UPDATE tm_tarea
-                    SET id_usuario_asignado = ?
+                    SET id_usuario_asignado = ?, 	estado_tarea = 2
                     WHERE id_tarea = ?";
             $sql = $conectar->prepare($sql);
             $sql->bindValue(1, $id_usuario);
@@ -83,6 +87,24 @@ class Tarea extends Conectar{
             echo "Error: " . $e->getMessage();
             return false;
         }
-        
+    }
+
+    public function close_tarea($id_tarea){
+        try {
+            $conectar = parent::conexion();
+            parent::set_names();
+            $sql = "UPDATE tm_tarea SET 
+                        tm_tarea.estado_tarea = 4,
+                        tm_tarea.fecha_finalizacion = CURRENT_TIMESTAMP 
+                    WHERE tm_tarea.id_tarea = ?";
+            $sql = $conectar->prepare($sql);
+            $sql->bindValue(1, $id_tarea);
+            $sql->execute();
+            $response = array("success" => true);
+            echo json_encode($response);
+        } catch (Exception $e) {
+            echo "Error: " . $e->getMessage();
+            return false;
+        }
     }
 }

@@ -50,10 +50,11 @@
 								<th class="d-none d-sm-table-cell" style="width: 10%;">Fecha de creación</th>
 								<th class="d-none d-sm-table-cell" style="width: 10%;">Título</th>
 								<th class="d-none d-sm-table-cell" style="width: 30%;">Descripcion</th>
-								<th class="d-none d-sm-table-cell" style="width: 30%;">Estado</th>
+								<th class="d-none d-sm-table-cell" style="width: 25%;">Estado</th>
 								<th class="d-none d-sm-table-cell" style="width: 10%;">Tiempo de finalización</th>
 								<th class="d-none d-sm-table-cell" style="width: 20%;">Fecha Finalización</th>
 								<th class="d-none d-sm-table-cell" style="width: 5%;">Usuario asignado</th>
+								<th class="d-none d-sm-table-cell" style="width: 5%;">Detalle</th>
 							</tr>
 						</thead>
 						<tbody>

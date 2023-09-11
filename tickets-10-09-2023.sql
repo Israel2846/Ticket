@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 10-09-2023 a las 22:06:01
+-- Tiempo de generación: 10-09-2023 a las 23:01:48
 -- Versión del servidor: 10.4.28-MariaDB
 -- Versión de PHP: 8.2.4
 
@@ -401,7 +401,7 @@ CREATE TABLE `tm_tarea` (
   `id_tarea` int(11) NOT NULL,
   `id_ticket` int(11) DEFAULT NULL,
   `id_usuario` int(11) NOT NULL DEFAULT 13,
-  `id_usuario_asignado` int(11) NOT NULL DEFAULT 13,
+  `id_usuario_asignado` int(11) NOT NULL,
   `fecha_creacion` datetime DEFAULT current_timestamp(),
   `tarea_titulo` varchar(50) NOT NULL,
   `tarea_desc` mediumtext NOT NULL,
@@ -414,18 +414,7 @@ CREATE TABLE `tm_tarea` (
 --
 
 INSERT INTO `tm_tarea` (`id_tarea`, `id_ticket`, `id_usuario`, `id_usuario_asignado`, `fecha_creacion`, `tarea_titulo`, `tarea_desc`, `fecha_finalizacion`, `estado_tarea`) VALUES
-(1, NULL, 13, 13, NULL, '', '', NULL, 1),
-(2, NULL, 13, 13, NULL, '', '', NULL, 1),
-(3, NULL, 13, 13, NULL, '', '', NULL, 1),
-(4, NULL, 13, 13, NULL, '', '', NULL, 1),
-(5, NULL, 13, 13, NULL, '', '', NULL, 1),
-(6, 124, 13, 13, NULL, '', '', NULL, 1),
-(7, 123, 13, 13, NULL, '', '', NULL, 1),
-(8, 124, 13, 13, NULL, '', '', NULL, 1),
-(9, 124, 13, 13, '2023-09-05 20:37:43', '', '', '2023-09-08 17:18:25', 3),
-(10, 125, 13, 13, '2023-09-05 20:39:54', '', '', NULL, 1),
-(11, 123, 13, 13, '2023-09-05 20:41:26', '', '', NULL, 1),
-(12, 126, 13, 13, '2023-09-05 20:44:13', '', '', NULL, 1);
+(19, 123, 13, 15, '2023-09-10 14:56:14', 'Sin internet', '<p>Se solicita arreglar internet</p>', NULL, 2);
 
 -- --------------------------------------------------------
 
@@ -608,7 +597,7 @@ ALTER TABLE `tm_subcategoria`
 -- AUTO_INCREMENT de la tabla `tm_tarea`
 --
 ALTER TABLE `tm_tarea`
-  MODIFY `id_tarea` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id_tarea` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT de la tabla `tm_ticket`

@@ -29,8 +29,12 @@ $(document).ready(function(){
                     if (cellData === 1) {
                         // Si el estado es 1 significa que está abierto
                         $(cell).html('<span class="label label-pill label-success">Abierto</span>');
-                    }else{
-                        $(cell).html(cellData);
+                    }else if(cellData===2){
+                        $(cell).html('<span class="label label-pill label-warning">En proceso</span>');
+                    }else if(cellData===3){
+                        $(cell).html('<span class="label label-pill label-Primary">Pausado</span>');
+                    }else if(cellData===4){
+                        $(cell).html('<span class="label label-pill label-danger">Finalizado</span>');
                     }
                 }
             },
@@ -40,7 +44,7 @@ $(document).ready(function(){
                 createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
                     if (cellData === null) {
                         // Si la fecha de finalización está vacía, agrega un botón amarillo
-                        $(cell).html('<span class="label label-pill label-warning">Sin finalizar</span>');
+                        $(cell).html('<span class="label label-pill label-danger">Sin finalizar</span>');
                     }else{
                         $(cell).html(cellData);
                     }
@@ -57,6 +61,12 @@ $(document).ready(function(){
                     }
                 }
             },
+            { 
+                "data": 'id_tarea',
+                createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+                    $(cell).html('<button type="button" onClick="ver(' + rowData.id_tarea + ');"  id="' + rowData.id_tarea + '" class="btn btn-inline btn-primary btn-sm ladda-button"><i class="fa fa-eye"></i></button>');
+                }
+            }
         ]
     })
     // Llenar combo de usuarios a asignar
@@ -69,8 +79,8 @@ $(document).ready(function(){
 function modal_asignar(id_tarea){
     $.post("../../controller/tarea.php?op=obtener", {id_tarea : id_tarea}, function(data){
         data = JSON.parse(data);
-        console.log(data[0][0]);
-        $('#id_tarea').val(data[0][0]);
+        console.log(data.id_tarea);
+        $('#id_tarea').val(data.id_tarea);
         $('#mdltitulo').html('Asignar agente');
         $('#modalasignar').modal('show');
     });
@@ -104,6 +114,11 @@ function guardar(e){
             console.error('Error en la solicitud AJAX:', error);
         }
     });
+}
+
+// Link para ver el detalle de la tarea
+function ver(id_tarea){
+    window.open('http://localhost:80/gestor-de-tickets/view/DetalleTarea/?ID='+ id_tarea +'');
 }
 
 init();

@@ -22,7 +22,11 @@ switch($_GET["op"]){
         echo json_encode($datos);
         break;
 
-    case "asignar";
+    case "asignar":
         $datos = $tarea->assign_tarea($_POST['id_tarea'], $_POST['usu_asig']);
+        break;
+
+    case "cerrar_tarea":
+        $tarea->close_tarea($_POST['id_tarea']);
         break;
 }
