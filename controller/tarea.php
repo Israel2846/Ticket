@@ -17,6 +17,10 @@ switch($_GET["op"]){
         echo json_encode($datos);
         break;
 
+    case "listar_x_ticket":
+        $datos;
+        break;
+
     case "obtener":
         $datos = $tarea->get_tarea($_POST['id_tarea']);
         echo json_encode($datos);

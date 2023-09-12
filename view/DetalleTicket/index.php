@@ -70,12 +70,39 @@ if (isset($_SESSION["usu_id"])) {
 
               <div class="col-lg-12">
                 <fieldset class="form-group">
-                  <label class="form-label semibold" for="tick_titulo">Documentos Adicionales</label>
+                  <label class="form-label semibold">Documentos Adicionales</label>
                   <table id="documentos_data" class="table table-bordered table-striped table-vcenter js-dataTable-full">
                     <thead>
                       <tr>
                         <th style="width: 90%;">Nombre</th>
                         <th class="text-center" style="width: 10%;"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                  </table>
+                </fieldset>
+              </div>
+
+
+              <div class="col-lg-12">
+                <fieldset class="form-group">
+                  <label class="form-label semibold" for="tareas">Tareas</label>
+                  <table id="tarea_data" class="table table-bordered table-striped table-vcenter js-dataTable-full">
+                    <thead>
+                      <tr>
+                        <th style="width: 5%;">#Tarea</th>
+                        <th style="width: 5%;">#Ticket</th>
+                        <th style="width: 5%;">Creador de tarea</th>
+                        <th class="d-none d-sm-table-cell" style="width: 10%;">Fecha de creación</th>
+                        <th class="d-none d-sm-table-cell" style="width: 10%;">Título</th>
+                        <th class="d-none d-sm-table-cell" style="width: 30%;">Descripcion</th>
+                        <th class="d-none d-sm-table-cell" style="width: 25%;">Estado</th>
+                        <th class="d-none d-sm-table-cell" style="width: 10%;">Tiempo de finalización</th>
+                        <th class="d-none d-sm-table-cell" style="width: 20%;">Fecha Finalización</th>
+                        <th class="d-none d-sm-table-cell" style="width: 5%;">Usuario asignado</th>
+                        <th class="d-none d-sm-table-cell" style="width: 5%;">Detalle</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -97,6 +124,9 @@ if (isset($_SESSION["usu_id"])) {
               </div>
 
           </div>
+
+
+
         </div>
 
         <section class="activity-line" id="lbldetalle">

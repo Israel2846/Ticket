@@ -32,36 +32,41 @@
 
         /* TODO: Listar ticket segun id de usuario */
         public function listar_ticket_x_usu($usu_id){
-            $conectar= parent::conexion();
-            parent::set_names();
-            $sql="SELECT 
-                tm_ticket.tick_id,
-                tm_ticket.usu_id,
-                tm_ticket.cat_id,
-                tm_ticket.tick_titulo,
-                tm_ticket.tick_descrip,
-                tm_ticket.tick_estado,
-                tm_ticket.fech_crea,
-                tm_ticket.fech_cierre,
-                tm_ticket.usu_asig,
-                tm_ticket.fech_asig,
-                tm_usuario.usu_nom,
-                tm_usuario.usu_ape,
-                tm_categoria.cat_nom,
-                tm_ticket.prio_id,
-                tm_prioridad.prio_nom
-                FROM 
-                tm_ticket
-                INNER join tm_categoria on tm_ticket.cat_id = tm_categoria.cat_id
-                INNER join tm_usuario on tm_ticket.usu_id = tm_usuario.usu_id
-                INNER join tm_prioridad on tm_ticket.prio_id = tm_prioridad.prio_id
-                WHERE
-                tm_ticket.est = 1 and tm_ticket.tick_estado = 'Abierto'
-                ";
-            $sql=$conectar->prepare($sql);
-            $sql->bindValue(1, $usu_id);
-            $sql->execute();
-            return $resultado=$sql->fetchAll();
+            try {
+                $conectar= parent::conexion();
+                parent::set_names();
+                $sql="SELECT 
+                    tm_ticket.tick_id,
+                    tm_ticket.usu_id,
+                    tm_ticket.cat_id,
+                    tm_ticket.tick_titulo,
+                    tm_ticket.tick_descrip,
+                    tm_ticket.tick_estado,
+                    tm_ticket.fech_crea,
+                    tm_ticket.fech_cierre,
+                    tm_ticket.usu_asig,
+                    tm_ticket.fech_asig,
+                    tm_usuario.usu_nom,
+                    tm_usuario.usu_ape,
+                    tm_categoria.cat_nom,
+                    tm_ticket.prio_id,
+                    tm_prioridad.prio_nom
+                    FROM 
+                    tm_ticket
+                    INNER join tm_categoria on tm_ticket.cat_id = tm_categoria.cat_id
+                    INNER join tm_usuario on tm_ticket.usu_id = tm_usuario.usu_id
+                    INNER join tm_prioridad on tm_ticket.prio_id = tm_prioridad.prio_id
+                    WHERE
+                    tm_ticket.est = 1 and tm_ticket.tick_estado = 'Abierto' AND tm_ticket.usu_asig = ?";
+                $sql=$conectar->prepare($sql);
+                $sql->bindValue(1, $usu_id);
+                $sql->execute();
+                return $sql->fetchAll();
+            } catch (Exception $e) {
+                $resultado = $e->getMessage();
+                return $resultado;
+            }
+            
         }
 
         /* TODO: Mostrar ticket segun id de ticket */

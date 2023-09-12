@@ -8,8 +8,9 @@ function init(){
     });
 }
 
-$(document).ready(function(){
-
+$(document).ready(function(){   
+    console.log(usu_id)
+    console.log(rol_id)
     /* TODO: Llenar Combo Categoria */
     $.post("../../controller/categoria.php?op=combo",function(data, status){
         $('#cat_id').html(data);
@@ -27,61 +28,68 @@ $(document).ready(function(){
 
     /* TODO: rol si es 1 entonces es usuario */
     if (rol_id==1){
+        console.log("entró");
         $('#viewuser').hide();
-
-        tabla=$('#ticket_data').dataTable({
-            "aProcessing": true,
-            "aServerSide": true,
-            dom: 'Bfrtip',
-            "searching": true,
-            lengthChange: false,
-            colReorder: true,
-            buttons: [
-                    'copyHtml5',
-                    'excelHtml5',
-                    'csvHtml5',
-                    'pdfHtml5'
-                    ],
+        $('#ticket_data').DataTable({
             "ajax":{
                 url: '../../controller/ticket.php?op=listar_x_usu',
-                type : "post",
-                dataType : "json",
-                data:{ usu_id : usu_id },
+                type : 'post',
+                data : {
+                    usu_id : usu_id
+                },
+                dataType: "json",
                 error: function(e){
                     console.log(e.responseText);
-                }
-            },
-            "ordering": false,
-            "bDestroy": true,
-            "responsive": true,
-            "bInfo":true,
-            "iDisplayLength": 10,
-            "autoWidth": false,
-            "language": {
-                "sProcessing":     "Procesando...",
-                "sLengthMenu":     "Mostrar _MENU_ registros",
-                "sZeroRecords":    "No se encontraron resultados",
-                "sEmptyTable":     "Ningún dato disponible en esta tabla",
-                "sInfo":           "Mostrando un total de _TOTAL_ registros",
-                "sInfoEmpty":      "Mostrando un total de 0 registros",
-                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-                "sInfoPostFix":    "",
-                "sSearch":         "Buscar:",
-                "sUrl":            "",
-                "sInfoThousands":  ",",
-                "sLoadingRecords": "Cargando...",
-                "oPaginate": {
-                    "sFirst":    "Primero",
-                    "sLast":     "Último",
-                    "sNext":     "Siguiente",
-                    "sPrevious": "Anterior"
                 },
-                "oAria": {
-                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-                }
-            }     
-        }).DataTable();
+                "dataSrc": ""
+            },
+            "columns": [
+                { "data": "tick_id" },
+                { "data": "cat_nom" },
+                { "data": "tick_titulo" },
+                { 
+                    "data": "prio_nom",
+                    createdCell : function(cell, cellData){
+                        $(cell).html('<span class="label label-pill label-warning">'+ cellData +'</span>')
+                    }
+                },
+                { 
+                    "data": "tick_estado",
+                    createdCell : function(cell, cellData){
+                        switch (cellData) {
+                            case 'Abierto':
+                                html_estado = '<span class="label label-pill label-success">'+ cellData +'</span>'
+                                break;
+                            case 'En proceso':
+                                html_estado = '<span class="label label-pill label-warning">'+ cellData +'</span>'
+                                break;
+                            case 'Cerrado':
+                                html_estado = '<span class="label label-pill label-warning">'+ cellData +'</span>'
+                                break;
+                        }
+                        $(cell).html(html_estado)
+                    }
+                },
+                { "data": "fech_crea" },
+                { "data": "fech_asig" },
+                { "data": "fech_asig" },
+                { "data": "fech_asig" },
+                { "data": "fech_asig" },
+                { "data": "fech_cierre" },
+                { 
+                    "data": "usu_nom",
+                    createdCell: function(cell, cellData){
+                        $(cell).html('<span class="label label-pill label-success">'+ cellData +'</span>')
+                    }
+                },
+                { 
+                    "data": "tick_id",
+                    createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+                        $(cell).html('<button type="button" onClick="ver(' + rowData.tick_id + ');"  id="' + rowData.tick_id + '" class="btn btn-inline btn-primary btn-sm ladda-button"><i class="fa fa-eye"></i></button>');
+                    }
+                },
+            ]
+        })
     }else{
         /* TODO: Filtro avanzado en caso de ser soporte */
         var tick_titulo = $('#tick_titulo').val();
