@@ -26,8 +26,7 @@ class Tarea extends Conectar{
             $sql = "SELECT
                         tm_tarea.id_tarea, 
                         tm_tarea.id_ticket, 
-                        creador.usu_nom as usu_nom, 
-                        asignado.usu_nom as usuario_asignado,
+                        creador.usu_nom as usu_nom,
                         tm_tarea.fecha_creacion, 
                         tm_tarea.tarea_titulo, 
                         tm_tarea.tarea_desc, 
@@ -39,8 +38,7 @@ class Tarea extends Conectar{
                             (TIMESTAMPDIFF(MINUTE, tm_tarea.fecha_creacion, tm_tarea.fecha_finalizacion) % 60), ' Minutos '
                         ) AS tiempo_finalizacion
                     FROM tm_tarea
-                    INNER JOIN tm_usuario AS creador ON tm_tarea.id_usuario = creador.usu_id
-                    LEFT JOIN tm_usuario AS asignado ON tm_tarea.id_usuario_asignado = asignado.usu_id";
+                    INNER JOIN tm_usuario AS creador ON tm_tarea.id_usuario = creador.usu_id";
             $sql = $conectar->prepare($sql);
             $sql->execute();
             return $sql->fetchAll();
@@ -120,7 +118,7 @@ class Tarea extends Conectar{
             $conectar = parent::conexion();
             parent::set_names();
             $sql = "UPDATE tm_tarea SET 
-                        tm_tarea.estado_tarea = 4,
+                        tm_tarea.estado_tarea = 0,
                         tm_tarea.fecha_finalizacion = CURRENT_TIMESTAMP 
                     WHERE tm_tarea.id_tarea = ?";
             $sql = $conectar->prepare($sql);

@@ -128,7 +128,7 @@ $(document).ready(function(){
                         case 1:
                             html_estado = '<span class="label label-pill label-success">Abierto</span>';
                             break;
-                        case 2:
+                        case 0:
                             html_estado = '<span class="label label-pill label-danger">Cerrado</span>';
                             break;
                     }
@@ -168,7 +168,7 @@ $(document).ready(function(){
 
 // Link para ver el detalle de la tarea
 function ver(id_tarea){
-    window.open('http://localhost:80/gestor-de-tickets/view/DetalleTarea/?ID='+ id_tarea +'');
+    window.location.href = 'http://localhost:80/gestor-de-tickets/view/DetalleTarea/?ID='+ id_tarea +'';
 }
 
 $(document).on(

@@ -29,12 +29,8 @@ $(document).ready(function(){
                     if (cellData === 1) {
                         // Si el estado es 1 significa que está abierto
                         $(cell).html('<span class="label label-pill label-success">Abierto</span>');
-                    }else if(cellData===2){
-                        $(cell).html('<span class="label label-pill label-warning">En proceso</span>');
-                    }else if(cellData===3){
-                        $(cell).html('<span class="label label-pill label-Primary">Pausado</span>');
-                    }else if(cellData===4){
-                        $(cell).html('<span class="label label-pill label-danger">Finalizado</span>');
+                    }else if(cellData===0){
+                        $(cell).html('<span class="label label-pill label-danger">Cerrado</span>');
                     }
                 }
             },
@@ -51,17 +47,6 @@ $(document).ready(function(){
                 }
             },
             { 
-                "data": 'usuario_asignado',
-                createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                    if (cellData === null) {
-                        // Si no se ah asignado, se agrega un botón rojo que manda a llamar a la función asignar con el id del elemento
-                        $(cell).html('<a onClick="modal_asignar('+ rowData.id_tarea +')"class="btn btn-danger center-cell">Sin Asignar</a>');
-                    }else{
-                        $(cell).html(cellData);
-                    }
-                }
-            },
-            { 
                 "data": 'id_tarea',
                 createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
                     $(cell).html('<button type="button" onClick="ver(' + rowData.id_tarea + ');"  id="' + rowData.id_tarea + '" class="btn btn-inline btn-primary btn-sm ladda-button"><i class="fa fa-eye"></i></button>');
@@ -69,10 +54,6 @@ $(document).ready(function(){
             }
         ]
     })
-    // Llenar combo de usuarios a asignar
-    $.post("../../controller/usuario.php?op=combo", function (data) {
-        $('#usu_asig').html(data);
-    });
 })
 
 // Función para mostrar modal de tarea
