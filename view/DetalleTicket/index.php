@@ -92,17 +92,13 @@ if (isset($_SESSION["usu_id"])) {
                   <table id="tarea_data" class="table table-bordered table-striped table-vcenter js-dataTable-full">
                     <thead>
                       <tr>
-                        <th style="width: 5%;">#Tarea</th>
-                        <th style="width: 5%;">#Ticket</th>
-                        <th style="width: 5%;">Creador de tarea</th>
+                        <th style="width: 20%;">Título</th>
+                        <th style="width: 20%;">Descripción</th>
+                        <th style="width: 10%;">Estado</th>
                         <th class="d-none d-sm-table-cell" style="width: 10%;">Fecha de creación</th>
-                        <th class="d-none d-sm-table-cell" style="width: 10%;">Título</th>
-                        <th class="d-none d-sm-table-cell" style="width: 30%;">Descripcion</th>
-                        <th class="d-none d-sm-table-cell" style="width: 25%;">Estado</th>
+                        <th class="d-none d-sm-table-cell" style="width: 10%;">Fecha de finalización</th>
                         <th class="d-none d-sm-table-cell" style="width: 10%;">Tiempo de finalización</th>
-                        <th class="d-none d-sm-table-cell" style="width: 20%;">Fecha Finalización</th>
-                        <th class="d-none d-sm-table-cell" style="width: 5%;">Usuario asignado</th>
-                        <th class="d-none d-sm-table-cell" style="width: 5%;">Detalle</th>
+                        <th class="d-none d-sm-table-cell" style="width: 10%;">Ver</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -112,6 +108,9 @@ if (isset($_SESSION["usu_id"])) {
                 </fieldset>
               </div>
 
+              <div class="col-lg-12">
+                <button type="button" id="btnNuevaTarea" class="btn btn-rounded btn-inline btn-primary">Nueva Tarea</button>
+              </div>
 
               <div class="col-lg-12">
                 <fieldset class="form-group">

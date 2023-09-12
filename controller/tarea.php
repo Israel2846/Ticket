@@ -18,7 +18,8 @@ switch($_GET["op"]){
         break;
 
     case "listar_x_ticket":
-        $datos;
+        $datos = $tarea->listar_tareas_x_ticket($_POST['tick_id']);
+        echo json_encode($datos);
         break;
 
     case "obtener":

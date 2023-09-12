@@ -49,19 +49,9 @@ if(isset($_SESSION["usu_id"])){
 				<div class="row">
 					<form method="post" id="tarea_form">
 
-						<input type="hidden" id="usu_id" name="usu_id" value="<?php echo $_SESSION["usu_id"] ?>">
+						<input type="hidden" id="usu_id" name="usu_id" value="<?php echo $_SESSION["usu_id"] ?>">						
 
-						<div class="col-lg-6">
-							<fieldset class="form-group">
-								<label class="form-label semibold" for="tick_id">Ticket al que pertenece</label>
-								<select name="tick_id" id="tick_id" class="form-control select2"
-								data-show-subtext="true" data-live-search="true">
-									
-                                </select>
-							</fieldset>
-						</div>
-
-						<div class="col-lg-6">
+						<div class="col-lg-12">
 							<fieldset class="form-group">
 								<label class="form-label semibold" for="tarea_titulo">Título</label>
 								<input type="text" name="tarea_titulo" id="tarea_titulo" class="form-control" placeholder="Escriba aquí el título de la tarea">

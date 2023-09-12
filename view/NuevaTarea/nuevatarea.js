@@ -31,15 +31,18 @@ $(document).ready(function() {
     });
     
     /* TODO: Llenar Combo ticket */
-    $.post("../../controller/ticket.php?op=combo",function(data, status){
+   /*  $.post("../../controller/ticket.php?op=combo",function(data, status){
         $('#tick_id').html(data);
-    });
+    }); */
 });
 
 function guardaryeditar(e){
     e.preventDefault();
+    var tick_id = getUrlParameter('ID');
     /* TODO: Array del form tarea */
     var formData = new FormData($("#tarea_form")[0]);
+    formData.append('tick_id', tick_id);
+    console.log(formData);
     /* TODO: validamos si los campos tienen informacion antes de guardar */
     if ($('#tarea_desc').summernote('isEmpty') || $('#tick_id').val() == 0 || $('#usu_id').val() == 0 || $('#tarea_titulo').val() == 0){
         swal("Advertencia!", "Campos Vacios", "warning");
@@ -63,5 +66,20 @@ function guardaryeditar(e){
         });
     }
 }
+
+var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : sParameterName[1];
+        }
+    }
+};
 
 init();

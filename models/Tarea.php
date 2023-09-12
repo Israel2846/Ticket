@@ -50,6 +50,32 @@ class Tarea extends Conectar{
         }
     }
 
+    public function listar_tareas_x_ticket($id_ticket){
+        try {
+            $conectar = parent::conexion();
+            parent::set_names();
+            $sql = "SELECT fecha_creacion,
+                        tm_tarea.id_tarea,
+                        tm_tarea.tarea_titulo,
+                        tm_tarea.tarea_desc,
+                        tm_tarea.fecha_finalizacion,
+                        tm_tarea.estado_tarea,
+                        CONCAT(
+                            FLOOR(TIMESTAMPDIFF(MINUTE, tm_tarea.fecha_creacion, tm_tarea.fecha_finalizacion) / 1440), ' Días ',
+                            FLOOR((TIMESTAMPDIFF(MINUTE, tm_tarea.fecha_creacion, tm_tarea.fecha_finalizacion) % 1440) / 60), ' Horas ',
+                            (TIMESTAMPDIFF(MINUTE, tm_tarea.fecha_creacion, tm_tarea.fecha_finalizacion) % 60), ' Minutos '
+                        ) AS tiempo_finalizacion
+                    FROM tm_tarea
+                    WHERE tm_tarea.id_ticket = ?";
+            $sql = $conectar->prepare($sql);
+            $sql->bindValue(1, $id_ticket);
+            $sql->execute();
+            return $sql->fetchAll();
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
     public function get_tarea($id_tarea){
         try {
             $conectar = parent::conexion();
