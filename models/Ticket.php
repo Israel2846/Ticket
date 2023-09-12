@@ -57,7 +57,7 @@
                     INNER join tm_usuario on tm_ticket.usu_id = tm_usuario.usu_id
                     INNER join tm_prioridad on tm_ticket.prio_id = tm_prioridad.prio_id
                     WHERE
-                    tm_ticket.est = 1 and tm_ticket.tick_estado = 'Abierto' AND tm_ticket.usu_asig = ?";
+                    tm_ticket.est = 1 AND tm_ticket.usu_asig = ?";
                 $sql=$conectar->prepare($sql);
                 $sql->bindValue(1, $usu_id);
                 $sql->execute();
@@ -267,12 +267,13 @@
         public function update_ticket_asignacion($tick_id,$usu_asig){
             $conectar= parent::conexion();
             parent::set_names();
-            $sql="update tm_ticket 
-                set	
-                    usu_asig = ?,
-                    fech_asig = now()
-                where
-                    tick_id = ?";
+            $sql="UPDATE tm_ticket 
+                    set	
+                        usu_asig = ?,
+                        tick_estado = 'En proceso',
+                        fech_asig = now()
+                    where
+                        tick_id = ?";
             $sql=$conectar->prepare($sql);
             $sql->bindValue(1, $usu_asig);
             $sql->bindValue(2, $tick_id);

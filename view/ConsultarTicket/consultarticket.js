@@ -64,7 +64,7 @@ $(document).ready(function(){
                                 html_estado = '<span class="label label-pill label-warning">'+ cellData +'</span>'
                                 break;
                             case 'Cerrado':
-                                html_estado = '<span class="label label-pill label-warning">'+ cellData +'</span>'
+                                html_estado = '<span class="label label-pill label-danger">'+ cellData +'</span>'
                                 break;
                         }
                         $(cell).html(html_estado)
