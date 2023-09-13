@@ -31,6 +31,7 @@ $(document).ready(function(){
         console.log("entró");
         $('#viewuser').hide();
         $('#tabla_tickets_abiertos').hide();
+        $('#tabla_tickets_en_proceso').hide();
         $('#ticket_usuario_normal').DataTable({
             "ajax":{
                 url: '../../controller/ticket.php?op=listar_x_usu',
@@ -94,6 +95,7 @@ $(document).ready(function(){
     }else{
         $('#tabla_usuario_normal').hide();
         datatable_abiertos();
+        datatable_en_proceso();
     }
 });
 
@@ -143,6 +145,8 @@ function guardar(e){
             $("#modalasignar").modal('hide');
             /* TODO:Recargar Datatable JS */
             $('#ticket_abierto').DataTable().ajax.reload();
+            // Recargar datatable en proceso
+            $('#ticket_en_proceso').DataTable().ajax.reload();
         }
     });
 }
@@ -224,6 +228,61 @@ function datatable_abiertos(){
                     "data": "tick_estado",
                     createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
                         $(cell).html('<span class="label label-pill label-success">' + cellData + '</span>')
+                    }
+                },
+                { "data": "fech_crea" },
+                { "data": "fech_asig" },
+                { "data": "timeresp" },
+                { "data": "timetransc" },
+                { "data": "tiempototal" },
+                { "data": "fech_cierre" },
+                { 
+                    "data": "usu_id",
+                    createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+                        $(cell).html('<span class="label label-pill label-success">' + rowData.usu_nom +'</span>');
+                    }
+                },
+                { 
+                    "data": "tick_id" ,
+                    createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+                        if (rowData.usu_asig === null) {
+                            $(cell).html('<button type="button" onClick="asignar(' + rowData.tick_id + ');"  id="' + rowData.tick_id + '" class="btn btn-inline btn-danger btn-sm ladda-button">Sin asignar</i></button>');
+                        } else {
+                            $(cell).html(rowData.asignado);
+                        }
+                    }
+                },
+                { 
+                    "data": "tick_id" ,
+                    createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+                        $(cell).html('<button type="button" onClick="ver(' + rowData.tick_id + ');"  id="' + rowData.tick_id + '" class="btn btn-inline btn-primary btn-sm ladda-button"><i class="fa fa-eye"></i></button>');
+                    }
+                },
+            ],
+            order : []
+        }
+    )
+}
+function datatable_en_proceso(){
+    $('#ticket_en_proceso').dataTable(
+        {
+            "ajax" : {
+                url : '../../controller/ticket.php?op=listar_ticket_en_proceso',
+                dataType : "json",
+                error: function(e){
+                    console.log(e.responseText);
+                },
+                "dataSrc": ""
+            },
+            "columns" : [
+                { "data": "tick_id" },
+                { "data": "cat_nom" },
+                { "data": "tick_titulo" },
+                { "data": "prio_nom" },
+                { 
+                    "data": "tick_estado",
+                    createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+                        $(cell).html('<span class="label label-pill label-warning">' + cellData + '</span>')
                     }
                 },
                 { "data": "fech_crea" },

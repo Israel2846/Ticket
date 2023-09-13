@@ -18,7 +18,13 @@
             $datos = $ticket->listar_ticket_abierto();
             echo json_encode($datos);
             break;
-            
+
+        // Listar tickets en proceso
+        case "listar_ticket_en_proceso":
+            $datos = $ticket->listar_ticket_en_proceso();
+            echo json_encode($datos);
+            break;
+
         // Combo de tickets
         case "combo":
             $datos = $ticket->get_ticket();
