@@ -175,8 +175,36 @@ $(document).on(
     "click",
     "#btnNuevaTarea",
     function(){
-        var tick_id = getUrlParameter('ID');
-        window.location.href = 'http://localhost:80/gestor-de-tickets/view/NuevaTarea/?ID='+ tick_id +'';
+        var id_usuario = $('#user_idx').val();
+        var id_ticket = getUrlParameter('ID');
+        $.ajax(
+            {
+                url : '../../controller/tarea.php?op=tareas_abiertas',
+                type : 'POST',
+                data : {
+                    id_usuario : id_usuario,
+                    id_ticket : id_ticket,
+                },
+                success : function(data){
+                    data = JSON.parse(data)
+                    if (data.tareas_abiertas >= 1) {
+                        swal({
+                            title: "HelpDesk!",
+                            text: "Necesitas cerrar tus tareas antes de crear una nueva",
+                            type: "warning",
+                            confirmButtonClass: "btn-primary"
+                        })
+                    } else if(data.tareas_abiertas === 0){
+                        window.location.href = 'http://localhost:80/gestor-de-tickets/view/NuevaTarea/?ID='+ id_ticket +'';
+                    } else {
+                        console.log("Error");
+                    }
+                },
+                error : function(error){
+                    console.log(error)
+                }
+            }
+        )
     }
 )
 

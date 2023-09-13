@@ -131,4 +131,21 @@ class Tarea extends Conectar{
             return false;
         }
     }
+
+    public function count_tareas_abiertas($id_usuario, $id_ticket){
+        try {
+            $conectar = parent::conexion();
+            parent::set_names();
+            $sql = "SELECT COUNT(*) AS tareas_abiertas
+                    FROM tm_tarea
+                    WHERE tm_tarea.estado_tarea = 1 AND tm_tarea.id_ticket = ? AND tm_tarea.id_usuario = ? ;";
+            $sql = $conectar->prepare($sql);
+            $sql->bindValue(1, $id_ticket);
+            $sql->bindValue(2, $id_usuario);
+            $sql->execute();
+            return $sql->fetch();
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
 }

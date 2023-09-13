@@ -34,4 +34,9 @@ switch($_GET["op"]){
     case "cerrar_tarea":
         $tarea->close_tarea($_POST['id_tarea']);
         break;
+
+    case "tareas_abiertas":
+        $datos = $tarea->count_tareas_abiertas($_POST['id_usuario'], $_POST['id_ticket']);
+        echo json_encode($datos);
+        break;
 }
