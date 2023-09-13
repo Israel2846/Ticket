@@ -13,6 +13,12 @@
 
     /*TODO: opciones del controlador Ticket*/
     switch($_GET["op"]){
+        // Listar tickets abiertos
+        case "listar_ticket_abierto":
+            $datos = $ticket->listar_ticket_abierto();
+            echo json_encode($datos);
+            break;
+            
         // Combo de tickets
         case "combo":
             $datos = $ticket->get_ticket();

@@ -110,36 +110,47 @@
         }
 
         /* TODO: Mostrar todos los ticket */
-        public function listar_ticket(){
-            $conectar= parent::conexion();
-            parent::set_names();
-            $sql="SELECT
-                tm_ticket.tick_id,
-                tm_ticket.usu_id,
-                tm_ticket.cat_id,
-                tm_ticket.tick_titulo,
-                tm_ticket.tick_descrip,
-                tm_ticket.tick_estado,
-                tm_ticket.fech_crea,
-                tm_ticket.fech_cierre,
-                tm_ticket.usu_asig,
-                tm_ticket.fech_asig,
-                tm_usuario.usu_nom,
-                tm_usuario.usu_ape,
-                tm_categoria.cat_nom,
-                tm_ticket.prio_id,
-                tm_prioridad.prio_nom
-                FROM 
-                tm_ticket
-                INNER join tm_categoria on tm_ticket.cat_id = tm_categoria.cat_id
-                INNER join tm_usuario on tm_ticket.usu_id = tm_usuario.usu_id
-                INNER join tm_prioridad on tm_ticket.prio_id = tm_prioridad.prio_id
-                WHERE
-                tm_ticket.est = 1 
-                ";
-            $sql=$conectar->prepare($sql);
-            $sql->execute();
-            return $resultado=$sql->fetchAll();
+        public function listar_ticket_abierto(){
+            try {
+                $conectar= parent::conexion();
+                parent::set_names();
+                $sql="SELECT
+                        tm_ticket.tick_id,
+                        tm_ticket.usu_id,
+                        tm_ticket.cat_id,
+                        tm_ticket.tick_titulo,
+                        tm_ticket.tick_descrip,
+                        tm_ticket.tick_estado,
+                        tm_ticket.fech_crea,
+                        tm_ticket.fech_cierre,
+                        tm_ticket.usu_asig,
+                        tm_ticket.fech_asig,
+                        creador.usu_nom,
+                        creador.usu_ape,
+                        asignado.usu_nom AS asignado,
+                        tm_categoria.cat_nom,
+                        tm_ticket.prio_id,
+                        tm_prioridad.prio_nom,
+                        CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_crea, tm_ticket.fech_asig), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_crea, tm_ticket.fech_asig)%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_crea, tm_ticket.fech_asig)%60, ' minutos') AS timeresp,
+                        CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_crea, NOW()), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_crea, NOW())%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_crea, NOW())%60, ' minutos') AS timetransc,
+                        CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_asig, tm_ticket.fech_cierre), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_asig, tm_ticket.fech_cierre)%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_asig, tm_ticket.fech_cierre)%60, ' minutos') AS timetarea,
+                        CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_crea, tm_ticket.fech_cierre), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_crea, tm_ticket.fech_cierre)%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_crea, tm_ticket.fech_cierre)%60, ' minutos') AS tiempototal
+                    FROM
+                        tm_ticket
+                    INNER join tm_categoria on tm_ticket.cat_id = tm_categoria.cat_id
+                    LEFT join tm_usuario AS creador on tm_ticket.usu_id = creador.usu_id
+                    LEFT JOIN tm_usuario as asignado on tm_ticket.usu_asig = asignado.usu_id
+                    INNER join tm_prioridad on tm_ticket.prio_id = tm_prioridad.prio_id
+                    WHERE
+                        tm_ticket.est = 1 and tm_ticket.tick_estado = 'Abierto'
+                    ORDER BY tm_ticket.prio_id DESC";
+                $sql=$conectar->prepare($sql);
+                $sql->execute();
+                return $sql->fetchAll();
+            } catch (Exception $e) {
+                return $e->getMessage();
+            }
+            
         }
 
         /* TODO: Mostrar detalle de ticket por id de ticket */
