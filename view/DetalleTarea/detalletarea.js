@@ -37,19 +37,14 @@ function listardetalle(id_tarea){
                 case 1:
                     elem_estado = '<span class="label label-pill label-success">Abierto</span>'
                     break;
-                case 2:
-                    elem_estado = '<span class="label label-pill label-warning">En proceso</span>'
-                    break;
-                case 3:
-                    elem_estado = '<span class="label label-pill label-primary">Pausado</span>'
-                    break;
-                case 4:
+                
+                case 0:
                     elem_estado = '<span class="label label-pill label-danger">Finalizado</span>'
                     break;
             }
 
-            if (data.estado_tarea == 4) {
-                $('#pnldetalle').hide();
+            if (data.estado_tarea == 0) {
+                $('#btncerrartarea').hide();
             }
 
             $('#lblestado').html(elem_estado);

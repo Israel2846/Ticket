@@ -63,42 +63,15 @@ if (isset($_SESSION["usu_id"])) {
 
                 </fieldset>
               </div>
-
+              <div class="col-lg-12">
+                <button type="button" id="btncerrartarea" class="btn btn-rounded btn-inline btn-warning">Cerrar Tarea</button>
+              </div>
           </div>
         </div>
 
         <section class="activity-line" id="lbldetalle">
 
         </section>
-
-        <div class="box-typical box-typical-padding" id="pnldetalle">
-          <p>
-            Ingrese su duda o consulta
-          </p>
-          <div class="row">
-              <div class="col-lg-12">
-                <fieldset class="form-group">
-                  <label class="form-label semibold" for="tarea_descrip">Descripción</label>
-                  <div class="summernote-theme-1">
-                    <textarea id="tarea_descrip" name="tarea_descrip" class="summernote"></textarea>
-                  </div>
-                </fieldset>
-              </div>
-
-              <!-- TODO: Agregar archivos adjuntos -->
-              <div class="col-lg-12">
-                <fieldset class="form-group">
-                  <label class="form-label semibold" for="fileElem">Documentos Adicionales</label>
-                  <input type="file" name="fileElem" id="fileElem" class="form-control" multiple>
-                </fieldset>
-              </div>
-
-              <div class="col-lg-12">
-                <button type="button" id="btnenviar" class="btn btn-rounded btn-inline btn-primary">Enviar</button>
-                <button type="button" id="btncerrartarea" class="btn btn-rounded btn-inline btn-warning">Cerrar Tarea</button>
-              </div>
-          </div>
-			  </div>
 
       </div>
     </div>
