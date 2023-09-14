@@ -13,6 +13,23 @@
 
     /*TODO: opciones del controlador Ticket*/
     switch($_GET["op"]){
+        // Pausar ticket
+        case 'pausar_ticket':
+            $resultado = $ticket->pause_ticket($_POST['tick_id']);
+            echo $resultado;
+            break;
+
+        // Reanudar ticket
+        case 'reanudar_ticket':
+            $resultado = $ticket->resume_ticket($_POST['tick_id']);
+            echo $resultado;
+            break;
+
+        case 'obtener_ticket':
+            $datos = $ticket->get_one_ticket($_POST['tick_id']);
+            echo json_encode($datos);
+            break;
+
         // Listar tickets abiertos
         case "listar_ticket_abierto":
             $datos = $ticket->listar_ticket_abierto();
@@ -325,8 +342,12 @@
 
                     if ($row["tick_estado"]=="Abierto"){
                         $output["tick_estado"] = '<span class="label label-pill label-success">Abierto</span>';
-                    }else{
+                    }else if($row["tick_estado"]=="Cerrado"){
                         $output["tick_estado"] = '<span class="label label-pill label-default">Cerrado</span>';
+                    }else if($row["tick_estado"]=="En proceso"){
+                        $output["tick_estado"] = '<span class="label label-pill label-warning">En proceso</span>';
+                    }else if($row["tick_estado"]=="Pausado"){
+                        $output["tick_estado"] = '<span class="label label-pill label-primary">Pausado</span>';
                     }
 
                     $output["tick_estado_texto"] = $row["tick_estado"];

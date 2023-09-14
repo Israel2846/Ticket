@@ -155,8 +155,10 @@ if (isset($_SESSION["usu_id"])) {
               </div>
 
               <div class="col-lg-12">
-                <button type="button" id="btnenviar" class="btn btn-rounded btn-inline btn-primary">Enviar</button>
-                <button type="button" id="btncerrarticket" class="btn btn-rounded btn-inline btn-warning">Cerrar Ticket</button>
+                <button type="button" id="btnenviar" class="btn btn-rounded btn-inline btn-success">Enviar</button>
+                <button type="button" id="btnpausarticket" class="btn btn-rounded btn-inline btn-primary">Pausar Ticket</button>
+                <button type="button" id="btnreanudarticket" class="btn btn-rounded btn-inline btn-warning">Reanudar Ticket</button>
+                <button type="button" id="btncerrarticket" class="btn btn-rounded btn-inline btn-danger">Cerrar Ticket</button>
               </div>
           </div>
 			  </div>

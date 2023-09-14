@@ -6,6 +6,7 @@ $(document).ready(function(){
     var tick_id = getUrlParameter('ID');
 
     listardetalle(tick_id);
+    ocultar_mostrar_botón_pausar();
 
     /* TODO: Inicializamos summernotejs */
     $('#tickd_descrip').summernote({
@@ -171,6 +172,7 @@ function ver(id_tarea){
     window.location.href = 'http://localhost:80/gestor-de-tickets/view/DetalleTarea/?ID='+ id_tarea +'';
 }
 
+// Click del botón "Nueva tarea"
 $(document).on(
     "click",
     "#btnNuevaTarea",
@@ -205,6 +207,108 @@ $(document).on(
                 }
             }
         )
+    }
+)
+
+// Click del botón "Pausar ticket"
+$(document).on(
+    "click",
+    "#btnpausarticket",
+    function(){
+        swal({
+            title: "HelpDesk",
+            text: "Esta seguro de Pausar el Ticket?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonClass: "btn-warning",
+            confirmButtonText: "Si",
+            cancelButtonText: "No",
+            closeOnConfirm: false
+        },
+        function(isConfirm) {
+            if (isConfirm) {
+                console.log('confirmó')
+                var id_ticket = getUrlParameter('ID');
+                $.ajax(
+                    {
+                        url : '../../controller/ticket.php?op=pausar_ticket',
+                        type : 'POST',
+                        data : {
+                            tick_id : id_ticket,
+                        },
+                        success : function(data){
+                            console.log(data)
+                            if (data == 1) {
+                                $('#btnpausarticket').hide();
+                                $('#btnreanudarticket').show();
+                                swal({
+                                    title: "HelpDesk!",
+                                    text: "Tarea pausada con exito",
+                                    type: "success",
+                                    confirmButtonClass: "btn-primary"
+                                })
+                            } else {
+                                console.log(data);
+                            }
+                        },
+                        error : function(error){
+                            console.log(error)
+                        }
+                    }
+                )
+            }
+        })
+    }
+)
+
+// Reanudar ticket
+$(document).on(
+    "click",
+    "#btnreanudarticket",
+    function(){
+        swal({
+            title: "HelpDesk",
+            text: "Esta seguro de Reanudar el Ticket?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonClass: "btn-warning",
+            confirmButtonText: "Si",
+            cancelButtonText: "No",
+            closeOnConfirm: false
+        },
+        function(isConfirm) {
+            if (isConfirm) {
+                console.log('confirmó')
+                var id_ticket = getUrlParameter('ID');
+                $.ajax(
+                    {
+                        url : '../../controller/ticket.php?op=reanudar_ticket',
+                        type : 'POST',
+                        data : {
+                            tick_id : id_ticket,
+                        },
+                        success : function(data){
+                            console.log(data)
+                            if (data == 1) {
+                                $('#btnpausarticket').show();
+                                $('#btnreanudarticket').hide();
+                                swal({
+                                    title: "HelpDesk!",
+                                    text: "Tarea reanudada con exito",
+                                    type: "success",
+                                    confirmButtonClass: "btn-primary"
+                                })
+                            } else {
+                                console.log(data);
+                            }
+                        },
+                        error : function(error){
+                            console.log(error)
+                        }
+                    }
+                )
+            }
+        })
     }
 )
 
@@ -315,6 +419,7 @@ function listardetalle(tick_id){
     /* TODO: Mostramos informacion del ticket en inputs */
     $.post("../../controller/ticket.php?op=mostrar", { tick_id : tick_id }, function (data) {
         data = JSON.parse(data);
+        console.log(data);
         $('#lblestado').html(data.tick_estado);
         $('#lblnomusuario').html(data.usu_nom +' '+data.usu_ape);
         $('#lblfechcrea').html(data.fech_crea);
@@ -333,6 +438,27 @@ function listardetalle(tick_id){
             $('#pnldetalle').hide();
         }
     });
+}
+
+// Listar detalle 
+function ocultar_mostrar_botón_pausar(){
+    var id_ticket = getUrlParameter('ID');
+
+    $.post(
+        "../../controller/ticket.php?op=obtener_ticket",
+        {
+            tick_id : id_ticket
+        },
+        function(data){
+            data = JSON.parse(data);
+            console.log(data.tick_estado);
+            if (data.tick_estado != 'Pausado') {
+                $('#btnreanudarticket').hide();
+            } else {
+                $('#btnpausarticket').hide();
+            }
+        }
+    )
 }
 
 init();

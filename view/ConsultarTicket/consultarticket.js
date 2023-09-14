@@ -65,6 +65,9 @@ $(document).ready(function(){
                             case 'En proceso':
                                 html_estado = '<span class="label label-pill label-warning">'+ cellData +'</span>'
                                 break;
+                            case 'Pausado':
+                                html_estado = '<span class="label label-pill label-primary">'+ cellData +'</span>'
+                                break;
                             case 'Cerrado':
                                 html_estado = '<span class="label label-pill label-danger">'+ cellData +'</span>'
                                 break;

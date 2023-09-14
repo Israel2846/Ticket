@@ -10,6 +10,70 @@
             return $resultado = $sql->fetchAll();
         }
 
+        // Obtener solo un registro
+        public function get_one_ticket($id_ticket){
+            $conectar = parent::conexion();
+            parent::set_names();
+            $sql = "SELECT * FROM tm_ticket where tick_id = ?";
+            $sql = $conectar->prepare($sql);
+            $sql->bindValue(1, $id_ticket);
+            $sql->execute();
+            return $sql->fetch();
+        }
+
+        // Pausar ticket
+        public function pause_ticket($id_ticket){
+            try {
+                $conectar = parent::conexion();
+                parent::set_names();
+
+                // Cambiar estado del ticket a Pausado
+                $sql = "UPDATE tm_ticket SET tm_ticket.tick_estado = 'Pausado' WHERE tm_ticket.tick_id = ?";
+                $sql = $conectar->prepare($sql);
+                $sql->bindParam(1, $id_ticket);
+                $sql->execute();
+
+                // Insertar registro con fecha en la que fue pausado
+                $sql2 = "INSERT INTO td_pausas_ticket (td_pausas_ticket.id_ticket, td_pausas_ticket.fecha_pausa) 
+                        VALUES (?, now())";
+                $sql2 = $conectar->prepare($sql2);
+                $sql2->bindParam(1, $id_ticket);
+                $sql2->execute();
+                return true;
+            } catch (Exception $e) {
+                return $e->getMessage();
+            }
+        }
+
+        // Reanudar ticket
+        public function resume_ticket($id_ticket){
+            try {
+                $conectar = parent::conexion();
+                parent::set_names();
+
+                // Cambiar estado del ticket a En proceso
+                $sql = "UPDATE tm_ticket SET tm_ticket.tick_estado = 'En proceso' WHERE tm_ticket.tick_id = ?";
+                $sql = $conectar->prepare($sql);
+                $sql->bindParam(1, $id_ticket);
+                $sql->execute();
+
+                // Actualizar el proceso de pausado con la fecha de reanudado
+                $sql2 = "UPDATE td_pausas_ticket
+                        SET td_pausas_ticket.fecha_reanuda = now()
+                        WHERE td_pausas_ticket.pausas_ticket_id = (
+                            SELECT MAX(td_pausas_ticket.pausas_ticket_id)
+                            FROM td_pausas_ticket
+                            WHERE td_pausas_ticket.id_ticket = ?
+                        )";
+                $sql2 = $conectar->prepare($sql2);
+                $sql2->bindParam(1, $id_ticket);
+                $sql2->execute();
+                echo true;
+            } catch (Exception $e) {
+                echo $e->getMessage();
+            }
+        }
+
         /* TODO: insertar nuevo ticket */
         public function insert_ticket($usu_id,$cat_id,$cats_id,$tick_titulo,$tick_descrip,$prio_id){
             $conectar= parent::conexion();
