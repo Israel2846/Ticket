@@ -42,6 +42,18 @@
             echo json_encode($datos);
             break;
 
+        // Listar tickets pausados
+        case "listar_ticket_pausado":
+            $datos = $ticket->listar_ticket_pausados();
+            echo json_encode($datos);
+            break;
+
+        // Listar tickets cerrados
+        case "listar_ticket_cerrado":
+            $datos = $ticket->listar_ticket_cerrado();
+            echo json_encode($datos);
+            break;
+
         // Combo de tickets
         case "combo":
             $datos = $ticket->get_ticket();
