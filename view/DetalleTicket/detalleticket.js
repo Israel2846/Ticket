@@ -213,8 +213,6 @@ $(document).on(
                                             success : function(data){
                                                 console.log(data)
                                                 if (data == 1) {
-                                                    $('#btnpausarticket').hide();
-                                                    $('#btnreanudarticket').show();
                                                     swal({
                                                         title: "HelpDesk!",
                                                         text: "Tareas cerradas con exito",
@@ -281,7 +279,7 @@ $(document).on(
                                 $('#btnNuevaTarea').hide();
                                 swal({
                                     title: "HelpDesk!",
-                                    text: "Tarea pausada con exito",
+                                    text: "Ticket pausado con exito",
                                     type: "success",
                                     confirmButtonClass: "btn-primary"
                                 })
@@ -333,7 +331,7 @@ $(document).on(
                                 $('#btnNuevaTarea').show();
                                 swal({
                                     title: "HelpDesk!",
-                                    text: "Tarea reanudada con exito",
+                                    text: "Ticket reanudado con exito",
                                     type: "success",
                                     confirmButtonClass: "btn-primary"
                                 })
