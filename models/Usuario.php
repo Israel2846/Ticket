@@ -36,23 +36,25 @@
         }
 
         /* TODO:Insert */
-        public function insert_usuario($usu_nom,$usu_ape,$usu_correo,$usu_pass,$rol_id,$usu_telf){
+        public function insert_usuario($usu_nom,$usu_ape,$usu_correo,$usu_pass,$usu_almacen,$usu_area,$rol_id,$usu_telf){
             $conectar= parent::conexion();
             parent::set_names();
-            $sql="INSERT INTO tm_usuario (usu_id, usu_nom, usu_ape, usu_correo, usu_pass, rol_id, usu_telf, fech_crea, fech_modi, fech_elim, est) VALUES (NULL,?,?,?,MD5(?),?,?,now(), NULL, NULL, '1');";
+            $sql="INSERT INTO tm_usuario (usu_id, usu_nom, usu_ape, usu_correo, usu_pass, usu_almacen, usu_area, rol_id, usu_telf, fech_crea, fech_modi, fech_elim, est) VALUES (NULL,?,?,?,MD5(?),?,?,?,?,now(), NULL, NULL, '1');";
             $sql=$conectar->prepare($sql);
             $sql->bindValue(1, $usu_nom);
             $sql->bindValue(2, $usu_ape);
             $sql->bindValue(3, $usu_correo);
             $sql->bindValue(4, $usu_pass);
-            $sql->bindValue(5, $rol_id);
-            $sql->bindValue(6, $usu_telf);
+            $sql->bindValue(5, $usu_almacen);
+            $sql->bindValue(6, $usu_area);
+            $sql->bindValue(7, $rol_id);
+            $sql->bindValue(8, $usu_telf);
             $sql->execute();
             return $resultado=$sql->fetchAll();
         }
 
         /* TODO:Update */
-        public function update_usuario($usu_id,$usu_nom,$usu_ape,$usu_correo,$usu_pass,$rol_id,$usu_telf){
+        public function update_usuario($usu_id,$usu_nom,$usu_ape,$usu_correo,$usu_pass,$usu_almacen,$usu_area,$rol_id,$usu_telf){
             $conectar= parent::conexion();
             parent::set_names();
             $sql="UPDATE tm_usuario set
@@ -60,19 +62,23 @@
                 usu_ape = ?,
                 usu_correo = ?,
                 usu_pass = ?,
+                usu_alamcen = ?,
+                usu_area = ?,
                 rol_id = ?,
                 usu_telf = ?
                 WHERE
                 usu_id = ?";
-            $sql=$conectar->prepare($sql);
-            $sql->bindValue(1, $usu_nom);
-            $sql->bindValue(2, $usu_ape);
-            $sql->bindValue(3, $usu_correo);
-            $sql->bindValue(4, $usu_pass);
-            $sql->bindValue(5, $rol_id);
-            $sql->bindValue(6, $usu_telf);
-            $sql->bindValue(7, $usu_id);
-            $sql->execute();
+             $sql=$conectar->prepare($sql);
+             $sql->bindValue(1, $usu_nom);
+             $sql->bindValue(2, $usu_ape);
+             $sql->bindValue(3, $usu_correo);
+             $sql->bindValue(4, $usu_pass);
+             $sql->bindValue(5, $usu_almacen);
+             $sql->bindValue(5, $usu_area);
+             $sql->bindValue(7, $rol_id);
+             $sql->bindValue(8, $usu_telf);
+             $sql->bindValue(9, $usu_id);
+             $sql->execute();
             return $resultado=$sql->fetchAll();
         }
 
@@ -186,5 +192,31 @@
             return $resultado=$sql->fetchAll();
         }
 
+        public function combo_almacen(){
+            try {
+                $conectar = parent::conexion();
+                parent::set_names();
+                $sql = "SELECT * FROM tm_almacen";
+                $sql = $conectar->prepare($sql);
+                $sql->execute();
+                return $sql->fetchAll();
+            } catch (Exception $e) {
+                return $e->getMessage();
+            }
+        }
+
+        public function combo_area($id_almacen){
+            try {
+                $conectar = parent::conexion();
+                parent::set_names();
+                $sql = "SELECT * FROM tm_area_almacen WHERE tm_area_almacen.id_almacen = ?";
+                $sql = $conectar->prepare($sql);
+                $sql->bindParam(1, $id_almacen);
+                $sql->execute();
+                return $sql->fetchAll();
+            } catch (Exception $e) {
+                return $e->getMessage();
+            }
+        }
     }
 ?>

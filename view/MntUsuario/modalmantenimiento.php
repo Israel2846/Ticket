@@ -32,6 +32,20 @@
                     </div>
 
                     <div class="form-group">
+                        <label class="form-label" for="usu_almacen">Almacen</label>
+                        <select class="select2" id="usu_almacen" name="usu_almacen">
+                            
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="usu_area">Area</label>
+                        <select class="select2" id="usu_area" name="usu_area">
+                            
+                        </select>
+                    </div>
+
+                    <div class="form-group">
                         <label class="form-label" for="rol_id">Rol</label>
                         <select class="select2" id="rol_id" name="rol_id">
                             <option value="1">Usuario</option>

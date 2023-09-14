@@ -7,13 +7,40 @@
 
     /*TODO: opciones del controlador Categoria*/
     switch($_GET["op"]){
+
+        // Llenar combo Almacen
+        case "combo_almacen":
+            $datos = $usuario->combo_almacen();
+            if(is_array($datos)==true and count($datos)>0){
+                $html.= "<option label='Seleccionar'></option>";
+                foreach($datos as $row)
+                {
+                    $html.= "<option value='".$row['id_almacen']."'>".$row['nombre_almacen']."</option>";
+                }
+                echo $html;
+            }
+            break;
+
+        // Llenar combo Area
+        case "combo_area":
+            $datos = $usuario->combo_area($_POST['id_almacen']);
+            if(is_array($datos)==true and count($datos)>0){
+                $html.= "<option label='Seleccionar'></option>";
+                foreach($datos as $row)
+                {
+                    $html.= "<option value='".$row['id_almacen']."'>".$row['nombre_area']."</option>";
+                }
+                echo $html;
+            }
+            break;
+
         /* TODO: Guardar y editar, guardar si el campo usu_id esta vacio */
         case "guardaryeditar":
             if(empty($_POST["usu_id"])){       
-                $usuario->insert_usuario($_POST["usu_nom"],$_POST["usu_ape"],$_POST["usu_correo"],$_POST["usu_pass"],$_POST["rol_id"],$_POST["usu_telf"]);     
+                $usuario->insert_usuario($_POST["usu_nom"],$_POST["usu_ape"],$_POST["usu_correo"],$_POST["usu_pass"],$_POST["usu_almacen"],$_POST["usu_area"],$_POST["rol_id"],$_POST["usu_telf"]);     
             }
             else {
-                $usuario->update_usuario($_POST["usu_id"],$_POST["usu_nom"],$_POST["usu_ape"],$_POST["usu_correo"],$_POST["usu_pass"],$_POST["rol_id"],$_POST["usu_telf"]);
+                $usuario->update_usuario($_POST["usu_id"],$_POST["usu_nom"],$_POST["usu_ape"],$_POST["usu_correo"],$_POST["usu_pass"],$_POST["usu_almacen"],$_POST["usu_area"],$_POST["rol_id"],$_POST["usu_telf"]);
             }
             break;
 
@@ -23,10 +50,13 @@
             $data= Array();
             foreach($datos as $row){
                 $sub_array = array();
+                $sub_array[] = $row["usu_id"];
                 $sub_array[] = $row["usu_nom"];
                 $sub_array[] = $row["usu_ape"];
                 $sub_array[] = $row["usu_correo"];
                 $sub_array[] = $row["usu_pass"];
+                $sub_array[] = $row["usu_almacen"];
+                $sub_array[] = $row["usu_area"];
 
                 if ($row["rol_id"]=="1"){
                     $sub_array[] = '<span class="label label-pill label-success">Usuario</span>';
@@ -63,6 +93,8 @@
                     $output["usu_ape"] = $row["usu_ape"];
                     $output["usu_correo"] = $row["usu_correo"];
                     $output["usu_pass"] = $row["usu_pass"];
+                    $output["usu_almacen"] = $row["usu_almacen"];
+                    $output["usu_area"] = $row["usu_area"];
                     $output["rol_id"] = $row["rol_id"];
                     $output["usu_telf"] = $row["usu_telf"];
                 }

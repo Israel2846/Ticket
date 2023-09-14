@@ -35,6 +35,29 @@ function guardaryeditar(e){
 }
 
 $(document).ready(function(){
+    // Llenar combo Almacen
+    $.post("../../controller/usuario.php?op=combo_almacen",
+        function(data, status){
+            console.log(data);
+            $('#usu_almacen').html(data);
+        }
+    );
+
+    $('#usu_almacen').change(
+        function(){
+            id_almacen = $(this).val();
+            $.post("../../controller/usuario.php?op=combo_area",
+                {
+                    id_almacen : id_almacen
+                },
+                function(data, status){
+                    console.log(data);
+                    $('#usu_area').html(data);
+                }
+            );
+        }
+    )
+
     tabla=$('#usuario_data').dataTable({
         "aProcessing": true,
         "aServerSide": true,
@@ -100,6 +123,8 @@ function editar(usu_id){
         $('#usu_ape').val(data.usu_ape);
         $('#usu_correo').val(data.usu_correo);
         $('#usu_pass').val(data.usu_pass);
+        $('#usu_almacen').val(data.usu_almacen);
+        $('#usu_area').val(data.usu_area);
         $('#rol_id').val(data.rol_id).trigger('change');
         $('#usu_telf').val(data.usu_telf);
     }); 
