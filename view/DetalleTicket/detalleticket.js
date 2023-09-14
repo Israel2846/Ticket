@@ -163,7 +163,8 @@ $(document).ready(function(){
                     $(cell).html('<button type="button" onClick="ver(' + rowData.id_tarea + ');"  id="' + rowData.id_tarea + '" class="btn btn-inline btn-primary btn-sm ladda-button"><i class="fa fa-eye"></i></button>');
                 }
             },
-        ]
+        ],
+        order : [],
     })
 });
 

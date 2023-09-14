@@ -55,8 +55,8 @@
                 $sub_array[] = $row["usu_ape"];
                 $sub_array[] = $row["usu_correo"];
                 $sub_array[] = $row["usu_pass"];
-                $sub_array[] = $row["usu_almacen"];
-                $sub_array[] = $row["usu_area"];
+                $sub_array[] = $row["nombre_almacen"];
+                $sub_array[] = $row["nombre_area"];
 
                 if ($row["rol_id"]=="1"){
                     $sub_array[] = '<span class="label label-pill label-success">Usuario</span>';

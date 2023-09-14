@@ -64,7 +64,8 @@ class Tarea extends Conectar{
                             (TIMESTAMPDIFF(MINUTE, tm_tarea.fecha_creacion, tm_tarea.fecha_finalizacion) % 60), ' Minutos '
                         ) AS tiempo_finalizacion
                     FROM tm_tarea
-                    WHERE tm_tarea.id_ticket = ?";
+                    WHERE tm_tarea.id_ticket = ?
+                    ORDER BY tm_tarea.fecha_creacion DESC";
             $sql = $conectar->prepare($sql);
             $sql->bindValue(1, $id_ticket);
             $sql->execute();
