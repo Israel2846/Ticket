@@ -35,8 +35,13 @@ switch($_GET["op"]){
         $tarea->close_tarea($_POST['id_tarea']);
         break;
 
+    case "cerrar_tarea_por_modal":
+        $respuesta = $tarea->close_tareas_x_modal($_POST['id_usuario']);
+        echo $respuesta;
+        break;
+
     case "tareas_abiertas":
-        $datos = $tarea->count_tareas_abiertas($_POST['id_usuario'], $_POST['id_ticket']);
+        $datos = $tarea->count_tareas_abiertas($_POST['id_usuario']);
         echo json_encode($datos);
         break;
 }

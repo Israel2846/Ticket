@@ -186,17 +186,53 @@ $(document).on(
                 type : 'POST',
                 data : {
                     id_usuario : id_usuario,
-                    id_ticket : id_ticket,
                 },
                 success : function(data){
                     data = JSON.parse(data)
                     if (data.tareas_abiertas >= 1) {
-                        swal({
-                            title: "HelpDesk!",
-                            text: "Necesitas cerrar tus tareas antes de crear una nueva",
-                            type: "warning",
-                            confirmButtonClass: "btn-primary"
-                        })
+                        swal(
+                            {
+                                title: "HelpDesk!",
+                                text: "Necesitas cerrar tus tareas antes de crear una nueva",
+                                type: "warning",
+                                showCancelButton: true,
+                                confirmButtonClass: "btn-primary",
+                                confirmButtonText: "Cerrar tareas",
+                                cancelButtonText: "Cancelar",
+                                closeOnConfirm: false
+                            },
+                            function(isConfirm){
+                                if (isConfirm) {
+                                    $.ajax(
+                                        {
+                                            url : '../../controller/tarea.php?op=cerrar_tarea_por_modal',
+                                            type : 'POST',
+                                            data : {
+                                                id_usuario : id_usuario,
+                                            },
+                                            success : function(data){
+                                                console.log(data)
+                                                if (data == 1) {
+                                                    $('#btnpausarticket').hide();
+                                                    $('#btnreanudarticket').show();
+                                                    swal({
+                                                        title: "HelpDesk!",
+                                                        text: "Tareas cerradas con exito",
+                                                        type: "success",
+                                                        confirmButtonClass: "btn-primary"
+                                                    })
+                                                } else {
+                                                    console.log(data);
+                                                }
+                                            },
+                                            error : function(error){
+                                                console.log(error)
+                                            }
+                                        }
+                                    )
+                                }
+                            }
+                        )
                     } else if(data.tareas_abiertas === 0){
                         window.location.href = 'http://localhost:80/gestor-de-tickets/view/NuevaTarea/?ID='+ id_ticket +'';
                     } else {
@@ -242,6 +278,7 @@ $(document).on(
                             if (data == 1) {
                                 $('#btnpausarticket').hide();
                                 $('#btnreanudarticket').show();
+                                $('#btnNuevaTarea').hide();
                                 swal({
                                     title: "HelpDesk!",
                                     text: "Tarea pausada con exito",
@@ -293,6 +330,7 @@ $(document).on(
                             if (data == 1) {
                                 $('#btnpausarticket').show();
                                 $('#btnreanudarticket').hide();
+                                $('#btnNuevaTarea').show();
                                 swal({
                                     title: "HelpDesk!",
                                     text: "Tarea reanudada con exito",
@@ -437,6 +475,10 @@ function listardetalle(tick_id){
         if (data.tick_estado_texto == "Cerrado"){
             /* TODO: Ocultamos panel de detalle */
             $('#pnldetalle').hide();
+        }
+        if (data.tick_estado_texto == "Cerrado" || data.tick_estado_texto == "Pausado"){
+            /* TODO: Ocultamos panel de detalle */
+            $('#btnNuevaTarea').hide();
         }
     });
 }

@@ -133,16 +133,37 @@ class Tarea extends Conectar{
         }
     }
 
-    public function count_tareas_abiertas($id_usuario, $id_ticket){
+    public function close_tareas_x_modal($id_usuario){
+        try {
+            $conectar = parent::conexion();
+            parent::set_names();
+            $sql = "UPDATE tm_tarea SET 
+                        tm_tarea.estado_tarea = 0,
+                        tm_tarea.fecha_finalizacion = CURRENT_TIMESTAMP 
+                    WHERE tm_tarea.id_tarea = (
+                            SELECT tm_tarea.id_tarea
+                            FROM tm_tarea
+                            WHERE tm_tarea.id_usuario = ? AND tm_tarea.estado_tarea = 1
+                        )";
+            $sql = $conectar->prepare($sql);
+            $sql->bindValue(1, $id_usuario);
+            $sql->execute();
+            echo true;
+        } catch (Exception $e) {
+            echo "Error: " . $e->getMessage();
+            return false;
+        }
+    }
+
+    public function count_tareas_abiertas($id_usuario){
         try {
             $conectar = parent::conexion();
             parent::set_names();
             $sql = "SELECT COUNT(*) AS tareas_abiertas
                     FROM tm_tarea
-                    WHERE tm_tarea.estado_tarea = 1 AND tm_tarea.id_ticket = ? AND tm_tarea.id_usuario = ? ;";
+                    WHERE tm_tarea.estado_tarea = 1 AND tm_tarea.id_usuario = ? ;";
             $sql = $conectar->prepare($sql);
-            $sql->bindValue(1, $id_ticket);
-            $sql->bindValue(2, $id_usuario);
+            $sql->bindValue(1, $id_usuario);
             $sql->execute();
             return $sql->fetch();
         } catch (Exception $e) {
