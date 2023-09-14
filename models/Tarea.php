@@ -148,4 +148,33 @@ class Tarea extends Conectar{
             return $e->getMessage();
         }
     }
+
+    // Insertar detalle de tarea
+    public function insert_tarea_detalle($id_tarea, $id_usuario, $descripcion_tarea){
+        try {
+            $conectar = parent::conexion();
+            parent::set_names();
+    
+            $sql = "INSERT INTO td_tareadetalle(
+                        tarea_id,
+                        usu_id,
+                        tarea_desc,
+                        fecha_crea,
+                        est) 
+                    VALUES (?,?,?, now(), 1)";
+
+            $sql = $conectar->prepare($sql);
+            $sql->bindParam(1, $id_tarea);
+            $sql->bindParam(2, $id_usuario);
+            $sql->bindParam(3, $descripcion_tarea);
+            $sql->execute();
+
+            $sql2 = "SELECT last_insert_id() as 'tarea_detalle_id'";
+            $sql2 = $conectar->prepare($sql2);
+            $sql2->execute();
+            return $sql2->fetchAll(pdo::FETCH_ASSOC);
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
 }
