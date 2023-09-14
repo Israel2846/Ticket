@@ -98,6 +98,17 @@ $(document).ready(function(){
             ]
         })
     }else{
+        setInterval(function(){
+            console.log('Recarga datatables');
+            /* TODO:Recargar Datatable abierto JS */
+            $('#ticket_abierto').DataTable().ajax.reload();
+            // Recargar datatable en proceso
+            $('#ticket_en_proceso').DataTable().ajax.reload();
+            // Recargar datatable pausado
+            $('#ticket_pausado').DataTable().ajax.reload();
+            // Recargar datatable cerrado
+            $('#ticket_cerrado').DataTable().ajax.reload();
+        }, 1000);
         $('#tabla_usuario_normal').hide();
         datatable_abiertos();
         datatable_en_proceso();
@@ -150,7 +161,7 @@ function guardar(e){
 
             /* TODO: Ocultar Modal */
             $("#modalasignar").modal('hide');
-            /* TODO:Recargar Datatable JS */
+            /* TODO:Recargar Datatable abierto JS */
             $('#ticket_abierto').DataTable().ajax.reload();
             // Recargar datatable en proceso
             $('#ticket_en_proceso').DataTable().ajax.reload();
@@ -412,7 +423,6 @@ function datatable_cerrado(){
                 { "data": "fech_crea" },
                 { "data": "fech_asig" },
                 { "data": "timeresp" },
-                { "data": "timetransc" },
                 { "data": "tiempototal" },
                 { "data": "fech_cierre" },
                 { 
