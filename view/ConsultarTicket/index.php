@@ -1,6 +1,6 @@
 <?php
   require_once("../../config/conexion.php"); 
-  if(isset($_SESSION["usu_id"])){ 
+//   if(isset($_SESSION["usu_id"])){ 
 ?>
 <!DOCTYPE html>
 <html>
@@ -188,7 +188,7 @@
 </body>
 </html>
 <?php
-  } else {
+  /* } else {
     header("Location:".Conectar::ruta()."index.php");
-  }
+  } */
 ?>

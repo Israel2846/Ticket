@@ -13,8 +13,11 @@
                 $sql_rol->bindParam(1, $correo);
                 $sql_rol->bindParam(2, $pass);
                 $sql_rol->execute();
-                $rol = $sql_rol->fetch();
-                $rol = $_POST["rol_id"];
+                $resultado = $sql_rol->fetch();
+                if (is_array($resultado) and count($resultado) > 0) {
+                    $rol = $resultado["rol_id"];
+                }
+                // $rol = $_POST["rol_id"];
                 if(empty($correo) and empty($pass)){
                     header("Location:".conectar::ruta()."index.php?m=2");
 					exit();
