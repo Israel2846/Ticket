@@ -8,6 +8,12 @@
             if(isset($_POST["enviar"])){
                 $correo = $_POST["usu_correo"];
                 $pass = $_POST["usu_pass"];
+                $sql_rol = "SELECT tm_usuario.rol_id FROM tm_usuario where tm_usuario.usu_correo = ? AND tm_usuario.usu_pass = MD5(?)";
+                $sql_rol = $conectar->prepare($sql_rol);
+                $sql_rol->bindParam(1, $correo);
+                $sql_rol->bindParam(2, $pass);
+                $sql_rol->execute();
+                $rol = $sql_rol->fetch();
                 $rol = $_POST["rol_id"];
                 if(empty($correo) and empty($pass)){
                     header("Location:".conectar::ruta()."index.php?m=2");

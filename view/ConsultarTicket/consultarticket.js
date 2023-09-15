@@ -98,7 +98,7 @@ $(document).ready(function(){
             ],
             order : []
         })
-    }else{
+    }else if(rol_id==2){
         setInterval(function(){
             console.log('Recarga datatables');
             /* TODO:Recargar Datatable abierto JS */
@@ -115,6 +115,8 @@ $(document).ready(function(){
         datatable_en_proceso();
         datatable_pausado();
         datatable_cerrado();
+    } else {
+        console.log('Usuario con rol 3')
     }
 });
 
