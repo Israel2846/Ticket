@@ -233,8 +233,6 @@ $(document).on(
                         )
                     } else if(data.tareas_abiertas === 0){
                         window.location.href = 'http://localhost:80/gestor-de-tickets/view/NuevaTarea/?ID='+ id_ticket +'';
-                    } else {
-                        console.log("Error");
                     }
                 },
                 error : function(error){

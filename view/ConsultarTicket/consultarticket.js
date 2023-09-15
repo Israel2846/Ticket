@@ -95,7 +95,8 @@ $(document).ready(function(){
                         $(cell).html('<button type="button" onClick="ver(' + rowData.tick_id + ');"  id="' + rowData.tick_id + '" class="btn btn-inline btn-primary btn-sm ladda-button"><i class="fa fa-eye"></i></button>');
                     }
                 },
-            ]
+            ],
+            order : []
         })
     }else{
         setInterval(function(){
