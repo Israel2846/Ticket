@@ -19,9 +19,16 @@
                     </li>
 
                     <li class="blue-dirty">
+                        <a href="..\MisTickets\">
+                            <span class="glyphicon glyphicon-th"></span>
+                            <span class="lbl">Mis Tickets</span>
+                        </a>
+                    </li>
+
+                    <li class="blue-dirty">
                         <a href="..\ConsultarTicket\">
                             <span class="glyphicon glyphicon-th"></span>
-                            <span class="lbl">Consultar Ticket</span>
+                            <span class="lbl">Todos los Tickets</span>
                         </a>
                     </li>
                 </ul>

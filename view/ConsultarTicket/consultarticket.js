@@ -25,99 +25,23 @@ $(document).ready(function(){
     $.post("../../controller/usuario.php?op=combo", function (data) {
         $('#usu_asig').html(data);
     });
-
-    /* TODO: rol si es 1 entonces es usuario */
-    if (rol_id==1){
-        console.log("entró");
-        $('#viewuser').hide();
-        $('#tabla_tickets_abiertos').hide();
-        $('#tabla_tickets_en_proceso').hide();
-        $('#tabla_tickets_pausados').hide();
-        $('#tabla_tickets_cerrados').hide();
-        $('#ticket_usuario_normal').DataTable({
-            "ajax":{
-                url: '../../controller/ticket.php?op=listar_x_usu',
-                type : 'post',
-                data : {
-                    usu_id : usu_id
-                },
-                dataType: "json",
-                error: function(e){
-                    console.log(e.responseText);
-                },
-                "dataSrc": ""
-            },
-            "columns": [
-                { "data": "tick_id" },
-                { "data": "cat_nom" },
-                { "data": "tick_titulo" },
-                { 
-                    "data": "prio_nom",
-                    createdCell : function(cell, cellData){
-                        $(cell).html('<span class="label label-pill label-warning">'+ cellData +'</span>')
-                    }
-                },
-                { 
-                    "data": "tick_estado",
-                    createdCell : function(cell, cellData){
-                        switch (cellData) {
-                            case 'Abierto':
-                                html_estado = '<span class="label label-pill label-success">'+ cellData +'</span>'
-                                break;
-                            case 'En proceso':
-                                html_estado = '<span class="label label-pill label-warning">'+ cellData +'</span>'
-                                break;
-                            case 'Pausado':
-                                html_estado = '<span class="label label-pill label-primary">'+ cellData +'</span>'
-                                break;
-                            case 'Cerrado':
-                                html_estado = '<span class="label label-pill label-danger">'+ cellData +'</span>'
-                                break;
-                        }
-                        $(cell).html(html_estado)
-                    }
-                },
-                { "data": "fech_crea" },
-                { "data": "fech_asig" },
-                { "data": "fech_asig" },
-                { "data": "fech_asig" },
-                { "data": "fech_asig" },
-                { "data": "fech_cierre" },
-                { 
-                    "data": "usu_nom",
-                    createdCell: function(cell, cellData){
-                        $(cell).html('<span class="label label-pill label-success">'+ cellData +'</span>')
-                    }
-                },
-                { 
-                    "data": "tick_id",
-                    createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                        $(cell).html('<button type="button" onClick="ver(' + rowData.tick_id + ');"  id="' + rowData.tick_id + '" class="btn btn-inline btn-primary btn-sm ladda-button"><i class="fa fa-eye"></i></button>');
-                    }
-                },
-            ],
-            order : []
-        })
-    }else if(rol_id==2){
-        setInterval(function(){
-            console.log('Recarga datatables');
-            /* TODO:Recargar Datatable abierto JS */
-            $('#ticket_abierto').DataTable().ajax.reload();
-            // Recargar datatable en proceso
-            $('#ticket_en_proceso').DataTable().ajax.reload();
-            // Recargar datatable pausado
-            $('#ticket_pausado').DataTable().ajax.reload();
-            // Recargar datatable cerrado
-            $('#ticket_cerrado').DataTable().ajax.reload();
-        }, 1000);
-        $('#tabla_usuario_normal').hide();
-        datatable_abiertos();
-        datatable_en_proceso();
-        datatable_pausado();
-        datatable_cerrado();
-    } else {
-        console.log('Usuario con rol 3')
-    }
+    
+    setInterval(function(){
+        console.log('Recarga datatables');
+        /* TODO:Recargar Datatable abierto JS */
+        $('#ticket_abierto').DataTable().ajax.reload();
+        // Recargar datatable en proceso
+        $('#ticket_en_proceso').DataTable().ajax.reload();
+        // Recargar datatable pausado
+        $('#ticket_pausado').DataTable().ajax.reload();
+        // Recargar datatable cerrado
+        $('#ticket_cerrado').DataTable().ajax.reload();
+    }, 1000);
+    $('#tabla_usuario_normal').hide();
+    datatable_abiertos();
+    datatable_en_proceso();
+    datatable_pausado();
+    datatable_cerrado();
 });
 
 /* TODO: Link para poder ver el detalle de ticket en otra ventana */
