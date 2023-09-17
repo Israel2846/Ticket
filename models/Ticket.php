@@ -22,7 +22,7 @@
         }
 
         // Pausar ticket
-        public function pause_ticket($id_ticket){
+        public function pause_ticket($id_ticket, $id_usuario){
             try {
                 $conectar = parent::conexion();
                 parent::set_names();
@@ -34,10 +34,11 @@
                 $sql->execute();
 
                 // Insertar registro con fecha en la que fue pausado
-                $sql2 = "INSERT INTO td_pausas_ticket (td_pausas_ticket.id_ticket, td_pausas_ticket.fecha_pausa) 
-                        VALUES (?, now())";
+                $sql2 = "INSERT INTO td_pausas_ticket (td_pausas_ticket.id_ticket, td_pausas_ticket.id_usuario, td_pausas_ticket.fecha_pausa) 
+                        VALUES (?, ?, now())";
                 $sql2 = $conectar->prepare($sql2);
                 $sql2->bindParam(1, $id_ticket);
+                $sql2->bindParam(2, $id_usuario);
                 $sql2->execute();
                 return true;
             } catch (Exception $e) {

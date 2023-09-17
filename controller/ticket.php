@@ -15,7 +15,7 @@
     switch($_GET["op"]){
         // Pausar ticket
         case 'pausar_ticket':
-            $resultado = $ticket->pause_ticket($_POST['tick_id']);
+            $resultado = $ticket->pause_ticket($_POST['tick_id'], $_POST['id_usuario']);
             echo $resultado;
             break;
 

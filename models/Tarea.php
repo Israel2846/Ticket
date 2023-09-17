@@ -137,17 +137,28 @@ class Tarea extends Conectar{
         try {
             $conectar = parent::conexion();
             parent::set_names();
-            $sql = "UPDATE tm_tarea SET 
+            $sql = "INSERT INTO td_pausas_ticket (td_pausas_ticket.id_ticket, td_pausas_ticket.id_usuario, td_pausas_ticket.fecha_pausa) 
+                    VALUES ((SELECT tm_tarea.id_ticket FROM tm_tarea WHERE tm_tarea.estado_tarea = 1 AND tm_tarea.id_usuario = ? limit 1), ?, now())";
+            $sql = $conectar->prepare($sql);
+            $sql->bindValue(1, $id_usuario);
+            $sql->bindValue(2, $id_usuario);
+            $sql->execute();
+            
+            $sql2 = "UPDATE tm_tarea 
+                    INNER JOIN tm_ticket ON tm_ticket.tick_id = tm_tarea.id_ticket
+                    SET 
                         tm_tarea.estado_tarea = 0,
-                        tm_tarea.fecha_finalizacion = CURRENT_TIMESTAMP 
+                        tm_tarea.fecha_finalizacion = CURRENT_TIMESTAMP ,
+                        tm_ticket.tick_estado = 'Pausado'
                     WHERE tm_tarea.id_tarea = (
                             SELECT tm_tarea.id_tarea
                             FROM tm_tarea
                             WHERE tm_tarea.id_usuario = ? AND tm_tarea.estado_tarea = 1
                         )";
-            $sql = $conectar->prepare($sql);
-            $sql->bindValue(1, $id_usuario);
-            $sql->execute();
+            $sql2 = $conectar->prepare($sql2);
+            $sql2->bindValue(1, $id_usuario);
+            $sql2->execute();
+
             echo true;
         } catch (Exception $e) {
             echo "Error: " . $e->getMessage();

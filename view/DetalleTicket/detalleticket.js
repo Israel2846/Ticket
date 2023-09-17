@@ -262,12 +262,14 @@ $(document).on(
             if (isConfirm) {
                 console.log('confirmó')
                 var id_ticket = getUrlParameter('ID');
+                var id_usuario = $('#user_idx').val();
                 $.ajax(
                     {
                         url : '../../controller/ticket.php?op=pausar_ticket',
                         type : 'POST',
                         data : {
                             tick_id : id_ticket,
+                            id_usuario : id_usuario
                         },
                         success : function(data){
                             console.log(data)
