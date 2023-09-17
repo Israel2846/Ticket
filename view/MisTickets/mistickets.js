@@ -3,12 +3,20 @@ $(document).ready(
         // Inicialización de variables de sesión
         const usu_id = $('#user_idx').val();
         const rol_id = $('#rol_idx').val();
+        var url = '';
+        if (rol_id == 1) {
+            url = '../../controller/ticket.php?op=listar_x_usu'
+        } else if(rol_id == 3){
+            url = '../../controller/ticket.php?op=listar_x_creador';
+        } else {
+            console.log('Error al consultar');
+        }
 
         // Tabla de datos
         $('#mis_tickets').DataTable(
             {
                 ajax : {
-                    url : '../../controller/ticket.php?op=listar_x_usu',
+                    url : url,
                     type : 'POST',
                     data : {
                         usu_id : usu_id
@@ -61,6 +69,8 @@ $(document).ready(
                             $(cell).html('<span class="label label-pill label-success">'+ cellData +'</span>')
                         }
                     },
+                    { "data": "nombre_almacen" },
+                    { "data": "nombre_area" },
                     { 
                         "data": "tick_id",
                         createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
@@ -73,3 +83,7 @@ $(document).ready(
         )
     }
 )
+
+function ver(tick_id){
+    window.location.href = 'http://localhost:80/gestor-de-tickets/view/DetalleTicket/?ID='+ tick_id +'';
+}

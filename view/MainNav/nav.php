@@ -1,6 +1,6 @@
 <?php
     /* TODO: Rol 1 es de Usuario */
-    if ($_SESSION["rol_id"]==1){
+    if ($_SESSION["rol_id"]==1 || $_SESSION["rol_id"]==3){
         ?>
             <nav class="side-menu">
                 <ul class="side-menu-list">
@@ -24,13 +24,14 @@
                             <span class="lbl">Mis Tickets</span>
                         </a>
                     </li>
-
+                    <?php if ($_SESSION["rol_id"]==1) {?>
                     <li class="blue-dirty">
                         <a href="..\ConsultarTicket\">
                             <span class="glyphicon glyphicon-th"></span>
                             <span class="lbl">Todos los Tickets</span>
                         </a>
                     </li>
+                    <?php } ?>
                 </ul>
             </nav>
         <?php

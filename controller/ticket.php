@@ -131,6 +131,12 @@
             echo json_encode($datos);
             break;
 
+        /* TODO: Listado de tickets segun usuario,formato json para Datatable JS */
+        case "listar_x_creador":
+            $datos=$ticket->listar_ticket_x_creador($_POST["usu_id"]);
+            echo json_encode($datos);
+            break;
+
         /* TODO: Listado de tickets,formato json para Datatable JS */
         case "listar":
             $datos=$ticket->listar_ticket();

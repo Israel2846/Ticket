@@ -39,8 +39,8 @@
 						<thead>
 							<tr>
 								<th style="width: 5%;">#Ticket</th>
-								<th style="width: 10%;">Categoria</th>
-								<th class="d-none d-sm-table-cell" style="width: 10%;">Titulo</th>
+								<th style="width: 5%;">Categoria</th>
+								<th class="d-none d-sm-table-cell" style="width: 5%;">Titulo</th>
 								<th class="d-none d-sm-table-cell" style="width: 5%;">Prioridad</th>
 								<th class="d-none d-sm-table-cell" style="width: 5%;">Estado</th>
 								<th class="d-none d-sm-table-cell" style="width: 10%;">F. Creación</th>
@@ -50,6 +50,8 @@
 								<th class="d-none d-sm-table-cell" style="width: 5%;">T. Total</th>
 								<th class="d-none d-sm-table-cell" style="width: 10%;">F. Cierre</th>
 								<th class="d-none d-sm-table-cell" style="width: 10%;">Creador</th>
+								<th class="d-none d-sm-table-cell" style="width: 10%;">Almacen</th>
+								<th class="d-none d-sm-table-cell" style="width: 10%;">Área</th>
 								<th class="text-center" style="width: 5%;">Info</th>
 							</tr>
 						</thead>

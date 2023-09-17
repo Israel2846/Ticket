@@ -7,7 +7,7 @@
             $sql = "SELECT * FROM tm_ticket";
             $sql = $conectar->prepare($sql);
             $sql->execute();
-            return $resultado = $sql->fetchAll();
+            return $sql->fetchAll();
         }
 
         // Obtener solo un registro
@@ -94,7 +94,7 @@
             return $resultado=$sql1->fetchAll(pdo::FETCH_ASSOC);
         }
 
-        /* TODO: Listar ticket segun id de usuario */
+        /* TODO: Listar ticket segun id de usuario asignado */
         public function listar_ticket_x_usu($usu_id){
             try {
                 $conectar= parent::conexion();
@@ -114,14 +114,62 @@
                     tm_usuario.usu_ape,
                     tm_categoria.cat_nom,
                     tm_ticket.prio_id,
-                    tm_prioridad.prio_nom
+                    tm_prioridad.prio_nom,
+                    tm_almacen.nombre_almacen,
+                    tm_area_almacen.nombre_area
                     FROM 
                     tm_ticket
                     INNER join tm_categoria on tm_ticket.cat_id = tm_categoria.cat_id
                     INNER join tm_usuario on tm_ticket.usu_id = tm_usuario.usu_id
                     INNER join tm_prioridad on tm_ticket.prio_id = tm_prioridad.prio_id
+                    INNER JOIN tm_almacen ON tm_almacen.id_almacen = tm_usuario.usu_almacen
+                    INNER JOIN tm_area_almacen ON tm_area_almacen.id_almacen = tm_usuario.usu_area
                     WHERE
                     tm_ticket.est = 1 AND tm_ticket.usu_asig = ?
+                    ORDER BY tm_ticket.tick_id DESC";
+                $sql=$conectar->prepare($sql);
+                $sql->bindValue(1, $usu_id);
+                $sql->execute();
+                return $sql->fetchAll();
+            } catch (Exception $e) {
+                $resultado = $e->getMessage();
+                return $resultado;
+            }
+            
+        }
+
+        /* TODO: Listar ticket segun id de usuario creador */
+        public function listar_ticket_x_creador($usu_id){
+            try {
+                $conectar= parent::conexion();
+                parent::set_names();
+                $sql="SELECT 
+                    tm_ticket.tick_id,
+                    tm_ticket.usu_id,
+                    tm_ticket.cat_id,
+                    tm_ticket.tick_titulo,
+                    tm_ticket.tick_descrip,
+                    tm_ticket.tick_estado,
+                    tm_ticket.fech_crea,
+                    tm_ticket.fech_cierre,
+                    tm_ticket.usu_asig,
+                    tm_ticket.fech_asig,
+                    tm_usuario.usu_nom,
+                    tm_usuario.usu_ape,
+                    tm_categoria.cat_nom,
+                    tm_ticket.prio_id,
+                    tm_prioridad.prio_nom,
+                    tm_almacen.nombre_almacen,
+                    tm_area_almacen.nombre_area
+                    FROM 
+                    tm_ticket
+                    INNER join tm_categoria on tm_ticket.cat_id = tm_categoria.cat_id
+                    INNER join tm_usuario on tm_ticket.usu_id = tm_usuario.usu_id
+                    INNER join tm_prioridad on tm_ticket.prio_id = tm_prioridad.prio_id
+                    INNER JOIN tm_almacen ON tm_almacen.id_almacen = tm_usuario.usu_almacen
+                    INNER JOIN tm_area_almacen ON tm_area_almacen.id_almacen = tm_usuario.usu_area
+                    WHERE
+                    tm_ticket.est = 1 AND tm_ticket.usu_id = ?
                     ORDER BY tm_ticket.tick_id DESC";
                 $sql=$conectar->prepare($sql);
                 $sql->bindValue(1, $usu_id);
