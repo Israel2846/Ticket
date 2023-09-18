@@ -180,11 +180,11 @@ function datatable_abiertos(){
                     }
                 },
                 { "data": "fech_crea" },
-                { "data": "fech_asig" },
-                { "data": "timeresp" },
+                // { "data": "fech_asig" },
+                // { "data": "timeresp" },
                 { "data": "timetransc" },
-                { "data": "tiempototal" },
-                { "data": "fech_cierre" },
+                // { "data": "tiempototal" },
+                // { "data": "fech_cierre" },
                 { 
                     "data": "usu_id",
                     createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
@@ -239,8 +239,8 @@ function datatable_en_proceso(){
                 { "data": "fech_asig" },
                 { "data": "timeresp" },
                 { "data": "timetransc" },
-                { "data": "tiempototal" },
-                { "data": "fech_cierre" },
+                // { "data": "tiempototal" },
+                // { "data": "fech_cierre" },
                 { 
                     "data": "usu_id",
                     createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
@@ -295,8 +295,8 @@ function datatable_pausado(){
                 { "data": "fech_asig" },
                 { "data": "timeresp" },
                 { "data": "timetransc" },
-                { "data": "tiempototal" },
-                { "data": "fech_cierre" },
+                // { "data": "tiempototal" },
+                // { "data": "fech_cierre" },
                 { 
                     "data": "usu_id",
                     createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
