@@ -133,7 +133,6 @@ $(document).on(
             function(isConfirm){
                 if (isConfirm) {
                     var id_tarea = getUrlParameter('ID');
-                    // var usu_id = $('#user_idx').val();
                     $.post(
                         "../../controller/tarea.php?op=cerrar_tarea",
                         { id_tarea : id_tarea },
@@ -190,6 +189,7 @@ $(document).on(
                     data : datos,
                     success : function(data){
                         console.log(data);
+                        listardetalle(idTarea);
                         $('#respTarea').summernote('reset');
                         swal(
                             "Correcto!",
