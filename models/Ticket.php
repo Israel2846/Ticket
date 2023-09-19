@@ -127,7 +127,7 @@
                     INNER JOIN tm_area_almacen ON tm_area_almacen.id_almacen = tm_usuario.usu_area
                     WHERE
                     tm_ticket.est = 1 AND tm_ticket.usu_asig = ?
-                    ORDER BY tm_ticket.tick_id DESC";
+                    ORDER BY FIELD(tm_ticket.tick_estado, 'Abierto', 'En proceso', 'Pausado', 'Cerrado') ASC, tm_ticket.prio_id DESC";
                 $sql=$conectar->prepare($sql);
                 $sql->bindValue(1, $usu_id);
                 $sql->execute();
