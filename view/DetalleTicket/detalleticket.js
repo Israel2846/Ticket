@@ -1,12 +1,19 @@
 function init(){
    
 }
+const rolUsuario = $('#rol_idx').val();
 
 $(document).ready(function(){
     var tick_id = getUrlParameter('ID');
 
     listardetalle(tick_id);
     ocultar_mostrar_botón_pausar();
+
+    if (rolUsuario == 3) {
+        $('#btnpausarticket').hide();
+        $('#btnreanudarticket').hide();
+        $('#btncerrarticket').hide();
+    }
 
     /* TODO: Inicializamos summernotejs */
     $('#tickd_descrip').summernote({

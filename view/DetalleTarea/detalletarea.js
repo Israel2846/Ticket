@@ -16,6 +16,7 @@ var getUrlParameter = function getUrlParameter(sParam){
 
 const idTarea = getUrlParameter("ID");
 const idUsuario = $('#user_idx').val();
+const rolUsuario = $('#rol_idx').val();
 
 function listardetalle(id_tarea){
     // Mostramos respuestas de la tarea
@@ -65,6 +66,10 @@ function listardetalle(id_tarea){
 $(document).ready(function(){
     var id_tarea = idTarea;
     listardetalle(id_tarea)
+
+    if (rolUsuario == 3) {
+        $('#btncerrartarea').hide();
+    }
 
     $('#tarea_descripusu').summernote(
         {

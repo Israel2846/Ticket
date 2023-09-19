@@ -279,9 +279,11 @@
                                             <!-- TODO: Mostrar perfil del usuario segun rol -->
                                             <?php
                                                 if ($row['rol_id']==1){
-                                                    echo 'Usuario';
-                                                }else{
                                                     echo 'Soporte';
+                                                }else if($row['rol_id']==3){
+                                                    echo 'Usuario';
+                                                } else {
+                                                    echo 'Admin';
                                                 }
                                             ?>
                                         </div>
