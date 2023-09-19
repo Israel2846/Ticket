@@ -245,6 +245,8 @@
                         tm_categoria.cat_nom,
                         tm_ticket.prio_id,
                         tm_prioridad.prio_nom,
+                        tm_almacen.nombre_almacen,
+                        tm_area_almacen.nombre_area,
                         CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_crea, tm_ticket.fech_asig), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_crea, tm_ticket.fech_asig)%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_crea, tm_ticket.fech_asig)%60, ' minutos') AS timeresp,
                         CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_crea, NOW()), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_crea, NOW())%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_crea, NOW())%60, ' minutos') AS timetransc,
                         CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_asig, tm_ticket.fech_cierre), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_asig, tm_ticket.fech_cierre)%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_asig, tm_ticket.fech_cierre)%60, ' minutos') AS timetarea,
@@ -255,6 +257,8 @@
                     LEFT join tm_usuario AS creador on tm_ticket.usu_id = creador.usu_id
                     LEFT JOIN tm_usuario as asignado on tm_ticket.usu_asig = asignado.usu_id
                     INNER join tm_prioridad on tm_ticket.prio_id = tm_prioridad.prio_id
+                    INNER JOIN tm_area_almacen ON creador.usu_area = tm_area_almacen.id_area_almacen
+                    INNER JOIN tm_almacen on creador.usu_almacen = tm_almacen.id_almacen
                     WHERE
                         tm_ticket.est = 1 and tm_ticket.tick_estado = 'Abierto'
                     ORDER BY tm_ticket.prio_id DESC";

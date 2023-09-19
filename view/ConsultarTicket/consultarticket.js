@@ -191,6 +191,8 @@ function datatable_abiertos(){
                         $(cell).html('<span class="label label-pill label-success">' + rowData.usu_nom +'</span>');
                     }
                 },
+                { "data" : "nombre_almacen" },
+                { "data" : "nombre_area" },
                 { 
                     "data": "tick_id" ,
                     createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {

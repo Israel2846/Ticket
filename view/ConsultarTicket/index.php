@@ -78,6 +78,8 @@
 								<!-- <th class="d-none d-sm-table-cell" style="width: 5%;">T. Total</th> -->
 								<!-- <th class="d-none d-sm-table-cell" style="width: 10%;">F. Cierre</th> -->
 								<th class="d-none d-sm-table-cell" style="width: 10%;">Creador</th>
+								<th class="d-none d-sm-table-cell" style="width: 10%;">Almacén</th>
+								<th class="d-none d-sm-table-cell" style="width: 10%;">Área</th>
 								<th class="d-none d-sm-table-cell" style="width: 10%;">Soporte</th>
 								<th class="text-center" style="width: 5%;">Info</th>
 							</tr>
