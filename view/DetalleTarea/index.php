@@ -39,7 +39,6 @@ if (isset($_SESSION["usu_id"])) {
 
         <div class="box-typical box-typical-padding">
           <div class="row">
-
               <div class="col-lg-6">
                 <fieldset class="form-group">
                   <label class="form-label semibold" for="tarea_titulo">Titulo</label>
@@ -60,19 +59,33 @@ if (isset($_SESSION["usu_id"])) {
                   <div class="summernote-theme-1">
                     <textarea id="tarea_descripusu" name="tarea_descripusu" class="summernote" name="name"></textarea>
                   </div>
-
                 </fieldset>
-              </div>
-              <div class="col-lg-12">
-                <button type="button" id="btncerrartarea" class="btn btn-rounded btn-inline btn-warning">Cerrar Tarea</button>
               </div>
           </div>
         </div>
 
-        <section class="activity-line" id="lbldetalle">
+        <!-- Seccion de respuestas -->
+        <section class="activity-line" id="pnlRespuestas">
 
         </section>
 
+        <div class="box-typical box-typical-padding" id="lblRespuesta">
+          <div class="row">
+            <!-- Mensajes de respuesta o seguimiento -->
+            <div class="col-lg-12" id="lblRespuesta">
+              <fieldset class="form-group">
+                <label class="form-label semibold">Respuesta</label>
+                <div class="summernote-theme-1">
+                  <textarea name="respTarea" id="respTarea" class="summernote"></textarea>
+                </div>
+              </fieldset>
+            </div>
+            <div class="col-lg-12">
+              <button type="button" id="btnEnviar" class="btn btn-rounded btn-inline btn-primary">Enviar</button>
+              <button type="button" id="btncerrartarea" class="btn btn-rounded btn-inline btn-warning">Cerrar Tarea</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <!-- Contenido -->

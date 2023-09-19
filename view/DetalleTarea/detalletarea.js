@@ -14,8 +14,11 @@ var getUrlParameter = function getUrlParameter(sParam){
     }
 }
 
+const idTarea = getUrlParameter("ID");
+const idUsuario = $('#user_idx').val();
+
 function listardetalle(id_tarea){
-    // Mostramos información del detalle de la tearea
+    // Mostramos respuestas de la tarea
     /* $.post(
         "../../controller/tarea.php?op=listardetalle",
         {id_tarea : id_tarea},
@@ -44,7 +47,7 @@ function listardetalle(id_tarea){
             }
 
             if (data.estado_tarea == 0) {
-                $('#btncerrartarea').hide();
+                $('#lblRespuesta').hide();
             }
 
             $('#lblestado').html(elem_estado);
@@ -60,7 +63,7 @@ function listardetalle(id_tarea){
 }
 
 $(document).ready(function(){
-    var id_tarea = getUrlParameter('ID');
+    var id_tarea = idTarea;
     listardetalle(id_tarea)
 
     $('#tarea_descripusu').summernote(
@@ -88,7 +91,7 @@ $(document).ready(function(){
     )
     $('#tarea_descripusu').summernote('disable')
 
-    $('#tarea_descrip').summernote(
+    $('#respTarea').summernote(
         {
             height: 400,
             lang: "es-ES",
@@ -155,6 +158,51 @@ $(document).on(
                 }
             }
         )
+    }
+)
+
+$(document).on(
+    "click",
+    "#btnEnviar",
+    function(){
+        var respuestaTarea = $('#respTarea').val();
+
+        // Validamos que no esten vacíos los campos
+        if ($('#respTarea').summernote('isEmpty')) {
+            swal(
+                "Advertencia",
+                "Falta respuesta",
+                "warning",
+            );
+        } else {
+            // Datos que recibe controlador
+            datos = {
+                id_tarea : idTarea,
+                id_usuario : idUsuario,
+                respuesta_tarea : respuestaTarea
+            }
+
+            // Ajax para mandar los datos al controlador e insertar en BD
+            $.ajax(
+                {
+                    url : "../../controller/tarea.php?op=insertar_respuesta",
+                    type : "POST",
+                    data : datos,
+                    success : function(data){
+                        console.log(data);
+                        $('#respTarea').summernote('reset');
+                        swal(
+                            "Correcto!",
+                            "Registrado correctamente",
+                            "success",
+                        );
+                    },
+                    error : function(e){
+                        console.log("Error! ", e.responseText)
+                    }
+                }
+            )
+        }
     }
 )
 

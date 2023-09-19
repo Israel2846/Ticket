@@ -18,7 +18,37 @@ class Tarea extends Conectar{
             return false; 
         }
     }
+
+    // Insertar detalle de tarea
+    public function insert_respuesta_tarea($id_tarea, $id_usuario, $descripcion_tarea){
+        try {
+            $conectar = parent::conexion();
+            parent::set_names();
     
+            $sql = "INSERT INTO td_tareadetalle(
+                        tarea_id,
+                        usu_id,
+                        tarea_desc,
+                        fecha_crea,
+                        est) 
+                    VALUES (?,?,?, now(), 1)";
+
+            $sql = $conectar->prepare($sql);
+            $sql->bindParam(1, $id_tarea);
+            $sql->bindParam(2, $id_usuario);
+            $sql->bindParam(3, $descripcion_tarea);
+            $sql->execute();
+
+            $sql2 = "SELECT last_insert_id() as 'tarea_detalle_id'";
+            $sql2 = $conectar->prepare($sql2);
+            $sql2->execute();
+            return $sql2->fetchAll(pdo::FETCH_ASSOC);
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+    
+    // Listar todas las tareas
     public function listar_tareas(){
         try{
             $conectar = parent::conexion();
@@ -48,6 +78,7 @@ class Tarea extends Conectar{
         }
     }
 
+    // Listar solo las tareas por el id del ticket
     public function listar_tareas_x_ticket($id_ticket){
         try {
             $conectar = parent::conexion();
@@ -75,6 +106,7 @@ class Tarea extends Conectar{
         }
     }
 
+    // Obtener solo una tarea
     public function get_tarea($id_tarea){
         try {
             $conectar = parent::conexion();
@@ -94,6 +126,30 @@ class Tarea extends Conectar{
         }
     }
 
+    // Listar respuestas de tareas
+    public function listar_respuestas_tarea($id_tarea){
+        try {
+            $conectar = parent::conexion();
+            parent::set_names();
+            $sql = "SELECT
+                        td_tareadetalle.tareadetalle_id,
+                        td_tareadetalle.tarea_desc,
+                        td_tareadetalle.fecha_crea,
+                        tm_usuario.usu_nom,
+                        tm_usuario.usu_ape,
+                        tm_usuario.rol_id
+                    FROM
+                        td_tareadetalle
+                    INNER JOIN tm_usuario ON td_tareadetalle.usu_id = tm_usuario.usu_id
+                    WHERE td_tareadetalle.tarea_id = ?";
+            $sql = $conectar->prepare($sql);
+            $sql->bindParam(1, $id_tarea);
+            $sql->execute();
+            return $sql->fetchAll();
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
 
     // Asignar tarea
     public function assign_tarea($id_tarea, $id_usuario){
@@ -114,6 +170,7 @@ class Tarea extends Conectar{
         }
     }
 
+    // Cerrar tarea
     public function close_tarea($id_tarea){
         try {
             $conectar = parent::conexion();
@@ -133,6 +190,7 @@ class Tarea extends Conectar{
         }
     }
 
+    // Cerrar tarea mediante el mensaje modal
     public function close_tareas_x_modal($id_usuario){
         try {
             $conectar = parent::conexion();
@@ -166,6 +224,7 @@ class Tarea extends Conectar{
         }
     }
 
+    // Contar tareas abiertas segun el id de usuario
     public function count_tareas_abiertas($id_usuario){
         try {
             $conectar = parent::conexion();
@@ -182,32 +241,5 @@ class Tarea extends Conectar{
         }
     }
 
-    // Insertar detalle de tarea
-    public function insert_tarea_detalle($id_tarea, $id_usuario, $descripcion_tarea){
-        try {
-            $conectar = parent::conexion();
-            parent::set_names();
     
-            $sql = "INSERT INTO td_tareadetalle(
-                        tarea_id,
-                        usu_id,
-                        tarea_desc,
-                        fecha_crea,
-                        est) 
-                    VALUES (?,?,?, now(), 1)";
-
-            $sql = $conectar->prepare($sql);
-            $sql->bindParam(1, $id_tarea);
-            $sql->bindParam(2, $id_usuario);
-            $sql->bindParam(3, $descripcion_tarea);
-            $sql->execute();
-
-            $sql2 = "SELECT last_insert_id() as 'tarea_detalle_id'";
-            $sql2 = $conectar->prepare($sql2);
-            $sql2->execute();
-            return $sql2->fetchAll(pdo::FETCH_ASSOC);
-        } catch (Exception $e) {
-            return $e->getMessage();
-        }
-    }
 }
