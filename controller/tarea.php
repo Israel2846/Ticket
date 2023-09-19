@@ -84,51 +84,12 @@ switch($_GET["op"]){
                     </header>
                     <div class="activity-line-action-list">
                         <section class="activity-line-action">
-                            <div class="time"><?php echo date("H:i:s", strtotime($row["fech_crea"]));?></div>
+                            <div class="time"><?php echo date("H:i:s", strtotime($row["fecha_crea"]));?></div>
                             <div class="cont">
                                 <div class="cont-in">
                                     <p>
-                                        <?php echo $row["tickd_descrip"];?>
+                                        <?php echo $row["tarea_desc"];?>
                                     </p>
-
-                                    <br>
-
-                                    <!-- TODO: Mostrar documentos adjunto en el detalle de ticket -->
-                                    <?php
-                                        $datos_det=$documento->get_documento_detalle_x_ticketd($row["tickd_id"]);
-                                        if(is_array($datos_det)==true and count($datos_det)>0){
-                                            ?>
-                                                <p><strong>Documentos Adicionales</strong></p>
-
-                                                <p>
-                                                <table class="table table-bordered table-striped table-vcenter js-dataTable-full">
-                                                    <thead>
-                                                        <tr>
-                                                            <th style="width: 60%;"> Nombre</th>
-                                                            <th style="width: 40%;"></th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                            <!-- TODO: Mostrar tantos documentos tenga el ticket detalle -->
-                                                            <?php
-                                                                foreach ($datos_det as $row_det){ 
-                                                            ?>
-                                                                <tr>
-                                                                    <td><?php echo $row_det["det_nom"]; ?></td>
-                                                                    <td>
-                                                                        <a href="../../public/document_detalle/<?php echo $row_det["tickd_id"]; ?>/<?php echo $row_det["det_nom"]; ?>" target="_blank" class="btn btn-inline btn-primary btn-sm">Ver</a>
-                                                                    </td>
-                                                                </tr>
-                                                            <?php
-                                                                }
-                                                            ?>
-                                                    </tbody>
-                                                </table>
-
-                                                </p>
-                                            <?php
-                                        }
-                                    ?>
                                 </div>
                             </div>
                         </section>

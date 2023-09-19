@@ -19,13 +19,13 @@ const idUsuario = $('#user_idx').val();
 
 function listardetalle(id_tarea){
     // Mostramos respuestas de la tarea
-    /* $.post(
-        "../../controller/tarea.php?op=listardetalle",
+    $.post(
+        "../../controller/tarea.php?op=listar_respuestas",
         {id_tarea : id_tarea},
         function(data){
-            $('#lbldetalle').html(data);
+            $('#pnlRespuestas').html(data);
         }
-    ) */
+    )
 
     // Mostramos información de la Tarea en los input
     $.post(
