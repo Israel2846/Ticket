@@ -153,7 +153,7 @@
 
 					<div class="col-lg-12" id="tabla_tickets_cerrados">
 						<fieldset class="form-group">
-							<label class="form-label semibold"><h3>Tickets Pausados</h3></label>
+							<label class="form-label semibold"><h3>Tickets Cerrados</h3></label>
 							<table id="ticket_cerrado" class="table table-bordered table-striped table-vcenter js-dataTable-full">
 								<thead>
 									<tr>

@@ -36,7 +36,7 @@ $(document).ready(function(){
         $('#ticket_pausado').DataTable().ajax.reload();
         // Recargar datatable cerrado
         $('#ticket_cerrado').DataTable().ajax.reload();
-    }, 1000);
+    }, 30000);
     $('#tabla_usuario_normal').hide();
     datatable_abiertos();
     datatable_en_proceso();
@@ -175,8 +175,8 @@ function datatable_abiertos(){
                 { "data": "prio_nom" },
                 { 
                     "data": "tick_estado",
-                    createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                        $(cell).html('<span class="label label-pill label-success">' + cellData + '</span>')
+                    render : function(data){
+                        return '<span class="label label-pill label-success">' + data + '</span>'
                     }
                 },
                 { "data": "fech_crea" },
@@ -187,30 +187,60 @@ function datatable_abiertos(){
                 // { "data": "fech_cierre" },
                 { 
                     "data": "usu_id",
-                    createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                        $(cell).html('<span class="label label-pill label-success">' + rowData.usu_nom +'</span>');
+                    render : function(data, type, row){
+                        return '<span class="label label-pill label-success">' + row.usu_nom +'</span>'
                     }
                 },
                 { "data" : "nombre_almacen" },
                 { "data" : "nombre_area" },
                 { 
                     "data": "tick_id" ,
-                    createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                        if (rowData.usu_asig === null) {
-                            $(cell).html('<button type="button" onClick="asignar(' + rowData.tick_id + ');"  id="' + rowData.tick_id + '" class="btn btn-inline btn-danger btn-sm ladda-button">Sin asignar</i></button>');
+                    render : function(data, type, row){
+                        if (row.usu_asig == null) {
+                            return '<button type="button" onClick="asignar(' + row.tick_id + ');"  id="' + row.tick_id + '" class="btn btn-inline btn-danger btn-sm ladda-button">Sin asignar</i></button>'
                         } else {
-                            $(cell).html(rowData.asignado);
+                            return row.asignado
                         }
                     }
                 },
                 { 
                     "data": "tick_id" ,
-                    createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                        $(cell).html('<button type="button" onClick="ver(' + rowData.tick_id + ');"  id="' + rowData.tick_id + '" class="btn btn-inline btn-primary btn-sm ladda-button"><i class="fa fa-eye"></i></button>');
+                    render : function(data, type, row){
+                        return '<button type="button" onClick="ver(' + row.tick_id + ');"  id="' + row.tick_id + '" class="btn btn-inline btn-primary btn-sm ladda-button"><i class="fa fa-eye"></i></button>'
                     }
                 },
             ],
-            order : []
+            order : [],
+            "bPaginate": true,
+            "bDestroy": true,
+            "responsive": true,
+            "bInfo":true,
+            "iDisplayLength": 10,
+            "autoWidth": false,
+            "language": {
+                "sProcessing":     "Procesando...",
+                "sLengthMenu":     "Mostrar _MENU_ registros",
+                "sZeroRecords":    "No se encontraron resultados",
+                "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                "sInfo":           "Mostrando un total de _TOTAL_ registros",
+                "sInfoEmpty":      "Mostrando un total de 0 registros",
+                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                "sInfoPostFix":    "",
+                "sSearch":         "Buscar:",
+                "sUrl":            "",
+                "sInfoThousands":  ",",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst":    "Primero",
+                    "sLast":     "Último",
+                    "sNext":     "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+                "oAria": {
+                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                }
+            } 
         }
     )
 }
@@ -233,8 +263,8 @@ function datatable_en_proceso(){
                 { "data": "prio_nom" },
                 { 
                     "data": "tick_estado",
-                    createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                        $(cell).html('<span class="label label-pill label-warning">' + cellData + '</span>')
+                    render : function(data){
+                        return '<span class="label label-pill label-success">' + data + '</span>'
                     }
                 },
                 { "data": "fech_crea" },
@@ -245,28 +275,58 @@ function datatable_en_proceso(){
                 // { "data": "fech_cierre" },
                 { 
                     "data": "usu_id",
-                    createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                        $(cell).html('<span class="label label-pill label-success">' + rowData.usu_nom +'</span>');
+                    render : function(data, type, row){
+                        return '<span class="label label-pill label-success">' + row.usu_nom +'</span>'
                     }
                 },
                 { 
                     "data": "tick_id" ,
-                    createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                        if (rowData.usu_asig === null) {
-                            $(cell).html('<button type="button" onClick="asignar(' + rowData.tick_id + ');"  id="' + rowData.tick_id + '" class="btn btn-inline btn-danger btn-sm ladda-button">Sin asignar</i></button>');
+                    render : function(data, type, row){
+                        if (row.usu_asig == null) {
+                            return '<button type="button" onClick="asignar(' + row.tick_id + ');"  id="' + row.tick_id + '" class="btn btn-inline btn-danger btn-sm ladda-button">Sin asignar</i></button>'
                         } else {
-                            $(cell).html(rowData.asignado);
+                            return row.asignado
                         }
                     }
                 },
                 { 
                     "data": "tick_id" ,
-                    createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                        $(cell).html('<button type="button" onClick="ver(' + rowData.tick_id + ');"  id="' + rowData.tick_id + '" class="btn btn-inline btn-primary btn-sm ladda-button"><i class="fa fa-eye"></i></button>');
+                    render : function(data, type, row){
+                        return '<button type="button" onClick="ver(' + row.tick_id + ');"  id="' + row.tick_id + '" class="btn btn-inline btn-primary btn-sm ladda-button"><i class="fa fa-eye"></i></button>'
                     }
                 },
             ],
-            order : []
+            order : [],
+            "bPaginate": true,
+            "bDestroy": true,
+            "responsive": true,
+            "bInfo":true,
+            "iDisplayLength": 10,
+            "autoWidth": false,
+            "language": {
+                "sProcessing":     "Procesando...",
+                "sLengthMenu":     "Mostrar _MENU_ registros",
+                "sZeroRecords":    "No se encontraron resultados",
+                "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                "sInfo":           "Mostrando un total de _TOTAL_ registros",
+                "sInfoEmpty":      "Mostrando un total de 0 registros",
+                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                "sInfoPostFix":    "",
+                "sSearch":         "Buscar:",
+                "sUrl":            "",
+                "sInfoThousands":  ",",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst":    "Primero",
+                    "sLast":     "Último",
+                    "sNext":     "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+                "oAria": {
+                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                }
+            } 
         }
     )
 }
@@ -289,8 +349,8 @@ function datatable_pausado(){
                 { "data": "prio_nom" },
                 { 
                     "data": "tick_estado",
-                    createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                        $(cell).html('<span class="label label-pill label-primary">' + cellData + '</span>')
+                    render : function(data){
+                        return '<span class="label label-pill label-success">' + data + '</span>'
                     }
                 },
                 { "data": "fech_crea" },
@@ -301,28 +361,58 @@ function datatable_pausado(){
                 // { "data": "fech_cierre" },
                 { 
                     "data": "usu_id",
-                    createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                        $(cell).html('<span class="label label-pill label-success">' + rowData.usu_nom +'</span>');
+                    render : function(data, type, row){
+                        return '<span class="label label-pill label-success">' + row.usu_nom +'</span>'
                     }
                 },
                 { 
                     "data": "tick_id" ,
-                    createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                        if (rowData.usu_asig === null) {
-                            $(cell).html('<button type="button" onClick="asignar(' + rowData.tick_id + ');"  id="' + rowData.tick_id + '" class="btn btn-inline btn-danger btn-sm ladda-button">Sin asignar</i></button>');
+                    render : function(data, type, row){
+                        if (row.usu_asig == null) {
+                            return '<button type="button" onClick="asignar(' + row.tick_id + ');"  id="' + row.tick_id + '" class="btn btn-inline btn-danger btn-sm ladda-button">Sin asignar</i></button>'
                         } else {
-                            $(cell).html(rowData.asignado);
+                            return row.asignado
                         }
                     }
                 },
                 { 
                     "data": "tick_id" ,
-                    createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                        $(cell).html('<button type="button" onClick="ver(' + rowData.tick_id + ');"  id="' + rowData.tick_id + '" class="btn btn-inline btn-primary btn-sm ladda-button"><i class="fa fa-eye"></i></button>');
+                    render : function(data, type, row){
+                        return '<button type="button" onClick="ver(' + row.tick_id + ');"  id="' + row.tick_id + '" class="btn btn-inline btn-primary btn-sm ladda-button"><i class="fa fa-eye"></i></button>'
                     }
                 },
             ],
-            order : []
+            order : [],
+            "bPaginate": true,
+            "bDestroy": true,
+            "responsive": true,
+            "bInfo":true,
+            "iDisplayLength": 10,
+            "autoWidth": false,
+            "language": {
+                "sProcessing":     "Procesando...",
+                "sLengthMenu":     "Mostrar _MENU_ registros",
+                "sZeroRecords":    "No se encontraron resultados",
+                "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                "sInfo":           "Mostrando un total de _TOTAL_ registros",
+                "sInfoEmpty":      "Mostrando un total de 0 registros",
+                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                "sInfoPostFix":    "",
+                "sSearch":         "Buscar:",
+                "sUrl":            "",
+                "sInfoThousands":  ",",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst":    "Primero",
+                    "sLast":     "Último",
+                    "sNext":     "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+                "oAria": {
+                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                }
+            } 
         }
     )
 }
@@ -345,8 +435,8 @@ function datatable_cerrado(){
                 { "data": "prio_nom" },
                 { 
                     "data": "tick_estado",
-                    createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                        $(cell).html('<span class="label label-pill label-danger">' + cellData + '</span>')
+                    render : function(data){
+                        return '<span class="label label-pill label-success">' + data + '</span>'
                     }
                 },
                 { "data": "fech_crea" },
@@ -356,28 +446,58 @@ function datatable_cerrado(){
                 { "data": "fech_cierre" },
                 { 
                     "data": "usu_id",
-                    createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                        $(cell).html('<span class="label label-pill label-success">' + rowData.usu_nom +'</span>');
+                    render : function(data, type, row){
+                        return '<span class="label label-pill label-success">' + row.usu_nom +'</span>'
                     }
                 },
                 { 
                     "data": "tick_id" ,
-                    createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                        if (rowData.usu_asig === null) {
-                            $(cell).html('<button type="button" onClick="asignar(' + rowData.tick_id + ');"  id="' + rowData.tick_id + '" class="btn btn-inline btn-danger btn-sm ladda-button">Sin asignar</i></button>');
+                    render : function(data, type, row){
+                        if (row.usu_asig == null) {
+                            return '<button type="button" onClick="asignar(' + row.tick_id + ');"  id="' + row.tick_id + '" class="btn btn-inline btn-danger btn-sm ladda-button">Sin asignar</i></button>'
                         } else {
-                            $(cell).html(rowData.asignado);
+                            return row.asignado
                         }
                     }
                 },
                 { 
                     "data": "tick_id" ,
-                    createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                        $(cell).html('<button type="button" onClick="ver(' + rowData.tick_id + ');"  id="' + rowData.tick_id + '" class="btn btn-inline btn-primary btn-sm ladda-button"><i class="fa fa-eye"></i></button>');
+                    render : function(data, type, row){
+                        return '<button type="button" onClick="ver(' + row.tick_id + ');"  id="' + row.tick_id + '" class="btn btn-inline btn-primary btn-sm ladda-button"><i class="fa fa-eye"></i></button>'
                     }
                 },
             ],
-            order : []
+            order : [],
+            "bPaginate": true,
+            "bDestroy": true,
+            "responsive": true,
+            "bInfo":true,
+            "iDisplayLength": 10,
+            "autoWidth": false,
+            "language": {
+                "sProcessing":     "Procesando...",
+                "sLengthMenu":     "Mostrar _MENU_ registros",
+                "sZeroRecords":    "No se encontraron resultados",
+                "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                "sInfo":           "Mostrando un total de _TOTAL_ registros",
+                "sInfoEmpty":      "Mostrando un total de 0 registros",
+                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                "sInfoPostFix":    "",
+                "sSearch":         "Buscar:",
+                "sUrl":            "",
+                "sInfoThousands":  ",",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst":    "Primero",
+                    "sLast":     "Último",
+                    "sNext":     "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+                "oAria": {
+                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                }
+            } 
         }
     )
 }
