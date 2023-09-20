@@ -110,8 +110,9 @@
 
         /* TODO: Actualizamos el ticket a cerrado y adicionamos una linea adicional */
         case "update":
-            $ticket->update_ticket($_POST["tick_id"]);
+            $resultado = $ticket->update_ticket($_POST["tick_id"]);
             $ticket->insert_ticketdetalle_cerrar($_POST["tick_id"],$_POST["usu_id"]);
+            echo json_encode($resultado);
             break;
 
         /* TODO: Reabrimos el ticket y adicionamos una linea adicional */

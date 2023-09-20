@@ -166,12 +166,42 @@ $(document).ready(function(){
             },
             { 
                 "data": "id_tarea" ,
-                createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                    $(cell).html('<button type="button" onClick="ver(' + rowData.id_tarea + ');"  id="' + rowData.id_tarea + '" class="btn btn-inline btn-primary btn-sm ladda-button"><i class="fa fa-eye"></i></button>');
+                render : function(data, type, row){
+                    return '<button type="button" onClick="ver(' + row.id_tarea + ');"  id="' + row.id_tarea + '" class="btn btn-inline btn-primary btn-sm ladda-button"><i class="fa fa-eye"></i></button>'
                 }
             },
         ],
         order : [],
+        "bPaginate": true,
+        "bDestroy": true,
+        "responsive": true,
+        "bInfo":true,
+        "iDisplayLength": 10,
+        "autoWidth": false,
+        "language": {
+            "sProcessing":     "Procesando...",
+            "sLengthMenu":     "Mostrar _MENU_ registros",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando un total de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando un total de 0 registros",
+            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+            "sInfoPostFix":    "",
+            "sSearch":         "Buscar:",
+            "sUrl":            "",
+            "sInfoThousands":  ",",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "Siguiente",
+                "sPrevious": "Anterior"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        } 
     })
 });
 
@@ -412,8 +442,10 @@ $(document).on("click","#btncerrarticket", function(){
             var usu_id = $('#user_idx').val();
             /* TODO: Actualizamos el ticket  */
             $.post("../../controller/ticket.php?op=update", { tick_id : tick_id,usu_id : usu_id }, function (data) {
-
+                console.log(data);
             });
+
+            $('#tarea_data').DataTable().ajax.reload();
 
             /* TODO:Alerta de ticket cerrado via email */
             $.post("../../controller/email.php?op=ticket_cerrado", {tick_id : tick_id}, function (data) {

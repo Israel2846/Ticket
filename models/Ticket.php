@@ -489,18 +489,38 @@
 
         /* TODO: actualizar ticket */
         public function update_ticket($tick_id){
-            $conectar= parent::conexion();
-            parent::set_names();
-            $sql="update tm_ticket 
-                set	
-                    tick_estado = 'Cerrado',
-                    fech_cierre = now()
-                where
-                    tick_id = ?";
-            $sql=$conectar->prepare($sql);
-            $sql->bindValue(1, $tick_id);
-            $sql->execute();
-            return $resultado=$sql->fetchAll();
+            try {
+                $conectar= parent::conexion();
+                parent::set_names();
+                $sql="update tm_ticket 
+                    set	
+                        tick_estado = 'Cerrado',
+                        fech_cierre = now()
+                    where
+                        tick_id = ?";
+                $sql=$conectar->prepare($sql);
+                $sql->bindValue(1, $tick_id);
+                $sql->execute();
+    
+                $sql2 = "SELECT tm_tarea.id_tarea FROM tm_tarea WHERE tm_tarea.id_ticket = ?";
+                $sql2=$conectar->prepare($sql2);
+                $sql2->bindValue(1, $tick_id);
+                $sql2->execute();
+                $resultado = $sql2->fetchAll();
+                // Cerrar tareas al Cerrar ticket
+                foreach ($resultado as $row) {
+                    $sql3 = "UPDATE tm_tarea SET 
+                                tm_tarea.estado_tarea = 0,
+                                tm_tarea.fecha_finalizacion = CURRENT_TIMESTAMP 
+                            WHERE tm_tarea.id_tarea = ?";
+                    $sql3 = $conectar->prepare($sql3);
+                    $sql3->bindValue(1, $row['id_tarea']);
+                    $sql3->execute();
+                }
+            } catch (Exception $e) {
+                return $e->getMessage();
+            }
+            return $resultado;
         }
 
         /* TODO:Cambiar estado del ticket al reabrir */
