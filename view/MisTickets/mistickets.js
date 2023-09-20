@@ -33,28 +33,28 @@ $(document).ready(
                     { "data": "tick_titulo" },
                     { 
                         "data": "prio_nom",
-                        createdCell : function(cell, cellData){
-                            $(cell).html('<span class="label label-pill label-warning">'+ cellData +'</span>')
+                        render : function (data, type, row) {
+                            return '<span class="label label-pill label-warning">'+ data +'</span>'
                         }
                     },
                     { 
                         "data": "tick_estado",
-                        createdCell : function(cell, cellData){
-                            switch (cellData) {
+                        render : function(data, type, row){
+                            switch (data) {
                                 case 'Abierto':
-                                    html_estado = '<span class="label label-pill label-success">'+ cellData +'</span>'
+                                    html_estado = '<span class="label label-pill label-success">'+ data +'</span>';
                                     break;
                                 case 'En proceso':
-                                    html_estado = '<span class="label label-pill label-warning">'+ cellData +'</span>'
+                                    html_estado = '<span class="label label-pill label-warning">'+ data +'</span>'
                                     break;
                                 case 'Pausado':
-                                    html_estado = '<span class="label label-pill label-primary">'+ cellData +'</span>'
+                                    html_estado = '<span class="label label-pill label-primary">'+ data +'</span>'
                                     break;
                                 case 'Cerrado':
-                                    html_estado = '<span class="label label-pill label-danger">'+ cellData +'</span>'
+                                    html_estado = '<span class="label label-pill label-danger">'+ data +'</span>'
                                     break;
                             }
-                            $(cell).html(html_estado)
+                            return html_estado;
                         }
                     },
                     { "data": "fech_crea" },
@@ -65,20 +65,52 @@ $(document).ready(
                     { "data": "fech_cierre" },
                     { 
                         "data": "usu_nom",
-                        createdCell: function(cell, cellData){
-                            $(cell).html('<span class="label label-pill label-success">'+ cellData +'</span>')
+                        render : function(data, type, row){
+                            var elemento = '<span class="label label-pill label-success">'+ data +'</span>';
+                            return elemento;
                         }
                     },
                     { "data": "nombre_almacen" },
                     { "data": "nombre_area" },
                     { 
                         "data": "tick_id",
-                        createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                            $(cell).html('<button type="button" onClick="ver(' + rowData.tick_id + ');"  id="' + rowData.tick_id + '" class="btn btn-inline btn-primary btn-sm ladda-button"><i class="fa fa-eye"></i></button>');
+                        render: function (data, type, row) {
+                            var buttonHtml = '<button type="button" onClick="ver(' + data + ');"  id="' + data + '" class="btn btn-inline btn-primary btn-sm ladda-button"><i class="fa fa-eye"></button>';
+                            return buttonHtml;
                         }
                     },
                 ],
-                order : []
+                order : [],
+                "bPaginate": true,
+                "bDestroy": true,
+                "responsive": true,
+                "bInfo":true,
+                "iDisplayLength": 10,
+                "autoWidth": false,
+                "language": {
+                    "sProcessing":     "Procesando...",
+                    "sLengthMenu":     "Mostrar _MENU_ registros",
+                    "sZeroRecords":    "No se encontraron resultados",
+                    "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                    "sInfo":           "Mostrando un total de _TOTAL_ registros",
+                    "sInfoEmpty":      "Mostrando un total de 0 registros",
+                    "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                    "sInfoPostFix":    "",
+                    "sSearch":         "Buscar:",
+                    "sUrl":            "",
+                    "sInfoThousands":  ",",
+                    "sLoadingRecords": "Cargando...",
+                    "oPaginate": {
+                        "sFirst":    "Primero",
+                        "sLast":     "Último",
+                        "sNext":     "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                    "oAria": {
+                        "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                    }
+                } 
             }
         )
     }
