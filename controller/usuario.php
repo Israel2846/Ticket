@@ -37,7 +37,7 @@
         /* TODO: Guardar y editar, guardar si el campo usu_id esta vacio */
         case "guardaryeditar":
             if(empty($_POST["usu_id"])){       
-                $usuario->insert_usuario($_POST["usu_nom"],$_POST["usu_ape"],$_POST["usu_correo"],$_POST["usu_pass"],$_POST["usu_almacen"],$_POST["usu_area"],$_POST["rol_id"],$_POST["usu_telf"]);     
+                $usuario->insert_usuario($_POST["usu_nom"],$_POST["usu_ape"],$_POST['num_colab'],$_POST["usu_correo"],$_POST["usu_pass"],$_POST["usu_almacen"],$_POST["usu_area"],$_POST["rol_id"],$_POST["usu_telf"]);     
             }
             else {
                 $usuario->update_usuario($_POST["usu_id"],$_POST["usu_nom"],$_POST["usu_ape"],$_POST["usu_correo"],$_POST["usu_pass"],$_POST["usu_almacen"],$_POST["usu_area"],$_POST["rol_id"],$_POST["usu_telf"]);

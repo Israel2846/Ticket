@@ -36,7 +36,7 @@ $(document).ready(function(){
         $('#ticket_pausado').DataTable().ajax.reload();
         // Recargar datatable cerrado
         $('#ticket_cerrado').DataTable().ajax.reload();
-    }, 30000);
+    }, 90000);
     $('#tabla_usuario_normal').hide();
     datatable_abiertos();
     datatable_en_proceso();
@@ -264,7 +264,7 @@ function datatable_en_proceso(){
                 { 
                     "data": "tick_estado",
                     render : function(data){
-                        return '<span class="label label-pill label-success">' + data + '</span>'
+                        return '<span class="label label-pill label-warning">' + data + '</span>'
                     }
                 },
                 { "data": "fech_crea" },
@@ -350,7 +350,7 @@ function datatable_pausado(){
                 { 
                     "data": "tick_estado",
                     render : function(data){
-                        return '<span class="label label-pill label-success">' + data + '</span>'
+                        return '<span class="label label-pill label-primary">' + data + '</span>'
                     }
                 },
                 { "data": "fech_crea" },
@@ -436,7 +436,7 @@ function datatable_cerrado(){
                 { 
                     "data": "tick_estado",
                     render : function(data){
-                        return '<span class="label label-pill label-success">' + data + '</span>'
+                        return '<span class="label label-pill label-danger">' + data + '</span>'
                     }
                 },
                 { "data": "fech_crea" },

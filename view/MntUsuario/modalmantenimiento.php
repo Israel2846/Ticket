@@ -22,6 +22,11 @@
                     </div>
 
                     <div class="form-group">
+                        <label class="form-label" for="usu_correo">Número de colaborador</label>
+                        <input type="text" class="form-control" id="num_colab" name="num_colab" placeholder="12345" required>
+                    </div>
+
+                    <div class="form-group">
                         <label class="form-label" for="usu_correo">Correo Electronico</label>
                         <input type="email" class="form-control" id="usu_correo" name="usu_correo" placeholder="test@test.com" required>
                     </div>
