@@ -11,6 +11,7 @@
             $sql->execute();
         }
 
+        // Insertar registro de documento de tareas
         public function insert_documento_tarea($id_tarea, $doc_nom){
             try {
                 $conectar = parent::conexion();
@@ -35,6 +36,22 @@
             $sql->bindParam(1,$tick_id);
             $sql->execute();
             return $resultado = $sql->fetchAll(pdo::FETCH_ASSOC);
+        }
+
+        // Obtener documento por tarea
+        public function get_documento_x_tarea($id_tarea){
+            try {
+                $conectar = parent::conexion();
+                parent::set_names();
+                $sql = "SELECT * FROM td_documento_tarea 
+                        WHERE id_tarea = ?";
+                $sql = $conectar -> prepare($sql);
+                $sql -> bindParam(1, $id_tarea);
+                $sql -> execute();
+                return $sql -> fetchAll(PDO::FETCH_ASSOC);
+            } catch (Exception $e) {
+                return $e -> getMessage();
+            }
         }
 
         /* TODO: insertar documento detalle */

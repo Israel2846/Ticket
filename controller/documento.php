@@ -25,5 +25,24 @@
                 "aaData"=>$data);
             echo json_encode($results);
         break;
+
+        case "listar_por_tarea":
+            $id_tarea = $_POST['id_tarea'];
+            $datos = $documento -> get_documento_x_tarea($id_tarea);
+            $data = Array();
+            foreach ($datos as $row) {
+                $sub_array = array();
+                $sub_array[] = '<a href="../../public/documentos_tareas/'.$id_tarea.'/'.$row["nom_doc"].'" target="_blank">'.$row["nom_doc"].'</a>';
+                $sub_array[] = '<a type="button" href="../../public/documentos_tareas/'.$id_tarea.'/'.$row["nom_doc"].'" target="_blank" class="btn btn-inline btn-primary btn-sm ladda-button"><i class="fa fa-eye"></i></a>';
+                $data[] = $sub_array;
+            }
+            $results = array(
+                "sEcho"=>1,
+                "iTotalRecords"=>count($data),
+                "iTotalDisplayRecords"=>count($data),
+                "aaData"=>$data
+            );
+            echo json_encode($results);
+            break;
     }
 ?>
