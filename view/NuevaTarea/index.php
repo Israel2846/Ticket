@@ -51,10 +51,17 @@ if(isset($_SESSION["usu_id"])){
 
 						<input type="hidden" id="usu_id" name="usu_id" value="<?php echo $_SESSION["usu_id"] ?>">						
 
-						<div class="col-lg-12">
+						<div class="col-lg-6">
 							<fieldset class="form-group">
 								<label class="form-label semibold" for="tarea_titulo">Título</label>
 								<input type="text" name="tarea_titulo" id="tarea_titulo" class="form-control" placeholder="Escriba aquí el título de la tarea">
+							</fieldset>
+						</div>
+
+						<div class="col-lg-6">
+							<fieldset class="form-group">
+								<label class="form-label semibold" for="tarea_titulo">Documentos adicionales</label>
+								<input type="file" name="fileElem" id="fileElem" class="form-control">
 							</fieldset>
 						</div>
 

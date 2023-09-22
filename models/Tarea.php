@@ -12,10 +12,16 @@ class Tarea extends Conectar{
             $sql->bindValue(3, $tarea_titulo);
             $sql->bindValue(4, $tarea_desc);
             $sql->execute();
-            return true;
+
+            // Obtenemos el ultimo registro que se insertó en la base de datos
+            $sql2 = "SELECT last_insert_id() AS 'id_tarea'";
+            $sql2 = $conectar -> prepare($sql2);
+            $sql2 -> execute();
+            
+            // Retornamos el ultimo registro
+            return $sql2 -> fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
-            echo "Error " . $e->getMessage();
-            return false; 
+            return "Error " . $e->getMessage();            
         }
     }
 

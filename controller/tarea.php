@@ -5,11 +5,43 @@ require_once("../config/conexion.php");
 require_once("../models/Tarea.php");
 $tarea = new Tarea();
 
+require_once("../models/Documento.php");
+$documento = new Documento();
+
 // Opciones del controlador Tarea
 switch($_GET["op"]){
     // Guardar/editar, si el id está vacío crea registro
     case "insert":
-        $tarea->insert_tarea($_POST["usu_id"], $_POST["tick_id"], $_POST["tarea_titulo"], $_POST["tarea_desc"]);
+        $datos = $tarea->insert_tarea($_POST["usu_id"], $_POST["tick_id"], $_POST["tarea_titulo"], $_POST["tarea_desc"]);
+
+        // Obtenemos el ID del ultimo registro insertado
+        if (is_array($datos) == true and count($datos) > 0) {
+            foreach ($datos as $row) {
+               $output["id_tarea"] = $row["id_tarea"];
+               
+                // Validamos si vienen archivos desde la vista
+                if (!empty($_FILES['files']['name'])) {
+                    $countfiles = count($_FILES['files']['name']);
+
+                    // Generamos ruta según el último ID registrado en la BD
+                    $ruta = "../public/documentos_tareas/".$output['id_tarea']."/";
+                    $files_arr = array();
+
+                    // Si no existe la ruta se crea
+                    if (!file_exists($ruta)) {
+                        mkdir($ruta, 0007, true);
+                    }
+
+                    // Recorremos archivos e insertamos tantos detalles como documentos vinieron desde la vista
+                    for ($i=0 ; $i < $countfiles; $i++ ) { 
+                        $doc1 = $_FILES['files']['tmp_name'][$i];
+                        $destino = $ruta.$_FILES['files']['name'][$i];
+                        $documento -> insert_documento_tarea($output['id_tarea'], $_FILES['files']['name'][$i]);
+                        move_uploaded_file($doc1, $destino);
+                    }
+                }
+            }
+        }
         break;
 
     case "listar":

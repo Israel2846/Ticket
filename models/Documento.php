@@ -11,6 +11,21 @@
             $sql->execute();
         }
 
+        public function insert_documento_tarea($id_tarea, $doc_nom){
+            try {
+                $conectar = parent::conexion();
+                $sql = "INSERT INTO td_documento_tarea (id_tarea, nom_doc, fech_crea, est)
+                        VALUES (?, ?, now(), 1)";
+                $sql = $conectar -> prepare($sql);
+                $sql -> bindParam(1, $id_tarea);
+                $sql -> bindParam(2, $doc_nom);
+                $sql -> execute();
+                return true;
+            } catch (Exception $e) {
+                return $e -> getMessage();
+            }
+        }
+
         /* TODO: Obtener Documento por Ticket */
         public function get_documento_x_ticket($tick_id){
             $conectar= parent::conexion();

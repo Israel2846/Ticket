@@ -29,11 +29,6 @@ $(document).ready(function() {
             ['height', ['height']]
         ]
     });
-    
-    /* TODO: Llenar Combo ticket */
-   /*  $.post("../../controller/ticket.php?op=combo",function(data, status){
-        $('#tick_id').html(data);
-    }); */
 });
 
 function guardaryeditar(e){
@@ -46,7 +41,11 @@ function guardaryeditar(e){
     /* TODO: validamos si los campos tienen informacion antes de guardar */
     if ($('#tarea_desc').summernote('isEmpty') || $('#tick_id').val() == 0 || $('#usu_id').val() == 0 || $('#tarea_titulo').val() == 0){
         swal("Advertencia!", "Campos Vacios", "warning");
-    }else{        
+    }else{   
+        var totalfiles = $('#fileElem').val().length;
+        for (let index = 0; index < totalfiles; index++) {
+            formData.append("files[]", $('#fileElem')[0].files[index]);
+        }
         /* TODO: Guardar Ticket */
         $.ajax({
             url: "../../controller/tarea.php?op=insert",
