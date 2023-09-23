@@ -17,7 +17,7 @@ class Tarea extends Conectar{
             $sql2 = "SELECT last_insert_id() AS 'id_tarea'";
             $sql2 = $conectar -> prepare($sql2);
             $sql2 -> execute();
-            
+
             // Retornamos el ultimo registro
             return $sql2 -> fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
@@ -45,10 +45,13 @@ class Tarea extends Conectar{
             $sql->bindParam(3, $descripcion_tarea);
             $sql->execute();
 
-            $sql2 = "SELECT last_insert_id() as 'tarea_detalle_id'";
+            // Obtenemos ultimo id insertado en la bd.
+            $sql2 = "SELECT last_insert_id() as 'id_detalle_tarea'";
             $sql2 = $conectar->prepare($sql2);
             $sql2->execute();
-            return $sql2->fetchAll(pdo::FETCH_ASSOC);
+
+            // Retornamos el último id.
+            return $sql2->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
             return $e->getMessage();
         }

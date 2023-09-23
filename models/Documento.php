@@ -27,6 +27,33 @@
             }
         }
 
+        /* TODO: insertar documento detalle */
+        public function insert_documento_detalle($tickd_id,$det_nom){
+            $conectar= parent::conexion();
+            /* consulta sql */
+            $sql="INSERT INTO td_documento_detalle (det_id,tickd_id,det_nom,est) VALUES (null,?,?,1);";
+            $sql = $conectar->prepare($sql);
+            $sql->bindParam(1,$tickd_id);
+            $sql->bindParam(2,$det_nom);
+            $sql->execute();
+        }
+
+        // Insertar documentos de respuestas de tarea
+        public function insert_documento_detalle_tarea($id_tarea,$nom_det){
+            try {
+                $conectar= parent::conexion();
+                /* consulta sql */
+                $sql="INSERT INTO td_documento_tarea_detalle(id_tarea, nom_det, est) VALUES(?, ?, 1)";
+                $sql = $conectar->prepare($sql);
+                $sql->bindParam(1,$id_tarea);
+                $sql->bindParam(2,$nom_det);
+                $sql->execute();
+                return true;
+            } catch (Exception $e) {
+                return $e -> getMessage();
+            }
+        }
+
         /* TODO: Obtener Documento por Ticket */
         public function get_documento_x_ticket($tick_id){
             $conectar= parent::conexion();
@@ -52,17 +79,6 @@
             } catch (Exception $e) {
                 return $e -> getMessage();
             }
-        }
-
-        /* TODO: insertar documento detalle */
-        public function insert_documento_detalle($tickd_id,$det_nom){
-            $conectar= parent::conexion();
-            /* consulta sql */
-            $sql="INSERT INTO td_documento_detalle (det_id,tickd_id,det_nom,est) VALUES (null,?,?,1);";
-            $sql = $conectar->prepare($sql);
-            $sql->bindParam(1,$tickd_id);
-            $sql->bindParam(2,$det_nom);
-            $sql->execute();
         }
 
         /* TODO: Obtener Documento x detalle */

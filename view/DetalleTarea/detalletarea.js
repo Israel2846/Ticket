@@ -233,18 +233,23 @@ $(document).on(
             );
         } else {
             // Datos que recibe controlador
-            datos = {
-                id_tarea : idTarea,
-                id_usuario : idUsuario,
-                respuesta_tarea : respuestaTarea
+            var formData = new FormData();
+            formData.append('id_tarea', idTarea);
+            formData.append('id_usuario', idUsuario);
+            formData.append('respuesta_tarea', respuestaTarea);
+            var totalFiles = $('#fileElem').val().length;
+            for (let index = 0; index < totalFiles; index++) {
+                formData.append("files[]", $('#fileElem')[0].files[index]);
             }
-
+            
             // Ajax para mandar los datos al controlador e insertar en BD
             $.ajax(
                 {
                     url : "../../controller/tarea.php?op=insertar_respuesta",
                     type : "POST",
-                    data : datos,
+                    data : formData,
+                    contentType: false,
+                    processData: false,
                     success : function(data){
                         console.log(data);
                         listardetalle(idTarea);

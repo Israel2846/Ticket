@@ -44,6 +44,29 @@ switch($_GET["op"]){
         }
         break;
 
+    case "insertar_respuesta":
+        $datos = $tarea->insert_respuesta_tarea($_POST['id_tarea'], $_POST['id_usuario'], $_POST['respuesta_tarea']);
+        if (is_array($datos) == true and count($datos) > 0) {
+            foreach ($datos as $row) {
+                $output['id_detalle_tarea'] = $row["id_detalle_tarea"];
+                if (!empty($_FILES['files']['name'])) {
+                    $countfiles = count($_FILES['files']['name']);
+                    $ruta = "../public/documentos_respuesta_tarea/".$output['id_detalle_tarea']."/";
+                    $files_arr = array();
+                    if (!file_exists($ruta)) {
+                        mkdir($ruta, 0777, true);
+                    }
+                    for ($i = 0; $i < $countfiles; $i++) { 
+                        $doc1 = $_FILES['files']['tmp_name'][$i];
+                        $destino = $ruta.$_FILES['files']['name'][$i];
+                        $documento -> insert_documento_detalle_tarea($output['id_detalle_tarea'], $_FILES['files']['name'][$i]);
+                        move_uploaded_file($doc1, $destino);
+                    }
+                }
+            }
+        }
+        break;
+
     case "listar":
         $datos = $tarea->listar_tareas();        
         echo json_encode($datos);
@@ -75,11 +98,6 @@ switch($_GET["op"]){
     case "tareas_abiertas":
         $datos = $tarea->count_tareas_abiertas($_POST['id_usuario']);
         echo json_encode($datos);
-        break;
-
-    case "insertar_respuesta":
-        $respuesta = $tarea->insert_respuesta_tarea($_POST['id_tarea'], $_POST['id_usuario'], $_POST['respuesta_tarea']);
-        echo $respuesta;
         break;
 
     case "listar_respuestas":
