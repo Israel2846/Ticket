@@ -140,6 +140,8 @@ switch($_GET["op"]){
                                     <p>
                                         <?php echo $row["tarea_desc"];?>
                                     </p>
+                                    <br>
+                                    <!-- Mostrar documentos en el las respuestas de las tareas -->
                                 </div>
                             </div>
                         </section>
