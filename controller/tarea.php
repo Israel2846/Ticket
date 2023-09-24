@@ -48,10 +48,10 @@ switch($_GET["op"]){
         $datos = $tarea->insert_respuesta_tarea($_POST['id_tarea'], $_POST['id_usuario'], $_POST['respuesta_tarea']);
         if (is_array($datos) == true and count($datos) > 0) {
             foreach ($datos as $row) {
-                $output['id_detalle_tarea'] = $row["id_detalle_tarea"];
+                $output['id_tarea'] = $row["id_tarea"];
                 if (!empty($_FILES['files']['name'])) {
                     $countfiles = count($_FILES['files']['name']);
-                    $ruta = "../public/documentos_respuesta_tarea/".$output['id_detalle_tarea']."/";
+                    $ruta = "../public/documentos_respuesta_tarea/".$output['id_tarea']."/";
                     $files_arr = array();
                     if (!file_exists($ruta)) {
                         mkdir($ruta, 0777, true);
@@ -59,7 +59,7 @@ switch($_GET["op"]){
                     for ($i = 0; $i < $countfiles; $i++) { 
                         $doc1 = $_FILES['files']['tmp_name'][$i];
                         $destino = $ruta.$_FILES['files']['name'][$i];
-                        $documento -> insert_documento_detalle_tarea($output['id_detalle_tarea'], $_FILES['files']['name'][$i]);
+                        $documento -> insert_documento_detalle_tarea($output['id_tarea'], $_FILES['files']['name'][$i]);
                         move_uploaded_file($doc1, $destino);
                     }
                 }
@@ -142,6 +142,39 @@ switch($_GET["op"]){
                                     </p>
                                     <br>
                                     <!-- Mostrar documentos en el las respuestas de las tareas -->
+                                    <?php 
+                                        $datos_tarea = $documento -> get_documento_detalle_x_tarea($row['tareadetalle_id']);
+                                        if (is_array($datos_tarea) and count($datos_tarea) > 0) {
+                                    ?>
+                                        <p><strong>Documentos Adicionales</strong></p>
+
+                                        <table class="table table-bordered table-striped table-vcenter js-dataTable-full">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 60;">Nombre</th>
+                                                    <th style="width: 40;"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            <?php 
+                                            foreach ($datos_tarea as $dato) {
+                                            ?>
+                                                <tr>
+                                                    <td>
+                                                        <?php echo $dato['nom_det']; ?>
+                                                    </td>
+                                                    <td>
+                                                        <a href="../public/documentos_respuesta_tarea/<?php echo $dato['id_tarea'];?>/<?php echo $dato['nom_det'];?>" target="_blank" class="btn btn-inline btn-primary btn-sm">Ver</a>
+                                                    </td>
+                                                </tr>
+                                            <?php      
+                                            }
+                                            ?>
+                                            </tbody>
+                                        </table>
+                                    <?php 
+                                        }
+                                    ?>
                                 </div>
                             </div>
                         </section>
@@ -149,4 +182,5 @@ switch($_GET["op"]){
                 </article>
             <?php } ?>
         <?php
+        break;
 }

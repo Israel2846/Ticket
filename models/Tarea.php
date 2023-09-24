@@ -46,7 +46,7 @@ class Tarea extends Conectar{
             $sql->execute();
 
             // Obtenemos ultimo id insertado en la bd.
-            $sql2 = "SELECT last_insert_id() as 'id_detalle_tarea'";
+            $sql2 = "SELECT last_insert_id() AS 'id_tarea'";
             $sql2 = $conectar->prepare($sql2);
             $sql2->execute();
 

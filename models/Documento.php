@@ -91,5 +91,19 @@
             $sql->execute();
             return $resultado = $sql->fetchAll(pdo::FETCH_ASSOC);
         }
+
+        // Obtener documentos por tarea
+        public function get_documento_detalle_x_tarea($id_tarea){
+            try {
+                $conectar = parent::conexion();
+                $sql = "SELECT * FROM td_documento_tarea_detalle WHERE id_tarea = ?";
+                $sql = $conectar -> prepare($sql);
+                $sql -> bindParam(1, $id_tarea);
+                $sql -> execute();
+                return $sql -> fetchAll(PDO::FETCH_ASSOC);
+            } catch (Exception $e) {
+                return $e -> getMessage();
+            }
+        }
     }
 ?>
