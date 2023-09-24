@@ -164,7 +164,7 @@ switch($_GET["op"]){
                                                         <?php echo $dato['nom_det']; ?>
                                                     </td>
                                                     <td>
-                                                        <a href="../public/documentos_respuesta_tarea/<?php echo $dato['id_tarea'];?>/<?php echo $dato['nom_det'];?>" target="_blank" class="btn btn-inline btn-primary btn-sm">Ver</a>
+                                                        <a href="../../public/documentos_respuesta_tarea/<?php echo $dato['id_tarea'];?>/<?php echo $dato['nom_det'];?>" target="_blank" class="btn btn-inline btn-primary btn-sm">Ver</a>
                                                     </td>
                                                 </tr>
                                             <?php      

@@ -13,6 +13,7 @@ $(document).ready(function(){
         $('#btnpausarticket').hide();
         $('#btnreanudarticket').hide();
         $('#btncerrarticket').hide();
+        $('#btnNuevaTarea').hide();
     }
 
     /* TODO: Inicializamos summernotejs */
