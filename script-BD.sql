@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 21-09-2023 a las 00:54:09
+-- Tiempo de generación: 24-09-2023 a las 22:01:22
 -- Versión del servidor: 10.4.28-MariaDB
 -- Versión de PHP: 8.2.4
 
@@ -45,6 +45,33 @@ CREATE TABLE `td_documento_detalle` (
   `det_id` int(11) NOT NULL,
   `tickd_id` int(11) NOT NULL,
   `det_nom` varchar(200) NOT NULL,
+  `est` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `td_documento_tarea`
+--
+
+CREATE TABLE `td_documento_tarea` (
+  `id_documento_tarea` int(11) NOT NULL,
+  `id_tarea` int(11) NOT NULL,
+  `nom_doc` varchar(400) NOT NULL,
+  `fech_crea` datetime NOT NULL,
+  `est` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `td_documento_tarea_detalle`
+--
+
+CREATE TABLE `td_documento_tarea_detalle` (
+  `id_tarea_detalle` int(11) NOT NULL,
+  `id_tarea` int(11) NOT NULL,
+  `nom_det` varchar(200) NOT NULL,
   `est` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
@@ -247,6 +274,20 @@ ALTER TABLE `td_documento_detalle`
   ADD PRIMARY KEY (`det_id`);
 
 --
+-- Indices de la tabla `td_documento_tarea`
+--
+ALTER TABLE `td_documento_tarea`
+  ADD PRIMARY KEY (`id_documento_tarea`),
+  ADD KEY `fk_id_tarea_documento` (`id_tarea`);
+
+--
+-- Indices de la tabla `td_documento_tarea_detalle`
+--
+ALTER TABLE `td_documento_tarea_detalle`
+  ADD PRIMARY KEY (`id_tarea_detalle`),
+  ADD KEY `fk_id_tarea_detalle` (`id_tarea`);
+
+--
 -- Indices de la tabla `td_pausas_ticket`
 --
 ALTER TABLE `td_pausas_ticket`
@@ -345,6 +386,18 @@ ALTER TABLE `td_documento_detalle`
   MODIFY `det_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `td_documento_tarea`
+--
+ALTER TABLE `td_documento_tarea`
+  MODIFY `id_documento_tarea` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `td_documento_tarea_detalle`
+--
+ALTER TABLE `td_documento_tarea_detalle`
+  MODIFY `id_tarea_detalle` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `td_pausas_ticket`
 --
 ALTER TABLE `td_pausas_ticket`
@@ -419,6 +472,18 @@ ALTER TABLE `tm_usuario`
 --
 -- Restricciones para tablas volcadas
 --
+
+--
+-- Filtros para la tabla `td_documento_tarea`
+--
+ALTER TABLE `td_documento_tarea`
+  ADD CONSTRAINT `fk_id_tarea_documento` FOREIGN KEY (`id_tarea`) REFERENCES `tm_tarea` (`id_tarea`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `td_documento_tarea_detalle`
+--
+ALTER TABLE `td_documento_tarea_detalle`
+  ADD CONSTRAINT `fk_id_tarea_detalle` FOREIGN KEY (`id_tarea`) REFERENCES `td_tareadetalle` (`tareadetalle_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `td_pausas_ticket`
