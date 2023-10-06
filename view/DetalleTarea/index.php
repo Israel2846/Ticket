@@ -102,6 +102,7 @@ if (isset($_SESSION["usu_id"])) {
               <fieldset class="form-group">
                 <label for="fileElement" class="form-label semibold">Documentos Adicionales</label>
                 <input type="file" name="fileElem" id="fileElem" class="form-control" multiple>
+                <p style="color: red;" id="errorText"></p>
               </fieldset>
             </div>
 

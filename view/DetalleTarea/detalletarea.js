@@ -65,6 +65,30 @@ function listardetalle(id_tarea){
 
 $(document).ready(function(){
     var id_tarea = idTarea;
+    const inputDocumentos = document.getElementById('fileElem');
+    const textoError = document.getElementById('errorText');
+    const btnEnviar = document.getElementById('btnEnviar');
+    const tamanoMax = 3*1024*1024;
+
+    // Restricción de tamaño de documentos
+    inputDocumentos.addEventListener('change', function() {
+        const documentos = inputDocumentos.files;
+        let tamanoTotal = 0;
+
+        for (let index = 0; index < documentos.length; index++) {
+            tamanoTotal += documentos[index].size;
+        }
+
+        if (tamanoTotal > tamanoMax) {
+            textoError.textContent = 'El tamaño de los documentos es mayor al límite';
+            inputDocumentos.value = '';
+            btnEnviar.style.display = 'none';
+        } else {
+            btnEnviar.style.display = 'block';
+            textoError.textContent = '';
+        }
+    });
+
     listardetalle(id_tarea)
 
     if (rolUsuario == 3) {
