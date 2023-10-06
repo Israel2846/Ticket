@@ -217,10 +217,12 @@ class Tarea extends Conectar{
                         tm_tarea.estado_tarea = 0,
                         tm_tarea.fecha_finalizacion = CURRENT_TIMESTAMP ,
                         tm_ticket.tick_estado = 'Pausado'
-                    WHERE tm_tarea.id_tarea = (
+                    WHERE tm_tarea.id_tarea IN (
+                        SELECT subquery.id_tarea
+                        FROM(
                             SELECT tm_tarea.id_tarea
                             FROM tm_tarea
-                            WHERE tm_tarea.id_usuario = ? AND tm_tarea.estado_tarea = 1
+                            WHERE tm_tarea.id_usuario = ? AND tm_tarea.estado_tarea = 1) AS subquery
                         )";
             $sql2 = $conectar->prepare($sql2);
             $sql2->bindValue(1, $id_usuario);
