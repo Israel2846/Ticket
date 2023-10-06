@@ -61,7 +61,8 @@ if(isset($_SESSION["usu_id"])){
 						<div class="col-lg-6">
 							<fieldset class="form-group">
 								<label class="form-label semibold" for="tarea_titulo">Documentos adicionales</label>
-								<input type="file" name="fileElem" id="fileElem" class="form-control">
+								<input type="file" name="fileElem" id="fileElem" class="form-control" multiple>
+								<p style="color: red;" id="errorText"></p>
 							</fieldset>
 						</div>
 
@@ -75,7 +76,7 @@ if(isset($_SESSION["usu_id"])){
 						</div>
 						
 						<div class="col-lg-12">
-							<button type="submit" name="action" value="add" class="btn btn-rounded btn-inline btn-primary">Guardar</button>
+							<button type="submit" name="action" value="add" class="btn btn-rounded btn-inline btn-primary" id="btnGuardar">Guardar</button>
 						</div>
 					</form>
 				</div>

@@ -6,6 +6,30 @@ function init(){
 }
 
 $(document).ready(function() { 
+    const inputDocumentos = document.getElementById('fileElem');
+    const textoError = document.getElementById('errorText');
+    const btnGuardar = document.getElementById('btnGuardar');
+    const tamanoMax = 3*1024*1024;
+
+    // Restricción de tamaño de documento
+    inputDocumentos.addEventListener('change', function() {
+        const documentos = inputDocumentos.files;
+        let tamanoTotal = 0;
+
+        for (let index = 0; index < documentos.length; index++) {
+            tamanoTotal += documentos[index].size;
+        }
+
+        if (tamanoTotal > tamanoMax) {
+            textoError.textContent = 'El tamaño de los documentos es mayor al límite';
+            inputDocumentos.value = '';
+            btnGuardar.style.display = 'none';
+        } else {
+            btnGuardar.style.display = 'block';
+            textoError.textContent = '';
+        }
+    });
+
     console.log($('#usu_id').val())
     /* TODO: Inicializar SummerNote */
     $('#tarea_desc').summernote({
