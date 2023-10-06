@@ -70,8 +70,6 @@ $(document).ready(
                             return elemento;
                         }
                     },
-                    { "data": "nombre_almacen" },
-                    { "data": "nombre_area" },
                     { 
                         "data": "tick_id",
                         render: function (data, type, row) {

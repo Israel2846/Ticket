@@ -115,16 +115,12 @@
                     tm_usuario.usu_ape,
                     tm_categoria.cat_nom,
                     tm_ticket.prio_id,
-                    tm_prioridad.prio_nom,
-                    tm_almacen.nombre_almacen,
-                    tm_area_almacen.nombre_area
+                    tm_prioridad.prio_nom
                     FROM 
                     tm_ticket
                     INNER join tm_categoria on tm_ticket.cat_id = tm_categoria.cat_id
                     INNER join tm_usuario on tm_ticket.usu_id = tm_usuario.usu_id
                     INNER join tm_prioridad on tm_ticket.prio_id = tm_prioridad.prio_id
-                    INNER JOIN tm_almacen ON tm_almacen.id_almacen = tm_usuario.usu_almacen
-                    INNER JOIN tm_area_almacen ON tm_area_almacen.id_almacen = tm_usuario.usu_area
                     WHERE
                     tm_ticket.est = 1 AND tm_ticket.usu_asig = ?
                     ORDER BY FIELD(tm_ticket.tick_estado, 'Abierto', 'En proceso', 'Pausado', 'Cerrado') ASC, tm_ticket.prio_id DESC";
@@ -159,16 +155,12 @@
                     tm_usuario.usu_ape,
                     tm_categoria.cat_nom,
                     tm_ticket.prio_id,
-                    tm_prioridad.prio_nom,
-                    tm_almacen.nombre_almacen,
-                    tm_area_almacen.nombre_area
+                    tm_prioridad.prio_nom
                     FROM 
                     tm_ticket
                     INNER join tm_categoria on tm_ticket.cat_id = tm_categoria.cat_id
                     INNER join tm_usuario on tm_ticket.usu_id = tm_usuario.usu_id
                     INNER join tm_prioridad on tm_ticket.prio_id = tm_prioridad.prio_id
-                    INNER JOIN tm_almacen ON tm_almacen.id_almacen = tm_usuario.usu_almacen
-                    INNER JOIN tm_area_almacen ON tm_area_almacen.id_almacen = tm_usuario.usu_area
                     WHERE
                     tm_ticket.est = 1 AND tm_ticket.usu_id = ?
                     ORDER BY tm_ticket.tick_id DESC";
