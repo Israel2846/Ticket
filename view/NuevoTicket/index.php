@@ -81,8 +81,9 @@
 
 						<div class="col-lg-6">
 							<fieldset class="form-group">
-								<label class="form-label semibold" for="exampleInput">Documentos Adicionales</label>
+								<label class="form-label semibold" for="exampleInput">Documentos Adicionales (MAX 3MB)</label>
 								<input type="file" name="fileElem" id="fileElem" class="form-control" multiple>
+								<p id="errorFiles" style="color: red;"></p>
 							</fieldset>
 						</div>
 
@@ -95,7 +96,7 @@
 							</fieldset>
 						</div>
 						<div class="col-lg-12">
-							<button type="submit" name="action" value="add" class="btn btn-rounded btn-inline btn-primary">Guardar</button>
+							<button type="submit" name="action" value="add" class="btn btn-rounded btn-inline btn-primary" id="btnGuardar">Guardar</button>
 						</div>
 					</form>
 				</div>

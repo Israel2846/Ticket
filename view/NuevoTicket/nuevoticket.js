@@ -6,6 +6,11 @@ function init(){
 }
 
 $(document).ready(function() {
+    const inputDocumento = document.getElementById('fileElem');
+    const textoError = document.getElementById('errorFiles');
+    const btnGuardar = document.getElementById('btnGuardar');
+    const tamañoMax = 3*1024*1024;
+
     /* TODO: Inicializar SummerNote */
     $('#tick_descrip').summernote({
         height: 150,
@@ -48,6 +53,24 @@ $(document).ready(function() {
         $('#prio_id').html(data);
     });
 
+    // Comprobamos si los documentos no exceden el tamaño maximo
+    inputDocumento.addEventListener('change', function() {
+        const documentos = inputDocumento.files;
+        let tamañoTotal = 0;
+
+        for (let index = 0; index < documentos.length; index++) {
+            tamañoTotal += documentos[index].size;        
+        }
+
+        if (tamañoTotal > tamañoMax) {
+            textoError.textContent = 'El tamaño total de los archivos es mayor al límite';
+            inputDocumento.value = '';
+            btnGuardar.style.display = 'none';
+        } else {
+            btnGuardar.style.display = 'block'
+            textoError.textContent = '';
+        }
+    })
 });
 
 function guardaryeditar(e){
