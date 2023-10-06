@@ -23,7 +23,7 @@
                     header("Location:".conectar::ruta()."index.php?m=2");
 					exit();
                 }else{
-                    $sql = "SELECT * FROM tm_usuario WHERE usu_correo=? or num_colab = ? and usu_pass=MD5(?) and rol_id=? and est=1";
+                    $sql = "SELECT * FROM tm_usuario WHERE (usu_correo=? or num_colab = ?) and usu_pass=MD5(?) and rol_id=? and est=1";
                     $stmt=$conectar->prepare($sql);
                     $stmt->bindValue(1, $correo);
                     $stmt->bindValue(2, $correo);
