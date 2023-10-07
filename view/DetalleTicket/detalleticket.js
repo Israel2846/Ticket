@@ -340,10 +340,15 @@ $(document).on(
                                 $('#btnNuevaTarea').hide();
                                 swal({
                                     title: "HelpDesk!",
-                                    text: "Ticket pausado con exito",
+                                    text: "Ticket Cerrado correctamente.",
                                     type: "success",
-                                    confirmButtonClass: "btn-primary"
-                                })
+                                    confirmButtonClass: "btn-success",
+                                    confirmButtonText: "Aceptar",
+                                    closeOnConfirm: false,
+                                    closeOnCancel: false
+                                }, function() {
+                                    window.location.href = 'http://localhost/gestor-de-tickets/view/MisTickets/';
+                                });
                             } else {
                                 console.log(data);
                             }
