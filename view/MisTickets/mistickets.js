@@ -28,7 +28,22 @@ $(document).ready(
                     dataSrc : ""
                 },
                 columns : [
-                    { "data": "tick_id" },
+                    { 
+                        "data": "tick_id",
+                        render: function(data, type, row){
+                            if (row.tick_estado == 'Abierto') {
+                                return '<span class="label label-pill label-success">'+ data +'</span>';
+                            } else if( row.tick_estado == 'En proceso') {
+                                return '<span class="label label-pill label-warning">'+ data +'</span>';
+                            } else if( row.tick_estado == 'Pausado') {
+                                return '<span class="label label-pill label-primary">'+ data +'</span>';
+                            } else if( row.tick_estado == 'Cerrado') {
+                                return '<span class="label label-pill label-danger">'+ data +'</span>';
+                            } else {
+                                return 'Error'
+                            }
+                        }
+                    },
                     { "data": "cat_nom" },
                     { "data": "tick_titulo" },
                     { 
