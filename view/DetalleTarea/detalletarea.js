@@ -223,14 +223,17 @@ $(document).on(
                             console.log(data)
                             if (data.success) {
                                 listardetalle(id_tarea);
-                                swal(
-                                    {
-                                        title: "HelpDesk!",
-                                        text: "Ticket Cerrado correctamente.",
-                                        type: "success",
-                                        confirmButtonClass: "btn-success"
-                                    }
-                                );
+                                swal({
+                                    title: "Correcto!",
+                                    text: "Tarea cerrada correctamente.",
+                                    type: "success",
+                                    confirmButtonClass: "btn-success",
+                                    confirmButtonText: "Aceptar",
+                                    closeOnConfirm: false,
+                                    closeOnCancel: false
+                                }, function() {
+                                    window.history.back();
+                                });
                             } else {
                                 swal("Error", "Hubo un problema al cerrar la tarea.", "error");
                             }

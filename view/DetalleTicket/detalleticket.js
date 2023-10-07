@@ -489,7 +489,12 @@ $(document).on("click","#btncerrarticket", function(){
                 title: "HelpDesk!",
                 text: "Ticket Cerrado correctamente.",
                 type: "success",
-                confirmButtonClass: "btn-success"
+                confirmButtonClass: "btn-success",
+                confirmButtonText: "Aceptar",
+                closeOnConfirm: false,
+                closeOnCancel: false
+            }, function() {
+                window.location.href = 'http://localhost/gestor-de-tickets/view/MisTickets/';
             });
         }
     });
