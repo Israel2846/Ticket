@@ -59,9 +59,9 @@ $(document).ready(
                     },
                     { "data": "fech_crea" },
                     { "data": "fech_asig" },
-                    { "data": "fech_asig" },
-                    { "data": "fech_asig" },
-                    { "data": "fech_asig" },
+                    { "data": "timeresp" },
+                    { "data": "timetransc" },
+                    { "data": "tiempototal" },
                     { "data": "fech_cierre" },
                     { 
                         "data": "usu_nom",

@@ -101,21 +101,25 @@
                 $conectar= parent::conexion();
                 parent::set_names();
                 $sql="SELECT 
-                    tm_ticket.tick_id,
-                    tm_ticket.usu_id,
-                    tm_ticket.cat_id,
-                    tm_ticket.tick_titulo,
-                    tm_ticket.tick_descrip,
-                    tm_ticket.tick_estado,
-                    tm_ticket.fech_crea,
-                    tm_ticket.fech_cierre,
-                    tm_ticket.usu_asig,
-                    tm_ticket.fech_asig,
-                    tm_usuario.usu_nom,
-                    tm_usuario.usu_ape,
-                    tm_categoria.cat_nom,
-                    tm_ticket.prio_id,
-                    tm_prioridad.prio_nom
+                        tm_ticket.tick_id,
+                        tm_ticket.usu_id,
+                        tm_ticket.cat_id,
+                        tm_ticket.tick_titulo,
+                        tm_ticket.tick_descrip,
+                        tm_ticket.tick_estado,
+                        tm_ticket.fech_crea,
+                        tm_ticket.fech_cierre,
+                        tm_ticket.usu_asig,
+                        tm_ticket.fech_asig,
+                        tm_usuario.usu_nom,
+                        tm_usuario.usu_ape,
+                        tm_categoria.cat_nom,
+                        tm_ticket.prio_id,
+                        tm_prioridad.prio_nom,
+                        CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_crea, tm_ticket.fech_asig), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_crea, tm_ticket.fech_asig)%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_crea, tm_ticket.fech_asig)%60, ' minutos') AS timeresp,
+                        CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_crea, NOW()), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_crea, NOW())%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_crea, NOW())%60, ' minutos') AS timetransc,
+                        CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_asig, tm_ticket.fech_cierre), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_asig, tm_ticket.fech_cierre)%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_asig, tm_ticket.fech_cierre)%60, ' minutos') AS timetarea,
+                        CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_crea, tm_ticket.fech_cierre), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_crea, tm_ticket.fech_cierre)%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_crea, tm_ticket.fech_cierre)%60, ' minutos') AS tiempototal
                     FROM 
                     tm_ticket
                     INNER join tm_categoria on tm_ticket.cat_id = tm_categoria.cat_id
@@ -141,21 +145,25 @@
                 $conectar= parent::conexion();
                 parent::set_names();
                 $sql="SELECT 
-                    tm_ticket.tick_id,
-                    tm_ticket.usu_id,
-                    tm_ticket.cat_id,
-                    tm_ticket.tick_titulo,
-                    tm_ticket.tick_descrip,
-                    tm_ticket.tick_estado,
-                    tm_ticket.fech_crea,
-                    tm_ticket.fech_cierre,
-                    tm_ticket.usu_asig,
-                    tm_ticket.fech_asig,
-                    tm_usuario.usu_nom,
-                    tm_usuario.usu_ape,
-                    tm_categoria.cat_nom,
-                    tm_ticket.prio_id,
-                    tm_prioridad.prio_nom
+                        tm_ticket.tick_id,
+                        tm_ticket.usu_id,
+                        tm_ticket.cat_id,
+                        tm_ticket.tick_titulo,
+                        tm_ticket.tick_descrip,
+                        tm_ticket.tick_estado,
+                        tm_ticket.fech_crea,
+                        tm_ticket.fech_cierre,
+                        tm_ticket.usu_asig,
+                        tm_ticket.fech_asig,
+                        tm_usuario.usu_nom,
+                        tm_usuario.usu_ape,
+                        tm_categoria.cat_nom,
+                        tm_ticket.prio_id,
+                        tm_prioridad.prio_nom,
+                        CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_crea, tm_ticket.fech_asig), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_crea, tm_ticket.fech_asig)%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_crea, tm_ticket.fech_asig)%60, ' minutos') AS timeresp,
+                        CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_crea, NOW()), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_crea, NOW())%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_crea, NOW())%60, ' minutos') AS timetransc,
+                        CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_asig, tm_ticket.fech_cierre), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_asig, tm_ticket.fech_cierre)%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_asig, tm_ticket.fech_cierre)%60, ' minutos') AS timetarea,
+                        CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_crea, tm_ticket.fech_cierre), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_crea, tm_ticket.fech_cierre)%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_crea, tm_ticket.fech_cierre)%60, ' minutos') AS tiempototal
                     FROM 
                     tm_ticket
                     INNER join tm_categoria on tm_ticket.cat_id = tm_categoria.cat_id
