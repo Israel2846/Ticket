@@ -79,19 +79,11 @@ $(document).ready(function(){
     $('#tickd_descripusu').summernote('disable');
 
     /* TODO: Listamos documentos en caso hubieran */
-    tabla=$('#documentos_data').dataTable({
+    tabla=$('#documentos_data').DataTable({
         "aProcessing": true,
         "aServerSide": true,
-        dom: 'Bfrtip',
-        "searching": true,
         lengthChange: false,
         colReorder: true,
-        buttons: [
-                'copyHtml5',
-                'excelHtml5',
-                'csvHtml5',
-                'pdfHtml5'
-                ],
         "ajax":{
             url: '../../controller/documento.php?op=listar',
             type : "post",
@@ -102,8 +94,10 @@ $(document).ready(function(){
             }
         },
         "bDestroy": true,
+        "bFilter": false,
+        "paging": false,
         "responsive": true,
-        "bInfo":true,
+        "bInfo":false,
         "iDisplayLength": 10,
         "autoWidth": false,
         "language": {
@@ -130,9 +124,13 @@ $(document).ready(function(){
                 "sSortDescending": ": Activar para ordenar la columna de manera descendente"
             }
         }
-    }).DataTable();
+    })
 
     $('#tarea_data').DataTable({
+        "aProcessing": true,
+        "aServerSide": true,
+        lengthChange: false,
+        colReorder: true,
         "ajax":{
             url: '../../controller/tarea.php?op=listar_x_ticket',
             type : 'post',
@@ -196,10 +194,11 @@ $(document).ready(function(){
             },
         ],
         order : [],
-        "bPaginate": true,
         "bDestroy": true,
+        "bFilter": false,
+        "paging": false,
         "responsive": true,
-        "bInfo":true,
+        "bInfo":false,
         "iDisplayLength": 10,
         "autoWidth": false,
         "language": {
@@ -225,7 +224,7 @@ $(document).ready(function(){
                 "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
                 "sSortDescending": ": Activar para ordenar la columna de manera descendente"
             }
-        } 
+        }
     })
 });
 
