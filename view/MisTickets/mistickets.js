@@ -4,7 +4,7 @@ $(document).ready(
         const usu_id = $('#user_idx').val();
         const rol_id = $('#rol_idx').val();
         var url = '';
-        if (rol_id == 1) {
+        if (rol_id == 1 || rol_id == 2) {
             url = '../../controller/ticket.php?op=listar_x_usu'
         } else if(rol_id == 3){
             url = '../../controller/ticket.php?op=listar_x_creador';
