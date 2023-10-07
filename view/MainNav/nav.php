@@ -24,6 +24,7 @@
                             <span class="lbl">Mis Tickets</span>
                         </a>
                     </li>
+                    
                     <?php if ($_SESSION["rol_id"]==1) {?>
                     <li class="blue-dirty">
                         <a href="..\ConsultarTicket\">
@@ -50,6 +51,13 @@
                         <a href="..\NuevoTicket\">
                             <span class="glyphicon glyphicon-th"></span>
                             <span class="lbl">Nuevo Ticket</span>
+                        </a>
+                    </li>
+
+                    <li class="blue-dirty">
+                        <a href="..\MisTickets\">
+                            <span class="glyphicon glyphicon-th"></span>
+                            <span class="lbl">Mis Tickets</span>
                         </a>
                     </li>
 
