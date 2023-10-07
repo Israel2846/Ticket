@@ -75,6 +75,9 @@ $(document).ready(function() {
 
 function guardaryeditar(e){
     e.preventDefault();
+
+    $('#btnGuardar').prop('disabled', true).text('Cargando...');
+
     /* TODO: Array del form ticket */
     var formData = new FormData($("#ticket_form")[0]);
     /* TODO: validamos si los campos tienen informacion antes de guardar */
@@ -112,7 +115,18 @@ function guardaryeditar(e){
                 $('#tick_titulo').val('');
                 $('#tick_descrip').summernote('reset');
                 /* TODO: Alerta de Confirmacion */
-                swal("Correcto!", "Registrado Correctamente", "success");
+                swal({
+                    title: "Correcto!",
+                    text: "Registrado correctamente",
+                    type: "success",
+                    showCancelButton: false,
+                    confirmButtonClass: "btn-success",
+                    confirmButtonText: "Aceptar",
+                    closeOnConfirm: false,
+                    closeOnCancel: false
+                }, function(){
+                    window.location.href = 'http://localhost/gestor-de-tickets/view/Home/';
+                });
             }
         });
     }
