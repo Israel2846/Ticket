@@ -15,6 +15,10 @@ $(document).ready(
         // Tabla de datos
         $('#mis_tickets').DataTable(
             {
+                "aProcessing": true,
+                "aServerSide": true,
+                lengthChange: false,
+                colReorder: true,
                 ajax : {
                     url : url,
                     type : 'POST',
@@ -94,10 +98,11 @@ $(document).ready(
                     },
                 ],
                 order : [],
-                "bPaginate": true,
                 "bDestroy": true,
+                "bFilter": false,
+                "paging": true,
                 "responsive": true,
-                "bInfo":true,
+                "bInfo":false,
                 "iDisplayLength": 10,
                 "autoWidth": false,
                 "language": {
@@ -123,7 +128,7 @@ $(document).ready(
                         "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
                         "sSortDescending": ": Activar para ordenar la columna de manera descendente"
                     }
-                } 
+                }
             }
         )
     }
