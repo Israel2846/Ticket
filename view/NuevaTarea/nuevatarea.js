@@ -57,6 +57,9 @@ $(document).ready(function() {
 
 function guardaryeditar(e){
     e.preventDefault();
+
+    $('#btnGuardar').prop('disabled', true).text('Cargando...')
+
     var tick_id = getUrlParameter('ID');
     /* TODO: Array del form tarea */
     var formData = new FormData($("#tarea_form")[0]);
@@ -84,7 +87,18 @@ function guardaryeditar(e){
                 $('#tarea_titulo').val('');
                 $('#tarea_desc').summernote('reset');
                 /* TODO: Alerta de Confirmacion */
-                swal("Correcto!", "Registrado Correctamente", "success");
+                swal({
+                    title: "Correcto!",
+                    text: "Registrado correctamente",
+                    type: "success",
+                    showCancelButton: false,
+                    confirmButtonClass: "btn-success",
+                    confirmButtonText: "Aceptar",
+                    closeOnConfirm: false,
+                    closeOnCancel: false
+                }, function(){
+                    window.location.href = 'http://localhost/gestor-de-tickets/view/DetalleTicket/?ID=' + tick_id;
+                });
             }
         });
     }
