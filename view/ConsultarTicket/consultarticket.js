@@ -160,6 +160,10 @@ $(document).on("click","#btntodo", function(){
 function datatable_abiertos(){
     $('#ticket_abierto').dataTable(
         {
+            "aProcessing": true,
+            "aServerSide": true,
+            lengthChange: false,
+            colReorder: true,
             "ajax" : {
                 url : '../../controller/ticket.php?op=listar_ticket_abierto',
                 dataType : "json",
@@ -211,10 +215,11 @@ function datatable_abiertos(){
                 },
             ],
             order : [],
-            "bPaginate": true,
             "bDestroy": true,
+            "bFilter": false,
+            "paging": true,
             "responsive": true,
-            "bInfo":true,
+            "bInfo":false,
             "iDisplayLength": 10,
             "autoWidth": false,
             "language": {
@@ -240,7 +245,7 @@ function datatable_abiertos(){
                     "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
                     "sSortDescending": ": Activar para ordenar la columna de manera descendente"
                 }
-            } 
+            }
         }
     )
 }
@@ -248,6 +253,10 @@ function datatable_abiertos(){
 function datatable_en_proceso(){
     $('#ticket_en_proceso').dataTable(
         {
+            "aProcessing": true,
+            "aServerSide": true,
+            lengthChange: false,
+            colReorder: true,
             "ajax" : {
                 url : '../../controller/ticket.php?op=listar_ticket_en_proceso',
                 dataType : "json",
@@ -297,10 +306,11 @@ function datatable_en_proceso(){
                 },
             ],
             order : [],
-            "bPaginate": true,
             "bDestroy": true,
+            "bFilter": false,
+            "paging": true,
             "responsive": true,
-            "bInfo":true,
+            "bInfo":false,
             "iDisplayLength": 10,
             "autoWidth": false,
             "language": {
@@ -326,7 +336,7 @@ function datatable_en_proceso(){
                     "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
                     "sSortDescending": ": Activar para ordenar la columna de manera descendente"
                 }
-            } 
+            }
         }
     )
 }
@@ -334,6 +344,10 @@ function datatable_en_proceso(){
 function datatable_pausado(){
     $('#ticket_pausado').dataTable(
         {
+            "aProcessing": true,
+            "aServerSide": true,
+            lengthChange: false,
+            colReorder: true,
             "ajax" : {
                 url : '../../controller/ticket.php?op=listar_ticket_pausado',
                 dataType : "json",
@@ -383,10 +397,11 @@ function datatable_pausado(){
                 },
             ],
             order : [],
-            "bPaginate": true,
             "bDestroy": true,
+            "bFilter": false,
+            "paging": true,
             "responsive": true,
-            "bInfo":true,
+            "bInfo":false,
             "iDisplayLength": 10,
             "autoWidth": false,
             "language": {
@@ -412,7 +427,7 @@ function datatable_pausado(){
                     "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
                     "sSortDescending": ": Activar para ordenar la columna de manera descendente"
                 }
-            } 
+            }
         }
     )
 }
@@ -420,6 +435,10 @@ function datatable_pausado(){
 function datatable_cerrado(){
     $('#ticket_cerrado').dataTable(
         {
+            "aProcessing": true,
+            "aServerSide": true,
+            lengthChange: false,
+            colReorder: true,
             "ajax" : {
                 url : '../../controller/ticket.php?op=listar_ticket_cerrado',
                 dataType : "json",
@@ -468,10 +487,11 @@ function datatable_cerrado(){
                 },
             ],
             order : [],
-            "bPaginate": true,
             "bDestroy": true,
+            "bFilter": false,
+            "paging": true,
             "responsive": true,
-            "bInfo":true,
+            "bInfo":false,
             "iDisplayLength": 10,
             "autoWidth": false,
             "language": {
@@ -497,7 +517,7 @@ function datatable_cerrado(){
                     "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
                     "sSortDescending": ": Activar para ordenar la columna de manera descendente"
                 }
-            } 
+            }
         }
     )
 }

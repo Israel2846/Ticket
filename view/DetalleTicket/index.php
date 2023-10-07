@@ -70,6 +70,16 @@ if (isset($_SESSION["usu_id"])) {
 
               <div class="col-lg-12">
                 <fieldset class="form-group">
+                  <label class="form-label semibold" for="tickd_descripusu">Descripción</label>
+                  <div class="summernote-theme-1">
+                    <textarea id="tickd_descripusu" name="tickd_descripusu" class="summernote" name="name"></textarea>
+                  </div>
+
+                </fieldset>
+              </div>
+
+              <div class="col-lg-12">
+                <fieldset class="form-group">
                   <label class="form-label semibold">Documentos Adicionales</label>
                   <table id="documentos_data" class="table table-bordered table-striped table-vcenter js-dataTable-full">
                     <thead>
@@ -112,15 +122,7 @@ if (isset($_SESSION["usu_id"])) {
                 <button type="button" id="btnNuevaTarea" class="btn btn-rounded btn-inline btn-primary">Nueva Tarea</button>
               </div>
 
-              <div class="col-lg-12">
-                <fieldset class="form-group">
-                  <label class="form-label semibold" for="tickd_descripusu">Descripción</label>
-                  <div class="summernote-theme-1">
-                    <textarea id="tickd_descripusu" name="tickd_descripusu" class="summernote" name="name"></textarea>
-                  </div>
-
-                </fieldset>
-              </div>
+              
 
           </div>
 
