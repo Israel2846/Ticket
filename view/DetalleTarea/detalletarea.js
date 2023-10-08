@@ -147,8 +147,6 @@ $(document).ready(function(){
     $('#documentos_data').DataTable({
         "aProcessing": true,
         "aServerSide": true,
-        dom: 'Bfrtip',
-        "searching": true,
         lengthChange: false,
         colReorder: true,
         buttons: [
@@ -167,8 +165,10 @@ $(document).ready(function(){
             }
         },
         "bDestroy": true,
+        "bFilter": false,
+        "paging": false,
         "responsive": true,
-        "bInfo":true,
+        "bInfo":false,
         "iDisplayLength": 10,
         "autoWidth": false,
         "language": {
