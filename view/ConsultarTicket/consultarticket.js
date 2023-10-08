@@ -173,7 +173,12 @@ function datatable_abiertos(){
                 "dataSrc": ""
             },
             "columns" : [
-                { "data": "tick_id" },
+                { 
+                    "data": "tick_id" ,
+                    render: function(data, type, row) {
+                        return '<span class="label label-pill label-success">' + data + '</span>'
+                    }
+                },
                 { "data": "cat_nom" },
                 { "data": "tick_titulo" },
                 { "data": "prio_nom" },
@@ -266,7 +271,12 @@ function datatable_en_proceso(){
                 "dataSrc": ""
             },
             "columns" : [
-                { "data": "tick_id" },
+                { 
+                    "data": "tick_id" ,
+                    render: function(data, type, row) {
+                        return '<span class="label label-pill label-warning">' + data + '</span>'
+                    }
+                },
                 { "data": "cat_nom" },
                 { "data": "tick_titulo" },
                 { "data": "prio_nom" },
@@ -357,7 +367,12 @@ function datatable_pausado(){
                 "dataSrc": ""
             },
             "columns" : [
-                { "data": "tick_id" },
+                { 
+                    "data": "tick_id" ,
+                    render: function(data, type, row) {
+                        return '<span class="label label-pill label-primary">' + data + '</span>'
+                    }
+                },
                 { "data": "cat_nom" },
                 { "data": "tick_titulo" },
                 { "data": "prio_nom" },
@@ -448,7 +463,12 @@ function datatable_cerrado(){
                 "dataSrc": ""
             },
             "columns" : [
-                { "data": "tick_id" },
+                { 
+                    "data": "tick_id" ,
+                    render: function(data, type, row) {
+                        return '<span class="label label-pill label-danger">' + data + '</span>'
+                    }
+                },
                 { "data": "cat_nom" },
                 { "data": "tick_titulo" },
                 { "data": "prio_nom" },
