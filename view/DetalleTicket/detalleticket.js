@@ -153,8 +153,8 @@ $(document).ready(function(){
             { "data": "tarea_desc" },
             { 
                 "data": "estado_tarea",
-                createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                    switch (cellData) {
+                render: function (data, type, row) {
+                    switch (data) {
                         case 1:
                             html_estado = '<span class="label label-pill label-success">Abierto</span>';
                             break;
@@ -162,27 +162,27 @@ $(document).ready(function(){
                             html_estado = '<span class="label label-pill label-danger">Cerrado</span>';
                             break;
                     }
-                    $(cell).html(html_estado)
+                    return html_estado
                 }
             },
             { "data": "fecha_creacion" },
             { 
                 "data": "fecha_finalizacion",
-                createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                    if (cellData == null) {
-                        $(cell).html('<span class="label label-pill label-danger">Sin Finalizar</span>')
+                render: function (data, type, row) {
+                    if (data == null) {
+                        return'<span class="label label-pill label-danger">Sin Finalizar</span>';
                     } else {
-                        $(cell).html(cellData)
+                        return data
                     }
                 }
             },
             { 
                 "data": "tiempo_finalizacion",
-                createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                    if (cellData == null) {
-                        $(cell).html('<span class="label label-pill label-danger">Sin Finalizar</span>')
+                render: function (data, type, row) {
+                    if (data == null) {
+                        return '<span class="label label-pill label-danger">Sin Finalizar</span>';
                     } else {
-                        $(cell).html(cellData)
+                        return data
                     }
                 }
             },
