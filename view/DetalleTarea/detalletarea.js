@@ -251,6 +251,9 @@ $(document).on(
     function(){
         var respuestaTarea = $('#respTarea').val();
 
+        // Se desabilita el botón y muestra Cargando...
+        $('#btnEnviar').prop('disabled', true).text('Cargando...');
+
         // Validamos que no esten vacíos los campos
         if ($('#respTarea').summernote('isEmpty')) {
             swal(
@@ -265,6 +268,8 @@ $(document).on(
             formData.append('id_usuario', idUsuario);
             formData.append('respuesta_tarea', respuestaTarea);
             var totalFiles = $('#fileElem').val().length;
+
+            // Agregar cada archivo al formulario
             for (let index = 0; index < totalFiles; index++) {
                 formData.append("files[]", $('#fileElem')[0].files[index]);
             }
@@ -277,16 +282,26 @@ $(document).on(
                     data : formData,
                     contentType: false,
                     processData: false,
+
                     success : function(data){
                         console.log(data);
                         listardetalle(idTarea);
                         $('#respTarea').summernote('reset');
-                        swal(
-                            "Correcto!",
-                            "Registrado correctamente",
-                            "success",
-                        );
+
+                        swal({
+                            title: "Correcto!",
+                            text: "Registrado correctamente",
+                            type: "success",
+                            showCancelButton: false,
+                            confirmButtonClass: "btn-success",
+                            confirmButtonText: "Aceptar",
+                            closeOnConfirm: true,
+                            closeOnCancel: false
+                        }, function(){
+                            $('#btnEnviar').prop('disabled', false).text('Enviar');
+                        });
                     },
+
                     error : function(e){
                         console.log("Error! ", e.responseText)
                     }
