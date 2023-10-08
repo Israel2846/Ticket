@@ -79,7 +79,16 @@ $(document).ready(
                     { "data": "fech_crea" },
                     { "data": "fech_asig" },
                     { "data": "timeresp" },
-                    { "data": "timetransc" },
+                    { 
+                        "data": "timetransc" ,
+                        render: function(data, type, row){
+                            if (row.tick_estado == 'Cerrado') {
+                                return '<span class="label label-pill label-danger">Ticket cerrado</span>';
+                            } else {
+                                return data;
+                            }
+                        }
+                    },
                     { "data": "tiempototal" },
                     { "data": "fech_cierre" },
                     { 
