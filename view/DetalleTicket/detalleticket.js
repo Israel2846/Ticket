@@ -419,6 +419,9 @@ $(document).on("click","#btnenviar", function(){
     var usu_id = $('#user_idx').val();
     var tickd_descrip = $('#tickd_descrip').val();
 
+    // Se desabilita el botón y muestra cargando...
+    $('#btnenviar').prop('disabled', true).text('Cargando...');
+
     /* TODO:Validamos si el summernote esta vacio antes de guardar */
     if ($('#tickd_descrip').summernote('isEmpty')){
         swal("Advertencia!", "Falta Descripción", "warning");
@@ -446,7 +449,20 @@ $(document).on("click","#btnenviar", function(){
                 /* TODO: Limpiar inputfile */
                 $('#fileElem').val('');
                 $('#tickd_descrip').summernote('reset');
-                swal("Correcto!", "Registrado Correctamente", "success");
+                
+                // Se muestra notificación y regresa el botón a estado original
+                swal({
+                    title: "Correcto!",
+                    text: "Registrado correctamente",
+                    type: "success",
+                    showCancelButton: false,
+                    confirmButtonClass: "btn-success",
+                    confirmButtonText: "Aceptar",
+                    closeOnConfirm: true,
+                    closeOnCancel: false
+                }, function(){
+                    $('#btnenviar').prop('disabled', false).text('Enviar');
+                });
             }
         });
     }
