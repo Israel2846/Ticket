@@ -261,6 +261,7 @@ $(document).on(
                 "Falta respuesta",
                 "warning",
             );
+            $('#btnEnviar').prop('disabled', false).text('Enviar');
         } else {
             // Datos que recibe controlador
             var formData = new FormData();

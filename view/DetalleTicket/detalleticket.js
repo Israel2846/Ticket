@@ -425,6 +425,8 @@ $(document).on("click","#btnenviar", function(){
     /* TODO:Validamos si el summernote esta vacio antes de guardar */
     if ($('#tickd_descrip').summernote('isEmpty')){
         swal("Advertencia!", "Falta Descripción", "warning");
+        // Se desabilita el botón y muestra cargando...
+        $('#btnenviar').prop('disabled', false).text('Enviar');
     }else{
         var formData = new FormData();
         formData.append('tick_id',tick_id);

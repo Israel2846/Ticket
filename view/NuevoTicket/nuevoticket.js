@@ -83,6 +83,7 @@ function guardaryeditar(e){
     /* TODO: validamos si los campos tienen informacion antes de guardar */
     if ($('#tick_descrip').summernote('isEmpty') || $('#tick_titulo').val()=='' || $('#cats_id').val() == 0 || $('#cat_id').val() == 0 || $('#prio_id').val() == 0){
         swal("Advertencia!", "Campos Vacios", "warning");
+        $('#btnGuardar').prop('disabled', false).text('Guardar');
     }else{
         var totalfiles = $('#fileElem').val().length;
         for (var i = 0; i < totalfiles; i++) {

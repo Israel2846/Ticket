@@ -68,6 +68,7 @@ function guardaryeditar(e){
     /* TODO: validamos si los campos tienen informacion antes de guardar */
     if ($('#tarea_desc').summernote('isEmpty') || $('#tick_id').val() == 0 || $('#usu_id').val() == 0 || $('#tarea_titulo').val() == 0){
         swal("Advertencia!", "Campos Vacios", "warning");
+        $('#btnGuardar').prop('disabled', false).text('Guardar')
     }else{   
         var totalfiles = $('#fileElem').val().length;
         for (let index = 0; index < totalfiles; index++) {
