@@ -40,7 +40,7 @@
                 $usuario->insert_usuario($_POST["usu_nom"],$_POST["usu_ape"],$_POST['num_colab'],$_POST["usu_correo"],$_POST["usu_pass"],$_POST["usu_almacen"],$_POST["usu_area"],$_POST["rol_id"],$_POST["usu_telf"]);     
             }
             else {
-                $usuario->update_usuario($_POST["usu_id"],$_POST["usu_nom"],$_POST["usu_ape"],$_POST["usu_correo"],$_POST["usu_pass"],$_POST["usu_almacen"],$_POST["usu_area"],$_POST["rol_id"],$_POST["usu_telf"]);
+                $usuario->update_usuario($_POST["usu_id"],$_POST["usu_nom"],$_POST["usu_ape"],$_POST['num_colab'],$_POST["usu_correo"],$_POST["usu_pass"],$_POST["usu_almacen"],$_POST["usu_area"],$_POST["rol_id"],$_POST["usu_telf"]);
             }
             break;
 
@@ -93,6 +93,7 @@
                     $output["usu_id"] = $row["usu_id"];
                     $output["usu_nom"] = $row["usu_nom"];
                     $output["usu_ape"] = $row["usu_ape"];
+                    $output["num_colab"] = $row["num_colab"];
                     $output["usu_correo"] = $row["usu_correo"];
                     $output["usu_pass"] = $row["usu_pass"];
                     $output["usu_almacen"] = $row["usu_almacen"];

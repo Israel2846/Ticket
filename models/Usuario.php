@@ -66,18 +66,19 @@
         }
 
         /* TODO:Update */
-        public function update_usuario($usu_id,$usu_nom,$usu_ape,$usu_correo,$usu_pass,$usu_almacen,$usu_area,$rol_id,$usu_telf){
+        public function update_usuario($usu_id,$usu_nom,$usu_ape,$num_colab,$usu_correo,$usu_pass,$usu_almacen,$usu_area,$rol_id,$usu_telf){
             $conectar= parent::conexion();
             parent::set_names();
             $sql="UPDATE tm_usuario set
                 usu_nom = ?,
                 usu_ape = ?,
                 usu_correo = ?,
-                usu_pass = ?,
-                usu_alamcen = ?,
+                usu_pass = md5(?),
+                usu_almacen = ?,
                 usu_area = ?,
                 rol_id = ?,
-                usu_telf = ?
+                usu_telf = ?,
+                num_colab = ?
                 WHERE
                 usu_id = ?";
              $sql=$conectar->prepare($sql);
@@ -86,10 +87,11 @@
              $sql->bindValue(3, $usu_correo);
              $sql->bindValue(4, $usu_pass);
              $sql->bindValue(5, $usu_almacen);
-             $sql->bindValue(5, $usu_area);
+             $sql->bindValue(6, $usu_area);
              $sql->bindValue(7, $rol_id);
              $sql->bindValue(8, $usu_telf);
-             $sql->bindValue(9, $usu_id);
+             $sql->bindValue(9, $num_colab);
+             $sql->bindValue(10, $usu_id);
              $sql->execute();
             return $resultado=$sql->fetchAll();
         }

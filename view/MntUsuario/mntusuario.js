@@ -121,10 +121,11 @@ function editar(usu_id){
         $('#usu_id').val(data.usu_id);
         $('#usu_nom').val(data.usu_nom);
         $('#usu_ape').val(data.usu_ape);
+        $('#num_colab').val(data.num_colab);
         $('#usu_correo').val(data.usu_correo);
-        $('#usu_pass').val(data.usu_pass);
-        $('#usu_almacen').val(data.usu_almacen);
-        $('#usu_area').val(data.usu_area);
+        $('#usu_pass').val(data.num_colab);
+        $('#usu_almacen').val(data.usu_almacen).trigger('change');
+        $('#usu_area').val(data.usu_area).trigger('change');
         $('#rol_id').val(data.rol_id).trigger('change');
         $('#usu_telf').val(data.usu_telf);
     }); 
