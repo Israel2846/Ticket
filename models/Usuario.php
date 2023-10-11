@@ -5,6 +5,7 @@
         public function login(){
             $conectar=parent::conexion();
             parent::set_names();
+
             if(isset($_POST["enviar"])){
                 $correo = $_POST["usu_correo"];
                 $pass = $_POST["usu_pass"];
@@ -15,9 +16,11 @@
                 $sql_rol->bindParam(3, $pass);
                 $sql_rol->execute();
                 $resultado = $sql_rol->fetch();
+
                 if (is_array($resultado) and count($resultado) > 0) {
                     $rol = $resultado["rol_id"];
                 }
+
                 // $rol = $_POST["rol_id"];
                 if(empty($correo) and empty($pass)){
                     header("Location:".conectar::ruta()."index.php?m=2");
@@ -31,6 +34,7 @@
                     $stmt->bindValue(4, $rol);
                     $stmt->execute();
                     $resultado = $stmt->fetch();
+
                     if (is_array($resultado) and count($resultado)>0){
                         $_SESSION["usu_id"]=$resultado["usu_id"];
                         $_SESSION["usu_nom"]=$resultado["usu_nom"];
@@ -50,7 +54,9 @@
         public function insert_usuario($usu_nom,$usu_ape,$num_colab, $usu_correo,$usu_pass,$usu_almacen,$usu_area,$rol_id,$usu_telf){
             $conectar= parent::conexion();
             parent::set_names();
+
             $sql="INSERT INTO tm_usuario (usu_id, usu_nom, usu_ape, usu_correo, usu_pass, usu_almacen, usu_area, rol_id, usu_telf, fech_crea, fech_modi, fech_elim, est, num_colab) VALUES (NULL,?,?,?,MD5(?),?,?,?,?,now(), NULL, NULL, '1', ?);";
+
             $sql=$conectar->prepare($sql);
             $sql->bindValue(1, $usu_nom);
             $sql->bindValue(2, $usu_ape);
@@ -62,6 +68,7 @@
             $sql->bindValue(8, $usu_telf);
             $sql->bindValue(9, $num_colab);
             $sql->execute();
+            
             return $resultado=$sql->fetchAll();
         }
 
