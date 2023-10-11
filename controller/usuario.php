@@ -149,7 +149,7 @@
 
         /* TODO: Formato para llenar combo en formato HTML */
         case "combo";
-            $datos = $usuario->get_usuario();
+            $datos = $usuario->get_usuario_soporte();
             if(is_array($datos)==true and count($datos)>0){
                 $html.= "<option label='Seleccionar'></option>";
                 foreach($datos as $row)

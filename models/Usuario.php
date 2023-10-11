@@ -68,7 +68,7 @@
             $sql->bindValue(8, $usu_telf);
             $sql->bindValue(9, $num_colab);
             $sql->execute();
-            
+
             return $resultado=$sql->fetchAll();
         }
 
@@ -122,6 +122,25 @@
             $sql=$conectar->prepare($sql);
             $sql->execute();
             return $resultado=$sql->fetchAll();
+        }
+
+        // Obtener usuarios de soporte
+        public function get_usuario_soporte(){
+            $conectar = parent::conexion();
+            parent::set_names();
+
+            $sql = "SELECT * FROM tm_usuario
+                INNER JOIN tm_almacen ON 
+                tm_usuario.usu_almacen = 
+                tm_almacen.id_almacen
+                INNER JOIN tm_area_almacen ON 
+                tm_usuario.usu_area = 
+                tm_area_almacen.id_area_almacen
+                WHERE rol_id != 3;";
+            $sql = $conectar -> prepare($sql);
+            $sql -> execute();
+
+            return $sql->fetchAll();
         }
 
         /* TODO: Obtener registros de usuarios segun rol 2 */
