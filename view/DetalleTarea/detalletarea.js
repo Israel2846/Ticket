@@ -300,6 +300,7 @@ $(document).on(
                             closeOnCancel: false
                         }, function(){
                             $('#btnEnviar').prop('disabled', false).text('Enviar');
+                            $('#fileElem').val('');
                         });
                     },
 
