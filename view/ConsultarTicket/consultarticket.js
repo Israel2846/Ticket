@@ -1,6 +1,5 @@
-var tabla;
-var usu_id =  $('#user_idx').val();
-var rol_id =  $('#rol_idx').val();
+const usu_id =  $('#user_idx').val();
+const rol_id =  $('#rol_idx').val();
 
 function init(){
     $("#ticket_form").on("submit",function(e){
@@ -8,9 +7,13 @@ function init(){
     });
 }
 
-$(document).ready(function(){   
-    console.log(usu_id)
-    console.log(rol_id)
+$(document).ready(function(){
+    // Inicializamos datatables
+    datatable_abiertos();
+    datatable_en_proceso();
+    datatable_pausado();
+    datatable_cerrado();
+
     /* TODO: Llenar Combo Categoria */
     $.post("../../controller/categoria.php?op=combo",function(data, status){
         $('#cat_id').html(data);
@@ -25,23 +28,15 @@ $(document).ready(function(){
     $.post("../../controller/usuario.php?op=combo", function (data) {
         $('#usu_asig').html(data);
     });
-    
+
+    // Intervalo de tiempo para actualizar datatables
     setInterval(function(){
         console.log('Recarga datatables');
-        /* TODO:Recargar Datatable abierto JS */
         $('#ticket_abierto').DataTable().ajax.reload();
-        // Recargar datatable en proceso
         $('#ticket_en_proceso').DataTable().ajax.reload();
-        // Recargar datatable pausado
         $('#ticket_pausado').DataTable().ajax.reload();
-        // Recargar datatable cerrado
         $('#ticket_cerrado').DataTable().ajax.reload();
     }, 90000);
-    $('#tabla_usuario_normal').hide();
-    datatable_abiertos();
-    datatable_en_proceso();
-    datatable_pausado();
-    datatable_cerrado();
 });
 
 /* TODO: Link para poder ver el detalle de ticket en otra ventana */

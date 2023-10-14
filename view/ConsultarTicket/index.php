@@ -35,33 +35,6 @@
 
 			<div class="box-typical box-typical-padding">
 				<div class="row">
-					<div class="col-lg-12" id="tabla_usuario_normal">
-						<fieldset class="form-group">
-							<table id="ticket_usuario_normal" class="table table-bordered table-striped table-vcenter js-dataTable-full">
-								<thead>
-									<tr>
-										<th style="width: 5%;">#Ticket</th>
-										<th style="width: 10%;">Categoria</th>
-										<th class="d-none d-sm-table-cell" style="width: 10%;">Titulo</th>
-										<th class="d-none d-sm-table-cell" style="width: 5%;">Prioridad</th>
-										<th class="d-none d-sm-table-cell" style="width: 5%;">Estado</th>
-										<th class="d-none d-sm-table-cell" style="width: 10%;">F. Creación</th>
-										<th class="d-none d-sm-table-cell" style="width: 10%;">F. Asignación</th>
-										<th class="d-none d-sm-table-cell" style="width: 5%;">T. Respuesta</th>
-										<th class="d-none d-sm-table-cell" style="width: 5%;">T. Transcurrido</th>
-										<th class="d-none d-sm-table-cell" style="width: 5%;">T. Total</th>
-										<th class="d-none d-sm-table-cell" style="width: 10%;">F. Cierre</th>
-										<th class="d-none d-sm-table-cell" style="width: 10%;">Creador</th>
-										<th class="text-center" style="width: 5%;">Info</th>
-									</tr>
-								</thead>
-								<tbody>
-
-								</tbody>
-							</table>
-						</fieldset>
-					</div>
-
 					<div class="col-lg-12" id="tabla_tickets_abiertos">
 						<fieldset class="form-group">
 							<label class="form-label semibold"><h3>Tickets Abiertos</h3></label>
