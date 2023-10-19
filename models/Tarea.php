@@ -1,7 +1,9 @@
 <?php
-class Tarea extends Conectar{
+class Tarea extends Conectar
+{
     // Insertar registro
-    public function insert_tarea($id_usuario, $id_ticket, $tarea_titulo, $tarea_desc){
+    public function insert_tarea($id_usuario, $id_ticket, $tarea_titulo, $tarea_desc)
+    {
         try {
             $conectar = parent::conexion();
             parent::set_names();
@@ -15,22 +17,23 @@ class Tarea extends Conectar{
 
             // Obtenemos el ultimo registro que se insertó en la base de datos
             $sql2 = "SELECT last_insert_id() AS 'id_tarea'";
-            $sql2 = $conectar -> prepare($sql2);
-            $sql2 -> execute();
+            $sql2 = $conectar->prepare($sql2);
+            $sql2->execute();
 
             // Retornamos el ultimo registro
-            return $sql2 -> fetchAll(PDO::FETCH_ASSOC);
+            return $sql2->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
-            return "Error " . $e->getMessage();            
+            return "Error " . $e->getMessage();
         }
     }
 
     // Insertar detalle de tarea
-    public function insert_respuesta_tarea($id_tarea, $id_usuario, $descripcion_tarea){
+    public function insert_respuesta_tarea($id_tarea, $id_usuario, $descripcion_tarea)
+    {
         try {
             $conectar = parent::conexion();
             parent::set_names();
-    
+
             $sql = "INSERT INTO td_tareadetalle(
                         tarea_id,
                         usu_id,
@@ -56,10 +59,11 @@ class Tarea extends Conectar{
             return $e->getMessage();
         }
     }
-    
+
     // Listar todas las tareas
-    public function listar_tareas(){
-        try{
+    public function listar_tareas()
+    {
+        try {
             $conectar = parent::conexion();
             parent::set_names();
             $sql = "SELECT
@@ -81,14 +85,15 @@ class Tarea extends Conectar{
             $sql = $conectar->prepare($sql);
             $sql->execute();
             return $sql->fetchAll();
-        } catch(Exception $e){
+        } catch (Exception $e) {
             echo "Error " . $e->getMessage();
-            return false; 
+            return false;
         }
     }
 
     // Listar solo las tareas por el id del ticket
-    public function listar_tareas_x_ticket($id_ticket){
+    public function listar_tareas_x_ticket($id_ticket)
+    {
         try {
             $conectar = parent::conexion();
             parent::set_names();
@@ -116,7 +121,8 @@ class Tarea extends Conectar{
     }
 
     // Obtener solo una tarea
-    public function get_tarea($id_tarea){
+    public function get_tarea($id_tarea)
+    {
         try {
             $conectar = parent::conexion();
             parent::set_names();
@@ -136,7 +142,8 @@ class Tarea extends Conectar{
     }
 
     // Listar respuestas de tareas
-    public function listar_respuestas_tarea($id_tarea){
+    public function listar_respuestas_tarea($id_tarea)
+    {
         try {
             $conectar = parent::conexion();
             parent::set_names();
@@ -161,7 +168,8 @@ class Tarea extends Conectar{
     }
 
     // Asignar tarea
-    public function assign_tarea($id_tarea, $id_usuario){
+    public function assign_tarea($id_tarea, $id_usuario)
+    {
         try {
             $conectar = parent::conexion();
             parent::set_names();
@@ -180,7 +188,8 @@ class Tarea extends Conectar{
     }
 
     // Cerrar tarea
-    public function close_tarea($id_tarea){
+    public function close_tarea($id_tarea)
+    {
         try {
             $conectar = parent::conexion();
             parent::set_names();
@@ -200,7 +209,8 @@ class Tarea extends Conectar{
     }
 
     // Cerrar tarea mediante el mensaje modal
-    public function close_tareas_x_modal($id_usuario){
+    public function close_tareas_x_modal($id_usuario)
+    {
         try {
             $conectar = parent::conexion();
             parent::set_names();
@@ -210,7 +220,7 @@ class Tarea extends Conectar{
             $sql->bindValue(1, $id_usuario);
             $sql->bindValue(2, $id_usuario);
             $sql->execute();
-            
+
             $sql2 = "UPDATE tm_tarea 
                     INNER JOIN tm_ticket ON tm_ticket.tick_id = tm_tarea.id_ticket
                     SET 
@@ -236,7 +246,8 @@ class Tarea extends Conectar{
     }
 
     // Contar tareas abiertas segun el id de usuario
-    public function count_tareas_abiertas($id_usuario){
+    public function count_tareas_abiertas($id_usuario)
+    {
         try {
             $conectar = parent::conexion();
             parent::set_names();
@@ -251,6 +262,4 @@ class Tarea extends Conectar{
             return $e->getMessage();
         }
     }
-
-    
 }
