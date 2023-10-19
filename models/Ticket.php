@@ -178,7 +178,7 @@ class Ticket extends Conectar
                     INNER join tm_prioridad on tm_ticket.prio_id = tm_prioridad.prio_id
                     WHERE
                     tm_ticket.est = 1 AND tm_ticket.usu_id = ?
-                    ORDER BY tm_ticket.tick_id DESC";
+                    ORDER BY FIELD(tm_ticket.tick_estado, 'Abierto', 'En proceso', 'Pausado', 'Cerrado') ASC, tm_ticket.prio_id DESC";
             $sql = $conectar->prepare($sql);
             $sql->bindValue(1, $usu_id);
             $sql->execute();
