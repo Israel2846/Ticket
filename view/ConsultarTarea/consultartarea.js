@@ -99,7 +99,7 @@ function guardar(e){
 
 // Link para ver el detalle de la tarea
 function ver(id_tarea){
-    window.open('http://localhost:80/gestor-de-tickets/view/DetalleTarea/?ID='+ id_tarea +'');
+    window.open('http://localhost/Ticket/view/DetalleTarea/?ID='+ id_tarea +'');
 }
 
 init();

@@ -141,5 +141,5 @@ $(document).ready(function () {
 })
 
 function ver(tick_id) {
-    window.location.href = 'http://localhost:80/gestor-de-tickets/view/DetalleTicket/?ID=' + tick_id + '';
+    window.location.href = 'http://localhost/Ticket/view/DetalleTicket/?ID=' + tick_id + '';
 }

@@ -30,7 +30,7 @@ class Conectar
     public static function ruta()
     {
         //TODO: Ruta Proyecto Local (seria 80)
-        return "http://localhost:80/gestor-de-tickets/";
+        return "http://localhost/Ticket/";
         //TODO: Ruta Proyecto Produccion
         //return "http://helpdesk.anderson-bastidas.com/";
     }

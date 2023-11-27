@@ -133,7 +133,11 @@ class Ticket extends Conectar
                     INNER join tm_usuario on tm_ticket.usu_id = tm_usuario.usu_id
                     INNER join tm_prioridad on tm_ticket.prio_id = tm_prioridad.prio_id
                     WHERE
-                    tm_ticket.est = 1 AND tm_ticket.usu_asig = ?
+                    tm_ticket.est = 1 AND tm_usuario.usu_id in (
+                            select tm_usuario.usu_id from tm_usuario where tm_usuario.usu_almacen = (
+                                select tm_usuario.usu_almacen from tm_usuario where tm_usuario.usu_id = ?
+                            )
+                        )
                     ORDER BY FIELD(tm_ticket.tick_estado, 'Abierto', 'En proceso', 'Pausado', 'Cerrado') ASC, tm_ticket.prio_id DESC";
             $sql = $conectar->prepare($sql);
             $sql->bindValue(1, $usu_id);

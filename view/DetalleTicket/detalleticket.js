@@ -230,7 +230,7 @@ $(document).ready(function(){
 
 // Link para ver el detalle de la tarea
 function ver(id_tarea){
-    window.location.href = 'http://localhost:80/gestor-de-tickets/view/DetalleTarea/?ID='+ id_tarea +'';
+    window.location.href = 'http://localhost/Ticket/view/DetalleTarea/?ID='+ id_tarea +'';
 }
 
 // Click del botón "Nueva tarea"
@@ -292,7 +292,7 @@ $(document).on(
                             }
                         )
                     } else if(data.tareas_abiertas === 0){
-                        window.location.href = 'http://localhost:80/gestor-de-tickets/view/NuevaTarea/?ID='+ id_ticket +'';
+                        window.location.href = 'http://localhost/Ticket/view/NuevaTarea/?ID='+ id_ticket +'';
                     }
                 },
                 error : function(error){
