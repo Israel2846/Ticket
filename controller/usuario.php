@@ -10,6 +10,7 @@ switch ($_GET["op"]) {
 
         // Llenar combo Almacen
     case "combo_almacen":
+        $html = "";
         $datos = $usuario->combo_almacen();
         if (is_array($datos) == true and count($datos) > 0) {
             $html .= "<option label='Seleccionar'></option>";
@@ -22,6 +23,7 @@ switch ($_GET["op"]) {
 
         // Llenar combo Area
     case "combo_area":
+        $html = "";
         $datos = $usuario->combo_area($_POST['id_almacen']);
         if (is_array($datos) == true and count($datos) > 0) {
             $html .= "<option label='Seleccionar'></option>";
@@ -143,6 +145,7 @@ switch ($_GET["op"]) {
 
         /* TODO: Formato para llenar combo en formato HTML */
     case "combo";
+        $html = "";
         $datos = $usuario->get_usuario_soporte();
         if (is_array($datos) == true and count($datos) > 0) {
             $html .= "<option label='Seleccionar'></option>";
