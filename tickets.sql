@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 28-12-2023 a las 23:09:21
+-- Tiempo de generación: 29-12-2023 a las 02:56:54
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -21,6 +21,136 @@ SET time_zone = "+00:00";
 -- Base de datos: `tickets`
 --
 
+DELIMITER $$
+--
+-- Procedimientos
+--
+CREATE DEFINER=`sol114`@`localhost` PROCEDURE `filtrar_ticket` (IN `tick_titulo` VARCHAR(50), IN `cat_id` INT, IN `prio_id` INT)   BEGIN
+ IF tick_titulo = '' THEN            
+ SET tick_titulo = NULL;
+ END IF; 
+ IF cat_id = '' THEN            
+ SET cat_id = NULL;
+ END IF; 
+ IF prio_id = '' THEN  
+ SET prio_id = NULL;
+ END IF;
+SELECT
+tm_ticket.tick_id,
+tm_ticket.usu_id,
+tm_ticket.cat_id,
+tm_ticket.tick_titulo,
+tm_ticket.tick_descrip,
+tm_ticket.tick_estado,
+tm_ticket.fech_crea,
+tm_ticket.fech_cierre,
+tm_ticket.usu_asig,
+tm_ticket.fech_asig,
+tm_usuario.usu_nom,
+tm_usuario.usu_ape,
+tm_categoria.cat_nom,
+tm_ticket.prio_id,
+tm_prioridad.prio_nom,
+CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_crea, tm_ticket.fech_asig), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_crea, tm_ticket.fech_asig)%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_crea, tm_ticket.fech_asig)%60, ' minutos') AS timeresp,
+CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_crea, NOW()), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_crea, NOW())%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_crea, NOW())%60, ' minutos') AS timetransc,
+CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_asig, tm_ticket.fech_cierre), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_asig, tm_ticket.fech_cierre)%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_asig, tm_ticket.fech_cierre)%60, ' minutos') AS timetarea,
+CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_crea, tm_ticket.fech_cierre), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_crea, tm_ticket.fech_cierre)%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_crea, tm_ticket.fech_cierre)%60, ' minutos') AS tiempototal
+FROM
+tm_ticket
+INNER join tm_categoria on tm_ticket.cat_id = tm_categoria.cat_id
+INNER join tm_usuario on tm_ticket.usu_id = tm_usuario.usu_id
+INNER join tm_prioridad on tm_ticket.prio_id = tm_prioridad.prio_id
+WHERE
+tm_ticket.est = 1 and tm_ticket.tick_estado = 'Abierto'
+AND tm_ticket.tick_titulo like IFNULL(tick_titulo,tm_ticket.tick_titulo)
+AND tm_ticket.cat_id =  IFNULL(cat_id,tm_ticket.cat_id)
+AND tm_ticket.prio_id = IFNULL(prio_id,tm_ticket.prio_id);
+END$$
+
+CREATE DEFINER=`sol114`@`localhost` PROCEDURE `filtrar_ticket2` (IN `tick_titulo` VARCHAR(50), IN `cat_id` INT, IN `prio_id` INT)   SELECT 
+            tm_ticket.tick_id, 
+            tm_ticket.usu_id,
+            tm_ticket.cat_id,
+            tm_ticket.tick_titulo, 
+            tm_ticket.tick_descrip,
+            tm_ticket.tick_estado, 
+            tm_ticket.fech_crea, 
+            tm_ticket.fech_cierre, 
+            tm_ticket.usu_asig, 
+            tm_ticket.fech_asig, 
+            tm_usuario.usu_nom, 
+            tm_usuario.usu_ape, 
+            tm_categoria.cat_nom, 
+            tm_ticket.prio_id, 
+            tm_prioridad.prio_nom 
+            FROM 
+            tm_ticket 
+            INNER join tm_categoria on tm_ticket.cat_id=tm_categoria.cat_id 
+            INNER join tm_usuario on tm_ticket.usu_id=tm_usuario.usu_id 
+            INNER join tm_prioridad on tm_ticket.prio_id=tm_prioridad.prio_id 
+            WHERE 
+            tm_ticket.est = 1 
+            AND tm_ticket.tick_titulo like IFNULL(tick_titulo, tm_ticket.tick_titulo) 
+            AND tm_ticket.cat_id like IFNULL(cat_id, tm_ticket.cat_id) 
+            AND tm_ticket.prio_id like IFNULL(prio_id, tm_ticket.prio_id)$$
+
+CREATE DEFINER=`sol114`@`localhost` PROCEDURE `sp_d_usuario_01` (IN `xusu_id` INT)   BEGIN
+	UPDATE tm_usuario 
+	SET 
+		est='0',
+		fech_elim = now() 
+	where usu_id=xusu_id;
+END$$
+
+CREATE DEFINER=`sol114`@`localhost` PROCEDURE `sp_i_ticketdetalle_01` (IN `xtick_id` INT, IN `xusu_id` INT)   BEGIN
+	INSERT INTO td_ticketdetalle 
+    (tickd_id,tick_id,usu_id,tickd_descrip,fech_crea,est) 
+    VALUES 
+    (NULL,xtick_id,xusu_id,'Ticket Cerrado...',now(),'1');
+END$$
+
+CREATE DEFINER=`sol114`@`localhost` PROCEDURE `sp_l_reporte_01` ()   BEGIN
+SELECT
+	tick.tick_id as id,
+	tick.tick_titulo as titulo,
+	tick.tick_descrip as descripcion,
+	tick.tick_estado as estado,
+	tick.fech_crea as FechaCreacion,
+	tick.fech_cierre as FechaCierre,
+	tick.fech_asig as FechaAsignacion,
+	CONCAT(usucrea.usu_nom,' ',usucrea.usu_ape) as NombreUsuario,
+	IFNULL(CONCAT(usuasig.usu_nom,' ',usuasig.usu_ape),'SinAsignar') as NombreSoporte,
+	cat.cat_nom as Categoria,
+	prio.prio_nom as Prioridad,
+	sub.cats_nom as SubCategoria
+	FROM 
+	tm_ticket tick
+	INNER join tm_categoria cat on tick.cat_id = cat.cat_id
+	INNER JOIN tm_subcategoria sub on tick.cats_id = sub.cats_id
+	INNER join tm_usuario usucrea on tick.usu_id = usucrea.usu_id
+	LEFT JOIN tm_usuario usuasig on tick.usu_asig = usuasig.usu_id
+	INNER join tm_prioridad prio on tick.prio_id = prio.prio_id
+	WHERE
+	tick.est = 1;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_l_usuario_01` ()   BEGIN
+	SELECT * FROM tm_usuario
+        INNER JOIN tm_almacen ON 
+        tm_usuario.usu_almacen = 
+        tm_almacen.id_almacen
+        INNER JOIN tm_area_almacen ON 
+        tm_usuario.usu_area = 
+        tm_area_almacen.id_area_almacen
+        where tm_usuario.est = 1;
+END$$
+
+CREATE DEFINER=`sol114`@`localhost` PROCEDURE `sp_l_usuario_02` (IN `xusu_id` INT)   BEGIN
+	SELECT * FROM tm_usuario where usu_id=xusu_id;
+END$$
+
+DELIMITER ;
+
 -- --------------------------------------------------------
 
 --
@@ -34,6 +164,13 @@ CREATE TABLE `td_documento` (
   `fech_crea` datetime NOT NULL,
   `est` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+--
+-- Volcado de datos para la tabla `td_documento`
+--
+
+INSERT INTO `td_documento` (`doc_id`, `tick_id`, `doc_nom`, `fech_crea`, `est`) VALUES
+(1, 1, 'ANYDESK.xlsx', '2023-12-28 16:11:56', 1);
 
 -- --------------------------------------------------------
 
@@ -88,6 +225,15 @@ CREATE TABLE `td_pausas_ticket` (
   `fecha_pausa` datetime DEFAULT NULL,
   `fecha_reanuda` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+--
+-- Volcado de datos para la tabla `td_pausas_ticket`
+--
+
+INSERT INTO `td_pausas_ticket` (`pausas_ticket_id`, `id_usuario`, `id_ticket`, `fecha_pausa`, `fecha_reanuda`) VALUES
+(1, 3, 1, '2023-12-28 19:20:57', NULL),
+(2, 3, 2, '2023-12-28 19:21:07', NULL),
+(3, 3, 3, '2023-12-28 19:21:17', NULL);
 
 -- --------------------------------------------------------
 
@@ -237,6 +383,15 @@ CREATE TABLE `tm_notificacion` (
   `est` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
+--
+-- Volcado de datos para la tabla `tm_notificacion`
+--
+
+INSERT INTO `tm_notificacion` (`not_id`, `usu_id`, `not_mensaje`, `tick_id`, `est`) VALUES
+(1, 3, 'Se le ha asignado el ticket Nro : ', 1, 1),
+(2, 305, 'Se le ha asignado el ticket Nro : ', 3, 1),
+(3, 4, 'Se le ha asignado el ticket Nro : ', 2, 1);
+
 -- --------------------------------------------------------
 
 --
@@ -355,7 +510,8 @@ INSERT INTO `tm_subcategoria` (`cats_id`, `cat_id`, `cats_nom`, `est`) VALUES
 (78, 27, 'Contraseñas', 1),
 (79, 23, 'Imagen en Monitores ', 1),
 (80, 1, 'Cámara de Video', 1),
-(81, 1, 'Antenas', 1);
+(81, 1, 'Antenas', 1),
+(82, 14, 'intelisis', 1);
 
 -- --------------------------------------------------------
 
@@ -398,6 +554,15 @@ CREATE TABLE `tm_ticket` (
   `est` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
+--
+-- Volcado de datos para la tabla `tm_ticket`
+--
+
+INSERT INTO `tm_ticket` (`tick_id`, `usu_id`, `cat_id`, `cats_id`, `tick_titulo`, `tick_descrip`, `tick_estado`, `fech_crea`, `usu_asig`, `fech_asig`, `tick_estre`, `tick_coment`, `fech_cierre`, `prio_id`, `est`) VALUES
+(1, 3, 6, 11, 'CAMBIO DE PESO', '<p>Ticket de SCAF</p>', 'Cerrado', '2023-12-28 16:11:56', 3, '2023-12-28 16:15:35', NULL, NULL, '2023-12-28 19:25:48', 2, 1),
+(2, 3, 6, 11, 'CAMBIO DE PESO', '<p>SCAF 2</p>', 'Cerrado', '2023-12-28 17:23:31', 4, '2023-12-28 18:57:21', NULL, NULL, '2023-12-28 19:27:01', 2, 1),
+(3, 3, 14, 82, 'CAMBIO DE PESO', '<p>asdf</p>', 'Cerrado', '2023-12-28 18:28:12', 305, '2023-12-28 18:37:35', NULL, NULL, '2023-12-28 19:28:29', 1, 1);
+
 -- --------------------------------------------------------
 
 --
@@ -410,6 +575,313 @@ CREATE TABLE `tm_usr_cat` (
   `rol_id` int(11) NOT NULL,
   `cat_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Volcado de datos para la tabla `tm_usr_cat`
+--
+
+INSERT INTO `tm_usr_cat` (`id`, `usu_id`, `rol_id`, `cat_id`) VALUES
+(1, 1, 2, 0),
+(2, 2, 2, 0),
+(3, 3, 2, 0),
+(4, 4, 2, 0),
+(5, 5, 3, 0),
+(6, 6, 3, 0),
+(7, 7, 2, 0),
+(8, 8, 3, 0),
+(9, 9, 2, 0),
+(10, 11, 1, 0),
+(11, 12, 2, 0),
+(12, 13, 3, 0),
+(13, 14, 3, 0),
+(14, 15, 3, 0),
+(15, 16, 3, 0),
+(16, 17, 3, 0),
+(17, 18, 3, 0),
+(18, 19, 3, 0),
+(19, 20, 3, 0),
+(20, 21, 3, 0),
+(21, 22, 3, 0),
+(22, 23, 3, 0),
+(23, 24, 3, 0),
+(24, 25, 3, 0),
+(25, 26, 3, 0),
+(26, 27, 3, 0),
+(27, 28, 3, 0),
+(28, 29, 3, 0),
+(29, 30, 3, 0),
+(30, 31, 3, 0),
+(31, 32, 3, 0),
+(32, 33, 3, 0),
+(33, 34, 3, 0),
+(34, 35, 3, 0),
+(35, 36, 3, 0),
+(36, 37, 3, 0),
+(37, 38, 3, 0),
+(38, 39, 3, 0),
+(39, 40, 3, 0),
+(40, 41, 3, 0),
+(41, 42, 3, 0),
+(42, 43, 3, 0),
+(43, 44, 3, 0),
+(44, 45, 3, 0),
+(45, 46, 3, 0),
+(46, 47, 3, 0),
+(47, 48, 3, 0),
+(48, 49, 3, 0),
+(49, 50, 3, 0),
+(50, 51, 3, 0),
+(51, 52, 3, 0),
+(52, 53, 3, 0),
+(53, 54, 3, 0),
+(54, 55, 3, 0),
+(55, 56, 3, 0),
+(56, 57, 3, 0),
+(57, 58, 3, 0),
+(58, 59, 3, 0),
+(59, 60, 3, 0),
+(60, 61, 3, 0),
+(61, 62, 3, 0),
+(62, 63, 3, 0),
+(63, 64, 3, 0),
+(64, 65, 3, 0),
+(65, 66, 3, 0),
+(66, 67, 3, 0),
+(67, 68, 3, 0),
+(68, 69, 3, 0),
+(69, 70, 3, 0),
+(70, 71, 3, 0),
+(71, 72, 3, 0),
+(72, 73, 3, 0),
+(73, 74, 3, 0),
+(74, 75, 3, 0),
+(75, 76, 3, 0),
+(76, 77, 3, 0),
+(77, 78, 3, 0),
+(78, 79, 3, 0),
+(79, 80, 3, 0),
+(80, 81, 3, 0),
+(81, 82, 3, 0),
+(82, 83, 3, 0),
+(83, 84, 3, 0),
+(84, 85, 3, 0),
+(85, 86, 3, 0),
+(86, 87, 3, 0),
+(87, 88, 3, 0),
+(88, 89, 3, 0),
+(89, 90, 3, 0),
+(90, 91, 3, 0),
+(91, 92, 3, 0),
+(92, 93, 3, 0),
+(93, 94, 3, 0),
+(94, 95, 3, 0),
+(95, 96, 3, 0),
+(96, 97, 3, 0),
+(97, 98, 3, 0),
+(98, 99, 3, 0),
+(99, 100, 3, 0),
+(100, 101, 3, 0),
+(101, 102, 3, 0),
+(102, 103, 3, 0),
+(103, 104, 3, 0),
+(104, 105, 3, 0),
+(105, 106, 3, 0),
+(106, 107, 3, 0),
+(107, 108, 3, 0),
+(108, 109, 3, 0),
+(109, 110, 3, 0),
+(110, 111, 3, 0),
+(111, 112, 3, 0),
+(112, 113, 3, 0),
+(113, 114, 3, 0),
+(114, 115, 3, 0),
+(115, 116, 3, 0),
+(116, 117, 3, 0),
+(117, 118, 3, 0),
+(118, 119, 3, 0),
+(119, 120, 3, 0),
+(120, 121, 3, 0),
+(121, 122, 3, 0),
+(122, 123, 3, 0),
+(123, 124, 3, 0),
+(124, 125, 3, 0),
+(125, 126, 3, 0),
+(126, 127, 3, 0),
+(127, 128, 3, 0),
+(128, 129, 3, 0),
+(129, 130, 3, 0),
+(130, 131, 3, 0),
+(131, 132, 3, 0),
+(132, 133, 3, 0),
+(133, 134, 3, 0),
+(134, 135, 3, 0),
+(135, 136, 3, 0),
+(136, 137, 3, 0),
+(137, 138, 3, 0),
+(138, 139, 3, 0),
+(139, 140, 3, 0),
+(140, 141, 3, 0),
+(141, 142, 3, 0),
+(142, 143, 3, 0),
+(143, 144, 3, 0),
+(144, 145, 3, 0),
+(145, 146, 3, 0),
+(146, 147, 3, 0),
+(147, 148, 3, 0),
+(148, 149, 3, 0),
+(149, 150, 3, 0),
+(150, 151, 3, 0),
+(151, 152, 3, 0),
+(152, 153, 3, 0),
+(153, 154, 3, 0),
+(154, 155, 3, 0),
+(155, 156, 3, 0),
+(156, 157, 3, 0),
+(157, 158, 3, 0),
+(158, 159, 3, 0),
+(159, 160, 3, 0),
+(160, 161, 3, 0),
+(161, 162, 3, 0),
+(162, 163, 3, 0),
+(163, 164, 3, 0),
+(164, 165, 3, 0),
+(165, 166, 3, 0),
+(166, 167, 3, 0),
+(167, 168, 3, 0),
+(168, 169, 3, 0),
+(169, 170, 3, 0),
+(170, 171, 3, 0),
+(171, 172, 3, 0),
+(172, 173, 3, 0),
+(173, 174, 3, 0),
+(174, 175, 3, 0),
+(175, 176, 3, 0),
+(176, 177, 3, 0),
+(177, 178, 3, 0),
+(178, 179, 3, 0),
+(179, 180, 3, 0),
+(180, 181, 3, 0),
+(181, 182, 3, 0),
+(182, 183, 3, 0),
+(183, 184, 3, 0),
+(184, 185, 3, 0),
+(185, 186, 3, 0),
+(186, 187, 3, 0),
+(187, 188, 3, 0),
+(188, 189, 3, 0),
+(189, 190, 3, 0),
+(190, 191, 3, 0),
+(191, 192, 3, 0),
+(192, 193, 3, 0),
+(193, 194, 3, 0),
+(194, 195, 3, 0),
+(195, 196, 3, 0),
+(196, 197, 3, 0),
+(197, 198, 3, 0),
+(198, 199, 3, 0),
+(199, 200, 3, 0),
+(200, 201, 3, 0),
+(201, 202, 3, 0),
+(202, 203, 3, 0),
+(203, 204, 3, 0),
+(204, 205, 3, 0),
+(205, 206, 3, 0),
+(206, 207, 3, 0),
+(207, 208, 3, 0),
+(208, 209, 3, 0),
+(209, 210, 3, 0),
+(210, 211, 3, 0),
+(211, 212, 3, 0),
+(212, 213, 3, 0),
+(213, 214, 3, 0),
+(214, 215, 3, 0),
+(215, 216, 3, 0),
+(216, 217, 3, 0),
+(217, 218, 3, 0),
+(218, 219, 3, 0),
+(219, 220, 3, 0),
+(220, 221, 3, 0),
+(221, 222, 3, 0),
+(222, 223, 3, 0),
+(223, 224, 3, 0),
+(224, 225, 3, 0),
+(225, 226, 3, 0),
+(226, 227, 3, 0),
+(227, 228, 3, 0),
+(228, 229, 3, 0),
+(229, 230, 3, 0),
+(230, 231, 3, 0),
+(231, 232, 3, 0),
+(232, 233, 3, 0),
+(233, 234, 3, 0),
+(234, 235, 3, 0),
+(235, 236, 3, 0),
+(236, 237, 3, 0),
+(237, 238, 3, 0),
+(238, 239, 3, 0),
+(239, 240, 3, 0),
+(240, 241, 3, 0),
+(241, 242, 3, 0),
+(242, 243, 3, 0),
+(243, 244, 3, 0),
+(244, 245, 3, 0),
+(245, 246, 3, 0),
+(246, 247, 3, 0),
+(247, 248, 3, 0),
+(248, 249, 3, 0),
+(249, 250, 3, 0),
+(250, 251, 3, 0),
+(251, 252, 3, 0),
+(252, 253, 3, 0),
+(253, 254, 3, 0),
+(254, 255, 3, 0),
+(255, 256, 3, 0),
+(256, 257, 3, 0),
+(257, 258, 3, 0),
+(258, 259, 3, 0),
+(259, 260, 3, 0),
+(260, 261, 3, 0),
+(261, 262, 3, 0),
+(262, 263, 3, 0),
+(263, 264, 3, 0),
+(264, 265, 3, 0),
+(265, 266, 3, 0),
+(266, 267, 3, 0),
+(267, 268, 3, 0),
+(268, 269, 3, 0),
+(269, 270, 3, 0),
+(270, 271, 3, 0),
+(271, 272, 3, 0),
+(272, 273, 3, 0),
+(273, 274, 1, 0),
+(274, 275, 3, 0),
+(275, 276, 3, 0),
+(276, 277, 3, 0),
+(277, 278, 3, 0),
+(278, 279, 3, 0),
+(279, 280, 3, 0),
+(280, 281, 3, 0),
+(281, 282, 3, 0),
+(282, 283, 3, 0),
+(283, 284, 1, 0),
+(284, 285, 3, 0),
+(285, 286, 3, 0),
+(286, 287, 2, 0),
+(287, 290, 3, 0),
+(288, 291, 3, 0),
+(289, 292, 3, 0),
+(290, 293, 3, 0),
+(291, 294, 3, 0),
+(292, 295, 3, 0),
+(293, 297, 3, 0),
+(294, 298, 3, 0),
+(295, 299, 3, 0),
+(296, 300, 3, 0),
+(297, 301, 3, 0),
+(298, 302, 3, 0),
+(299, 303, 3, 0),
+(300, 304, 1, 17),
+(301, 305, 2, 14);
 
 -- --------------------------------------------------------
 
@@ -439,306 +911,307 @@ CREATE TABLE `tm_usuario` (
 --
 
 INSERT INTO `tm_usuario` (`usu_id`, `usu_nom`, `usu_ape`, `num_colab`, `usu_correo`, `usu_pass`, `usu_almacen`, `usu_area`, `rol_id`, `usu_telf`, `fech_crea`, `fech_modi`, `fech_elim`, `est`) VALUES
-(1, 'Jorge', 'Gala', '1440', 'soporteit@solulogis.com', 'f4a331b7a22d1b237565d8813a34d8ac', 1, 1, 2, '9981265517', '2023-10-02 12:01:52', '2023-10-02 12:02:08', NULL, 1),
-(2, 'Héctor', 'González', '1797', 'aux-sist4@solulogis.com', '8d9fc2308c8f28d2a7d2f6f48801c705', 1, 1, 2, '9981265863', '2023-10-02 11:04:15', NULL, NULL, 1),
+(1, 'Jorge', 'Gala', '1440', 'soporteit@solulogis.com', '0298f96c3bd7fc8f11bea5b8d6e562cf', 1, 1, 2, '9981265517', '2023-10-02 12:01:52', '2023-10-02 12:02:08', NULL, 1),
+(2, 'Héctor', 'González', '1797', 'aux-sist4@solulogis.com', '0298f96c3bd7fc8f11bea5b8d6e562cf', 1, 1, 2, '9981265863', '2023-10-02 11:04:15', NULL, NULL, 1),
 (3, 'Israel', 'Colin', '2846', 'aux-sist-aifa1@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 2, 2, '5517600294', '2023-10-02 11:15:45', NULL, NULL, 1),
-(4, 'Arby', 'Pat', '0088', 'arby.pat@solulogis.com', '47fb33421eb25052e477ab7bbc53e72f', 1, 1, 2, '9982424145', '2023-10-02 11:23:32', NULL, NULL, 1),
-(5, 'Gabriel', 'Mellado', '12345', 'gmellado@cco.com.mx', '827ccb0eea8a706c4c34a16891f84e7b', 3, 3, 3, '5512345678', '2023-10-06 12:39:12', NULL, NULL, 1),
-(6, 'Mildreth', 'Ponciano', '77', 'mildreth.ponciano@cco.com.mx', '28dd2c7955ce926456240b2ff0100bde', 2, 4, 3, '5566316591', '2023-10-06 14:19:50', NULL, NULL, 1),
-(7, 'Jocelin', 'Galván', '66', 'aux-sist-aifa2@cco.com.mx', '3295c76acbf4caaed33c36b1b5fc2cb1', 2, 2, 2, '5512345678', '2023-10-06 15:00:38', NULL, NULL, 1),
-(8, 'Christopher ', 'Durán', 'AF-144', 'cristopher.duran@cco.com.mx', '2587a2eb7c437c1e43f97aef715c0cfa', 2, 2, 3, '5586161310', '2023-10-06 17:31:40', NULL, NULL, 1),
-(9, 'Diego', 'Rosas', '12345', 'aux-sist-aicm2@cco.com.mx', '827ccb0eea8a706c4c34a16891f84e7b', 3, 3, 2, '5546968170', '2023-10-09 14:12:35', NULL, NULL, 1),
-(11, 'Fernanda', 'Lopez', '12345', 'aux-sist-aicm1@cco.com.mx', '827ccb0eea8a706c4c34a16891f84e7b', 3, 3, 1, '5546968170', '2023-10-09 14:15:31', NULL, NULL, 1),
-(12, 'Rodrigo', 'Amaro', '1759', 'aux-sist1@solulogis.com', 'ba1b3eba322eab5d895aa3023fe78b9c', 1, 1, 2, '018009998080', '2023-10-09 14:36:09', NULL, NULL, 1),
-(13, 'Jesus Francisco', 'Acuautla Sanchez', 'SC-42', 'jesusfrancisco@cco.com.mx', '9e9dddc63e3bad3d8125a2befb4bd876', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(14, ' Alejandro ', 'Arango Gabriel', 'SC-48', 'alejandro@cco.com.mx', 'e1da06639aa3b8d11513584c2d232a16', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(15, 'Gian Aldrick', 'Arguelles Franco', 'SC-27', 'gianaldrick@cco.com.mx', '23c08883e88fe5a9def45eeb860ba9f9', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(16, 'Cecilia', 'Arzate Diaz', 'SC-29', 'cecilia@cco.com.mx', 'e731a915a46565e87c5fba36458b1d33', 5, 9, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(17, 'Blanca Yanet', 'Barroso Castro', 'SC-52', 'blancayanet@cco.com.mx', 'dd5f5e5e6d8fd026db1e231e38654349', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(18, 'Jose Alfredo', 'Becerril Marquez', 'SC-45', 'josealfredo@cco.com.mx', '8dfac160c4646f0a14483ce0a6a51b0f', 5, 11, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(19, 'Abiram Shibolet', 'Bravo Miranda', 'SC-24', 'abiramshibolet@cco.com.mx', 'f3ed07709265ceb97aacee045ba0477b', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(20, 'Erick Martin', 'Caballero Ramirez', 'SC-03', 'erickmartin@cco.com.mx', '642fff995244418e7fda8a6d6087aa9b', 5, 11, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(21, 'Cynthia Daniela', 'Caseres Lara', 'SC-19', 'cynthiadaniela@cco.com.mx', 'd1b9f0076a858d8d8ad7fb61f2d2a736', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(22, 'Gabriela Abigail', 'Castillo Castillo', 'SC-13', 'gabrielaabigail@cco.com.mx', '51c739bf08700aabef12895daab7bd24', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(23, 'Alvaro Adrian', 'Castro Arellano', 'SC-10', 'alvaroadrian@cco.com.mx', 'ef6d3a7e58c3a70a730018470e7e2dd3', 5, 11, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(24, 'Brandon Cristopher', 'Cedillo Rodriguez', 'SC-53', 'brandoncristopher@cco.com.mx', '415383f393ca339a7238f9176629cabc', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(25, 'Hector Miguel', 'Corona Rendon', 'SC-35', 'hectormiguel@cco.com.mx', '46eb01660101e94688faf502134e0b1f', 5, 11, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(26, 'Jose Manuel', 'Cortes Vazquez', 'SC-04', 'josemanuel@cco.com.mx', '7de640394427a3c251154c57eab9500b', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(27, 'Miguel Angel', 'Cruz Ferreira', 'SC-25', 'miguelangel@cco.com.mx', 'fb7f77b7e2ee7c7165f30ec04fe19afa', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(28, 'Karla Ximena', 'Diaz Salas', 'SC-50', 'karlaximena@cco.com.mx', '7f9f44a01bb57f769280953fd8a19834', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(29, 'Jesus', 'Dorado Hernandez', 'SC-32', 'jesus@cco.com.mx', '5e56facb9cbab7eedf0c254d7deed229', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(30, 'Luis Edwin', 'Galindo Ramirez', 'SC-05', 'luisedwin@cco.com.mx', '661a1d16fec5420aa66ffe7224aa8dfa', 5, 11, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(31, 'Ailyn Daniela ', 'Gutierrez Garcia', 'SC-39', 'ailyndaniela@cco.com.mx', 'c1724c65c0f7a96898309dd01dd26b43', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(32, 'Jose Ricardo', 'Gutierrez Sanchez', 'SC-06', 'josericardo@cco.com.mx', '61ca83039318fc6af8418afb8e397f45', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(33, 'Alexis ', 'Hernandez Perez', 'SC-33', 'alexis@cco.com.mx', '13034cc2a0726f9f822bd51d2f52cebe', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(34, 'Brandon Antonio', 'Martinez Garcia', 'SC-11', 'brandonantonio@cco.com.mx', 'ae190cccc8b8a2f139a1cb439168eba7', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(35, 'Oscar ', 'Martinez Valadez', 'SC-46', 'oscar@cco.com.mx', '444345c7d48b1e0b00e6b930cc39d04f', 5, 9, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(36, 'Gabriel Alejandro', 'Mellado Martinez', 'SC-07', 'gabrielalejandro@cco.com.mx', 'bc9909e0e1ffc6987e42c7a6c8e357c9', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(37, 'Myriam Sarai', 'Montor Pineda', 'SC-08', 'myriamsarai@cco.com.mx', '17fa9741c650d8acc990d84143e7a7e7', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(38, 'Oscar', 'Nava Hernandez', 'SC-16', 'oscar@cco.com.mx', 'a00a7182d9d1590a20c11dd678196fa8', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(39, 'Jorge Antonio', 'Obregon Rodriguez', 'SC-09', 'jorgeantonio@cco.com.mx', 'd4e7984b8047a7addcf2d9ba2016918e', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(40, 'Alejandro', 'Ochoa Serrano', 'SC-28', 'alejandro@cco.com.mx', '094c55cd4980fdaef1632979a5c98f31', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(41, 'Maria Yoali', 'Perez Rivera', 'SC-47', 'mariayoali@cco.com.mx', 'a10756858b1ac288bd28d23b630e3374', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(42, 'Jose Antonio', 'Piñon Ridriguez', 'SC-21', 'joseantonio@cco.com.mx', '93cbf21c7d5164c0f2426863b00e8de4', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(43, 'Damian Paul', 'Portilla Valencia', 'SC-43', 'damianpaul@cco.com.mx', 'ee0d5fe66d957c2191bf3a2533c9e13b', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(44, 'Rocio', 'Ramirez Flores', 'SC-01', 'rocio@cco.com.mx', '82225881e6993f6ca816dd72a09323d0', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(45, 'Jesus Vicente', 'Rendon Acosta', 'SC-14', 'jesusvicente@cco.com.mx', 'e365f057f62571f240451b9a4cf7c210', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(46, 'Jorge Osmain', 'Rivas Gonzalez', 'SC-40', 'jorgeosmain@cco.com.mx', 'e26447750f5404bc400bf6d50eed055c', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(47, 'Heriberto', 'Rodriguez Cortes', 'SC-30', 'heriberto@cco.com.mx', '9831b86a96484740fbd8e58326e53084', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(48, 'Rair Jesus', 'Rodriguez Ortiz', 'SC-12', 'rairjesus@cco.com.mx', 'f52823e4325bfc05e3816737f0b328cc', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(49, 'Angel', 'Rodriguez Perez', 'SC-02', 'angel@cco.com.mx', 'd235b3cdab685e29a4ef0f2b243ca6dc', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(50, 'Diego Fabian', 'Segura Olvera', 'SC-44', 'diegofabian@cco.com.mx', 'e13ac2b94ca07717aaa2567f0a2d7735', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(51, 'Erik', 'Tapia Garcia', 'SC-49', 'erik@cco.com.mx', '9879b8e82e2f43eb7a8af2b85a1a1417', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(52, 'Mayte', 'Torres Arenas', 'SC-15', 'mayte@cco.com.mx', 'fb0b2e65be07c57d59e948a670fa3e3e', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(53, 'Fernanda', 'Torres Perales', 'SC-26', 'fernanda@cco.com.mx', '6c58452476c6c2ed355ae7910c4c87d3', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(54, 'Alan Daniel', 'Velazquez Uribe', 'SC-17', 'alandaniel@cco.com.mx', '07840c30f05b9d5d5e25008ba647e05f', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(55, 'Edgar Manuel', 'Villalba Caballero', 'SC-51', 'edgarmanuel@cco.com.mx', '8668b079afdc7ed6d14ad67940e57f09', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(56, 'David', 'Villegas Correa', 'SC-22', 'david@cco.com.mx', 'bafd78001e584733beb2e5204e78b2a2', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(57, 'Emilio Felipe', 'Abarca Ortiz', 'AF-04', 'emiliofelipe@cco.com.mx', '492f8e9963f2832da4f26b6c22e7d0bb', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(58, 'Vanessa Xaneiry', 'Aguilar Barrera', 'AF-41', 'vanessaxaneiry@cco.com.mx', '3b1c8a61fa6119604cae6b38ad6562cc', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(59, ' Edgar Teodoro ', 'Andrade Torres', 'AF-264', 'edgarteodoro@cco.com.mx', '6e176e3548df0e60cae34a57b1f7c927', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(60, 'Elda Sarahi', 'Arenas Martinez', 'AF-139', 'eldasarahi@cco.com.mx', 'ebc15181437362a33b81d8c0200edd66', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(61, 'Diana', 'Armendariz Sandoval', 'AF-42', 'diana@cco.com.mx', '5e3502bb8803f77ddf1e9259bf7e3ed0', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(62, 'Omar Adrian', 'Arriaga Torres', 'AF-195', 'omaradrian@cco.com.mx', 'a0a4c18b3d5103d2e0de135e36947702', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(63, 'Jonathan Francisco ', 'Arrieta Gutierrez', 'AF-137', 'jonathanfrancisco@cco.com.mx', 'b912aef0e00542fbd692d1b24a8efd81', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(64, 'Jesus Enrique ', 'Arroyo Cazares', 'AF-233', 'jesusenrique@cco.com.mx', '84a59af45ffc46112a98af1b6a25652e', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(65, 'Brayan', 'Ayala Sanchez', 'AF-244', 'brayan@cco.com.mx', '244a36729bd1764cf2c354b3e61474d8', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(66, 'Yovanni Gaciel ', 'Ayehualtencatl Peña', 'AF-235', 'yovannigaciel@cco.com.mx', '463ad2ccc00097633d7e1e89ef66b662', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(67, 'Maria Daniel ', 'Badillo Santa', 'AF-246', 'mariadaniel@cco.com.mx', '4e2c9aff75a9506b4066eea7c62d8ef1', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(68, 'Jonathan', 'Barragan Gonzalez', 'AF-58', 'jonathan@cco.com.mx', 'a68b8003ff723e6c13c563f6e333530b', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(69, 'Rebeca Jazmine', 'Bermudez Galindo', 'AF-155', 'rebecajazmine@cco.com.mx', '83bb83bbf201425bab3139366fe03388', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(70, 'Gabriel', 'Bolañoz Martinez', 'AF-25', 'gabriel@cco.com.mx', '78eec9e14b82ad3280d37aaf95867797', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(71, 'Margarita ', 'Botello Muñoz', 'AF-167', 'margarita@cco.com.mx', 'c5ac5505f232135946953a87e3aa7e37', 2, 5, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(72, 'Eduardo', 'Brendel Rodriguez', 'AF-247', 'eduardo@cco.com.mx', '8833c8c6a70eb60b3b6058a65a494a74', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(73, 'Luis Angel ', 'Cabrera Santos', 'AF-111', 'luisangel@cco.com.mx', '465faab403d31a00e1d686ea861c6410', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(74, 'Santiago de Jesus', 'Cabrera Vilchis', 'AF-199', 'santiagodejesus@cco.com.mx', '20fc277c72648f14ccfeca2d4384b6ed', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(75, 'Alan Manuel', 'Calderon Tello', 'AF-187', 'alanmanuel@cco.com.mx', '33382f4b5d994e253353ec8076331f1f', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(76, 'Victor Damian', 'Caloca Salvador', 'AF-32', 'victordamian@cco.com.mx', '9aac3c26559f59a242a0534aea4e1915', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(77, 'Ricardo Daniel ', 'Camacho Olvera', 'AF-132', 'ricardodaniel@cco.com.mx', 'd8783cf2e1f3556be4eebd4a9b1be0ae', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(78, 'Cesar Tlatoani', 'Canales Cruz', 'AF-29', 'cesartlatoani@cco.com.mx', '910b66cf779b43b847f2e519d71bb6f3', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(79, 'Alberto ', 'Cano Negrete', 'AF-84', 'alberto@cco.com.mx', '74f9adbfed331151d0693c53c5593815', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(80, 'Brayan Abdiel', 'Castro Caballero', 'AF-248', 'brayanabdiel@cco.com.mx', '38d19928d85fd398c38c6a5db40fd0e6', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(81, 'Jean Israel', 'Castro Rodriguez', 'AF-09', 'jeanisrael@cco.com.mx', '988d52a97b8b318946dc85f2afb03f58', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(82, 'Abel Armando', 'Chavez Guzman', 'AF-3639', 'abelarmando@cco.com.mx', '06bf7d2d5914bf8d466d504fca31616f', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(83, 'Victor Hugo ', 'Chavez Guzman', 'AF-2396', 'victorhugo@cco.com.mx', '20e372a5dac23a459ab42240eeae3abe', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(84, 'Daniel', 'Contreras Caballero', 'AF-191', 'daniel@cco.com.mx', '1c768e9748d38d3792d92f35911cb627', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(85, 'Julio Cesar', 'Cuevas Cerritos', 'AF-81', 'juliocesar@cco.com.mx', 'ddec89a6463980178452da2c603f1657', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(86, 'Roberto ', 'Davila Martinez', 'AF-98', 'roberto@cco.com.mx', 'f707ac1e1ecfa7fe6f8e772e22706794', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(87, 'Hernandez Christian', 'Del Campo', 'AF-156', 'hernandezchristian@cco.com.mx', '451cad33f5f38f1b812652ddb67aeeaf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(88, 'Marin Hugo Cesar ', 'Del Rio', 'AF-204', 'marinhugocesar@cco.com.mx', '079797a5022ea199d7a94088b908a8f1', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(89, 'Ariana ', 'Delgadillo Galvan', 'AF-89', 'ariana@cco.com.mx', 'de341f62ec1e9160439b9687882ed879', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(90, 'Nelibeth Bibiana', 'Diaz Ledezma', 'AF-86', 'nelibethbibiana@cco.com.mx', '132c696b17da96398029865bb8fcd764', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(91, 'Elizabeth ', 'Dominguez Gallardo', 'AF-2401', 'elizabeth@cco.com.mx', 'd5ac7fe2e5fdf0f21a6d81aff29fa4c7', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(92, 'Rosa Araceli', 'Dominguez Hernandez', 'AF-44', 'rosaaraceli@cco.com.mx', 'a37fe851fe50c7a8bbc5596131663ade', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(93, 'Arturo Emanuel', 'Dorado Hernandez', 'AF-69', 'arturoemanuel@cco.com.mx', '9c0554a3948822952962212ad28315a4', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(94, 'Alejandro Alonso ', 'Duran Hipolito', 'AF-210', 'alejandroalonso@cco.com.mx', '2e23557c680a42cddabcacd422d922da', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(95, 'Michel', 'Duran Olmedo', 'AF-74', 'michel@cco.com.mx', '9766a5a812bd1e5715d555a0fe42231e', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(96, 'Mario', 'Espinosa Gomez', 'AF-196', 'mario@cco.com.mx', '2ab7deba513d06ed3fba219e2d290add', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(97, 'Francisco ', 'Espinosa Ramirez', 'AF-138', 'francisco@cco.com.mx', 'b847be89658da8a604929120f918e274', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(98, 'Jose Francisco', 'Flores Hernandez', 'AF-223', 'josefrancisco@cco.com.mx', 'baaeb262b82189a8cc4a4cdf40c461df', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(99, 'Emanuel', 'Flores Salgado', 'AF-55', 'emanuel@cco.com.mx', '36be7f63aa59273bcf0a58d131fa1704', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(100, 'Jonathan Uriel ', 'Galicia Cruz', 'AF-218', 'jonathanuriel@cco.com.mx', '5ff2cc05d81ed4cd5563c871b4b453fc', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(101, 'Xitlali', 'Gama Jimenez', 'AF-18', 'xitlali@cco.com.mx', '27d219e6d4c3dcfbc4c4d1baaf01276e', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(102, 'Alan Uriel ', 'Garcia Alonso', 'AF-217', 'alanuriel@cco.com.mx', 'dbd60d99d475c5c5722b884652b0faa4', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(103, 'Angel Martin ', 'Garcia Bautista', 'AF-207', 'angelmartin@cco.com.mx', 'afa5f81a359e56cfde8b59f07ef5466a', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(104, 'Luis Roberto ', 'Garcia Bautista', 'AF-249', 'luisroberto@cco.com.mx', 'e4464377ba4f8c51c45815a2ca9ac62c', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(105, 'Eduardo Daniel ', 'Garcia Garcia', 'AF-250', 'eduardodaniel@cco.com.mx', 'cb0bb853d445aab3231610b847967ea6', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(106, 'Andres', 'Garcia Hernandez', 'AF-93', 'andres@cco.com.mx', 'f035151514dc500c69b5a4da4d96e3ba', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(107, 'Mario Yahir', 'Garcia Juarez', 'AF-03', 'marioyahir@cco.com.mx', '625fce0923dc862b2742e4a00d5d2ee3', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(108, 'Manuel Arturo', 'Garcia Martinez', 'AF-22999', 'manuelarturo@cco.com.mx', 'decda5d3df4bcab5ae7340baefea2f20', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(109, 'Gloria', 'Garcia Serna', 'AF-21', 'gloria@cco.com.mx', '77f94713ddf6f10d1856e28cbae4bed1', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(110, 'Andrik Uriel', 'Garcia Serrano', 'AF-37', 'andrikuriel@cco.com.mx', '87f31dcf19a95cd697343004002171ec', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(111, 'Ulises Adrian', 'Garcia Serrano', 'AF-08', 'ulisesadrian@cco.com.mx', 'a711608b92c1c6599f78834628878324', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(112, 'Juan Carlos', 'Garcia Venegas', 'AF-22492', 'juancarlos@cco.com.mx', 'eb2feee3ec320f3f64d9a678a4b4b37a', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(113, 'Juan Jose', 'Garcia Venegas', 'AF-190', 'juanjose@cco.com.mx', 'c139e1c080ee73b28781b69ca17d50d5', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(114, 'Victor Antonio ', 'Garcia Xicali', 'AF-237', 'victorantonio@cco.com.mx', '0b3b3bfdf985d3fe1203a1e66e512f4a', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(115, 'Jose Maria', 'Garibay Aparicio', 'AF-23206', 'josemaria@cco.com.mx', 'fab56b6cc7b017d3b4d1db6187349120', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(116, 'Jesus Aldair', 'Garnica Hernandez', 'AF-23', 'jesusaldair@cco.com.mx', '8b8d6c3d752ed40694721b9aff93b824', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(117, 'Jonathan ', 'Garrido Perez', 'AF-2396', 'jonathan@cco.com.mx', '20e372a5dac23a459ab42240eeae3abe', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(118, 'Valetin ', 'Gayosso Soto', 'AF-236', 'valetin@cco.com.mx', '443953d7214d15b9904d6fd3f475f29e', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(119, 'Alexis Aldair ', 'Gomez Chavez', 'AF-173', 'alexisaldair@cco.com.mx', '6492d054856611404f2f26c398278115', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(120, 'Luis Alberto', 'Gonzalez Gutierres', 'AF-245', 'luisalberto@cco.com.mx', 'e08555947a08b7fed0aa84fd4a325b68', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(121, 'Alan Diego', 'Gonzalez Hernandez', 'AF-182', 'alandiego@cco.com.mx', '0468ef0ae096d6434e9a1e7f80be9024', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(122, 'Juan Carlos ', 'Gonzalez Lopez', 'AF-23035', 'juancarlos@cco.com.mx', 'c7008ac74f8e5231df09caf72cd6c166', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(123, 'Mario Walfred', 'Gonzalez Lopez', 'AF-251', 'mariowalfred@cco.com.mx', '7dde21c86060d3d6a4a2edc5540eaf34', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(124, 'Erika Naivid', 'Gonzalez Maldonado', 'AF-153', 'erikanaivid@cco.com.mx', '399633aea7ec566588ad8d432748daa3', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(125, 'Armando Yair', 'Gonzalez Muñoz', 'AF-186', 'armandoyair@cco.com.mx', 'cc5ca2b269c205722e663500e9ba1dc6', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(126, 'Josue Ismael ', 'Gonzalez Samaniego', 'AF-157', 'josueismael@cco.com.mx', '9b1023f63f56b0de86c4ab37d2511cd0', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(127, 'Joel ', 'Gonzalez Ventura', 'AF-206', 'joel@cco.com.mx', '2fc4e945fed2a332729804a8739105b3', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(128, 'Eduardo', 'Guerrero Fuentes', 'AF-13', 'eduardo@cco.com.mx', '09753f9ae3403c148b34c85083bfdd27', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(129, 'Ricardo', 'Guerrero Garcia', 'AF-166', 'ricardo@cco.com.mx', 'eaef6efa2edfedcff55f53e66ea3c05b', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(130, 'Miguel Angel ', 'Gutierrez Brizuela', 'AF-125', 'miguelangel@cco.com.mx', '989e4df3e901c37bfae259d9d0b2eaa5', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(131, 'Edgar Martin', 'Gutierrez Diaz', 'AF-73', 'edgarmartin@cco.com.mx', '75a0339764fdcf0c48ec83be6861b791', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(132, 'Fernando ', 'Gutierrez Salinas', 'AF-113', 'fernando@cco.com.mx', 'b30f11370cc0b508bac5a1439e9144dd', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(133, 'Daniela', 'Gutierrez Tapia', 'AF-151', 'daniela@cco.com.mx', '0bdcdc1ed284142dc8e6d20f56290fcc', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(134, 'Jonathan Raul', 'Gutierrez Vazquez', 'AF-226', 'jonathanraul@cco.com.mx', 'baae1114f409d3ca588b3fa2a32f3893', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(135, 'Maria del Carmen ', 'Hernandez Cortes', 'AF-221', 'mariadelcarmen@cco.com.mx', '42065e65dccef4310c98e75376e06ddb', 2, 5, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(136, 'Jurgen Michell ', 'Hernandez Flores', 'AF-119', 'jurgenmichell@cco.com.mx', 'f9188914489a909377e525b7ab79d80c', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(137, 'Mario Antonio ', 'Hernandez Flores', 'AF-104', 'marioantonio@cco.com.mx', '6b12c0fbfaa2dbfa941c83ff4f123b37', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(138, 'Ana Karen ', 'Hernandez Gomez', 'AF-114', 'anakaren@cco.com.mx', '62c952cdc0a1c023e9cd81330b53088e', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(139, 'Edgar', 'Hernandez Lopez', 'AF-164', 'edgar@cco.com.mx', 'bf3b533145516b10fc39dbd28ce312ba', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(140, 'Isaac Armando ', 'Hernandez Lopez', 'AF-107', 'isaacarmando@cco.com.mx', 'e90da4b4ed47e630c455adfbcc50bb90', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(141, 'Fernando', 'Hernandez Maya', '30100', 'fernando@cco.com.mx', '32472eb6885a55919e517965fddd2d74', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(142, 'Jazmin ', 'Hernandez Monter', 'AF-83', 'jazmin@cco.com.mx', 'ae9cd27af3b878183b0553ae8d1c2c50', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(143, 'Israel', 'Huerta Aranda', 'AF-75', 'israel@cco.com.mx', 'd36a008845de227ade36ad1733caf25b', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(144, 'Ismael', 'Iturbe Mendoza', 'AF-162', 'ismael@cco.com.mx', '5be191d2b73a1f2f082022c9699c987f', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(145, 'Kevin Omar', 'Jacuinde Salazar', 'AF-189', 'kevinomar@cco.com.mx', '9160674a60af3003a57b5bbe89a8a057', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(146, 'Marcos ', 'Jaime Lujano', '103', 'marcos.jaime@cco.com.mx', '6974ce5ac660610b44d9b9fed0ff9548', 2, 6, 3, '12135874', '2023-10-09 16:16:22', NULL, NULL, 1),
-(147, 'Pedro Angel', 'Jaimes Guzman', 'AF-242', 'pedroangel@cco.com.mx', '8d1ace48db2dc104314f85058f60ff25', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(148, 'Luis Jeronimo', 'Jimenez Garcia', 'AF-23208', 'luisjeronimo@cco.com.mx', '4276779bb2989037e2db87daa2bd5039', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(149, 'Hector', 'Jimenez Ibarra', 'AF-158', 'hector@cco.com.mx', 'a909a0c7f1eee15896fb1719faccf448', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(150, 'Javier ', 'Jimenez Marques', 'AF-215', 'javier@cco.com.mx', '8bc05f5165ea4e0d554c109be141191e', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(151, 'Diana Belem', 'Jimenez Martinez', 'AF-150', 'dianabelem@cco.com.mx', '26efeb627efb722004fde70f2cff3a08', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(152, 'Marcial ', 'Jimenez Rodriguez', 'AF-252', 'marcial@cco.com.mx', '83d745e561ea399dbd85c28b131df12c', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(153, 'Jorge Abraham', 'Jimenez Rojo', 'AF-46', 'jorgeabraham@cco.com.mx', '1a09d6bd2c0c7fc069c6282e9af7f418', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(154, 'Imelda', 'Juarez Cruz', 'AF-22998', 'imelda@cco.com.mx', '10e1869c79e00dee9a26c8203119bb97', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(155, 'Luis Gael', 'Juarez Hernandez', 'AF-24', 'luisgael@cco.com.mx', '0592097c840b72c8807f02b0799e8471', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(156, 'Andres', 'Leyte Manrrique', 'AF-211', 'andres@cco.com.mx', '4d9d5ff690a7a14cdaf49b994c69cc13', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(157, 'Cesar Alexis ', 'Lopez Camacho', 'AF-201', 'cesaralexis@cco.com.mx', '39e6fe0a7c6e40584400db04bb7a8ca7', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(158, 'Cesar Ariel', 'Lopez Camacho', 'AF-203', 'cesarariel@cco.com.mx', '8c83ad7b2c0c8507cfa74aaa654e025f', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(159, 'Agustina', 'Lopez Cruz', 'AF-23035', 'agustina@cco.com.mx', 'c7008ac74f8e5231df09caf72cd6c166', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(160, 'Armando', 'Lopez Gonzalez', 'AF-95', 'armando@cco.com.mx', 'c5fa4e0646576b7e8fcde97ae5943f8b', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(161, 'Jorge Eduardo', 'Lopez Gonzalez', 'AF-192', 'jorgeeduardo@cco.com.mx', '24c76327db873ca686781cd2070c7eb9', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(162, 'Enrique ', 'Lugo Martinez', 'AF-127', 'enrique@cco.com.mx', '368d71b82b1e80bfe94aafd942e572cc', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(163, 'Berenice', 'Luna Allier', 'AF-88', 'berenice@cco.com.mx', '505f20fb4c60d6e15e0735e37c3ab8b6', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(164, 'Laura Angelica ', 'Luna Buendia', 'AF-129', 'lauraangelica@cco.com.mx', '3b7061023ce60dae815275c318eb50bf', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(165, 'Nestor Ignacio', 'Macias Luna', 'AF-50', 'nestorignacio@cco.com.mx', '7bd17ac038c2438dac11607d89be51a6', 2, 2, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(166, 'Miguel ', 'Macias Maldonado', 'AF-253', 'miguel@cco.com.mx', 'b2c87812f4da29c81926fb34932b8c22', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(167, 'Omar Eduardo ', 'Macias Oble', 'AF-254', 'omareduardo@cco.com.mx', '369527f0a7580864e840c95fa15c880d', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(168, 'Luis Daniel', 'Magdaleno Baeza', 'AF-34', 'luisdaniel@cco.com.mx', 'b7b3867ffec7e346399f67dde70db326', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(169, 'Jose Raymundo', 'Martinez Alvarez', 'AF-51', 'joseraymundo@cco.com.mx', '73bb2a4c1ebc7aa6074ab928fee5a3ad', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(170, 'Luis Alberto ', 'Martinez Casiano', 'AF-231', 'luisalberto@cco.com.mx', '8fbfd3cbaa7ed355adc8c2a61a9ec03e', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(171, 'Francisco', 'Martinez Gallegos', 'AF-170', 'francisco@cco.com.mx', 'a283c1c182702c354af3ab8f9b75123b', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(172, 'Ricardo ', 'Martinez Gaspar', 'AF-145', 'ricardo@cco.com.mx', '310d1d24adad4f4345a88285e4b4eb97', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(173, 'Jorge Ivan ', 'Martinez Hernandez', 'AF-2420', 'jorgeivan@cco.com.mx', '63eeef35234b959605834a9ad557d8fa', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(174, 'Juan Manuel', 'Martinez Hernandez', 'AF-47', 'juanmanuel@cco.com.mx', '8d427612f7b82eb318209c3233e1b167', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(175, 'Daniel ', 'Martinez Martinez', 'AF-202', 'daniel@cco.com.mx', 'd7edb67e20a538c084de4aecea5fa0e7', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(176, 'Gilberto ', 'Martinez Ortega', 'AF-255', 'gilberto@cco.com.mx', '3fee5ea52198fc701ae61dadd5166bc8', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(177, 'Edwin Emanuel', 'Martinez Sanchez', 'AF-256', 'edwinemanuel@cco.com.mx', '77ac6b3f799e5295543eed6fd7230c8e', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(178, 'Julio Cesar ', 'Martinez Suarez', 'AF-96', 'juliocesar@cco.com.mx', '48cdf5662f8ce5dcc6195307a6cd0bf3', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(179, 'Donovan', 'Medellin Patlan', 'AF-257', 'donovan@cco.com.mx', '46dff9cf313239468a9abb21c3440db9', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(180, 'Miguel Angel', 'Medina Granados', 'AF-154', 'miguelangel@cco.com.mx', '9406d7947306d12c10e88ca13285874b', 3, 14, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(181, 'Carlos ', 'Medina Vega Roberto', 'AF-240', 'carlos@cco.com.mx', '366549901d22b921805a80103562f50e', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(182, 'Angel', 'Mendez Canales', 'AF-141', 'angel@cco.com.mx', 'df49820ba747ee7cbc2a9ef27dbf41b7', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(183, 'Marco Antonio', 'Mendoza Guzman', 'AF-185', 'marcoantonio@cco.com.mx', '7db01c6d3246cab198018f3612e17a94', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(184, 'Ana Rosa ', 'Mendoza Quintero', 'AF-131', 'anarosa@cco.com.mx', 'f20b785befed7dbb18262e8b84566dd6', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(185, 'Irving Francisco', 'Mondragon Mancilla', 'AF-19954', 'irvingfrancisco@cco.com.mx', '4c262a26ffbb76bccb9ec9cbfef79660', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(186, 'Carlos Daniel ', 'Morales Gonzalez', 'AF-205', 'carlosdaniel@cco.com.mx', '9e730153c948c0d1eb0732c5d4ffcf6f', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(187, 'Daniel Humberto', 'Moreno Alcantar', 'AF-76', 'danielhumberto@cco.com.mx', '4475a61f8429cdff655f91b049ea3c62', 2, 5, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(188, 'Hector Alejandro ', 'Moreno Reyna', 'AF-208', 'hectoralejandro@cco.com.mx', '8a695731fd5937b0a46ef85266d5cb5b', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(189, 'Miguel Angel', 'Muñoz Garcia', 'AF-219', 'miguelangel@cco.com.mx', '548f8a34d5452b815552bc1629c25bd8', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(190, 'Jesus Antonio ', 'Nava Anaya', 'AF-213', 'jesusantonio@cco.com.mx', 'b24ca118b9a16aadd9248b4ade8d48f8', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(191, 'Abraham Alejandro', 'Nava Rojas', 'AF-53', 'abrahamalejandro@cco.com.mx', 'c70ce0434b9a2b50d87972da49e28bda', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(192, 'Erick Miguel ', 'Nava Sanchez', 'AF-174', 'erickmiguel@cco.com.mx', '4b8691b612bc7bb78b3caa5145252242', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(193, 'Brenda Nataly', 'Nieto Castañeda', 'AF', 'brendanataly@cco.com.mx', '06fa567b72d78b7e3ea746973fbbd1d5', 2, 2, 3, '1', '2023-10-09 16:16:22', NULL, '2023-10-26 14:00:15', 0),
-(194, 'Jose Marcos', 'Nuñez Dominguez', 'AF-59', 'josemarcos@cco.com.mx', '4ff7cf9ba531ea3ed291b6078bcf4f84', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(195, 'Esteban ', 'Olguin Nolasco', 'AF-115', 'esteban@cco.com.mx', 'b6bf6a7c8e7ca78775d557ae4df613c1', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(196, 'Brandon Axel', 'Oliva Robledo', 'AF-135', 'brandonaxel@cco.com.mx', 'e21f3bfe8074f518b4bda7525b96129f', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(197, 'Lesli Yaremi', 'Olvera Rodriguez', 'AF-227', 'lesliyaremi@cco.com.mx', '0229c1a58014ebb20c811e70195130e6', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(198, 'Maria del Rosario', 'Orozco Rosario', 'AF-94', 'mariadelrosario@cco.com.mx', '9862909a117d8eaef6230ba2fa91a341', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(199, 'Luis Alfredo ', 'Ortega Covarrubias', 'AF-183', 'luisalfredo@cco.com.mx', '50f2c16bffab104ff88fb044b1744a4f', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(200, 'Ivan ', 'Ortega Diaz', 'AF-225', 'ivan@cco.com.mx', '18a04e816a9f3e1d40c776069add9d45', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(201, 'Jose Alexei', 'Ortega Molina', 'AF-212', 'josealexei@cco.com.mx', '626c6d65ad69cbb004acd79d4c740ce9', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(202, 'Joaquin ', 'Otañez Cazarez', 'AF-149', 'joaquin@cco.com.mx', '473537275dfaae8e2fc4587dd0f78090', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(203, 'Francisco Efrain', 'Parra Oropeza', 'AF-142', 'franciscoefrain@cco.com.mx', '34251ee5053b67bef71671f68c608742', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(204, 'Itzmatl Damian', 'Peralta Perez', 'AF-05', 'itzmatldamian@cco.com.mx', '83c6e1d198ba59810a3837b395230020', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(205, 'Leonides Francisco ', 'Perez Acleto', 'AF-180', 'leonidesfrancisco@cco.com.mx', '86205b66dfd852f2e5faf8164e9c94ac', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(206, 'Owen Axel ', 'Perez Manzur', 'AF-92', 'owenaxel@cco.com.mx', '057253e8ddfbd49c1403a5568dda8c7e', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(207, 'Julio', 'Perez Orta', 'AF-26', 'julio@cco.com.mx', '319fbcb0940a890c266d670ec83d5246', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(208, 'Miguel Angel', 'Perez Orta', 'AF-12', 'miguelangel@cco.com.mx', '9021a30f647d2bf0224a15cc33dc8a19', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(209, 'Victor Hugo ', 'Perez Padilla', 'AF-234', 'victorhugo@cco.com.mx', 'd28abdcddf70037247541afe030286a7', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(210, 'Gilberto ', 'Perez Ramirez', 'AF-116', 'gilberto@cco.com.mx', '3131cfd8e6e235110a7a3266f7095dc5', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(211, 'Jesus Angel', 'Pineda Arriaga', 'AF-241', 'jesusangel@cco.com.mx', '1c1ecb344e715a26c7183c3adcc2fb15', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(212, 'Yoman Francisco ', 'Piscil Fuentes', 'AF-238', 'yomanfrancisco@cco.com.mx', '216633261e9931581729c29e6e39dd92', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(213, 'Fatima Yoselin', 'Quintero Corona', 'AF-60', 'fatimayoselin@cco.com.mx', '67caf418c9668580b13ad630f74c8d65', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(214, 'Rogelio ', 'Ramiez Torres', 'AF-232', 'rogelio@cco.com.mx', '21744d89f383a59a355718cbc42783f6', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(215, 'Giovanni', 'Ramirez Nava', 'AF-23205', 'giovanni@cco.com.mx', '7792bb6e134edc0c7f370551b7afe18d', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(216, 'Victor Enrique', 'Ramirez Rendon', 'AF-16', 'victorenrique@cco.com.mx', '982544df3f3a59b8210ce999751420f8', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(217, 'Christian Ivan', 'Real Ramirez', 'AF-194', 'christianivan@cco.com.mx', '71194a8157f01e828e3e8adc318f3f72', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(218, 'Juan David', 'Recoba Altamirano', 'AF-198', 'juandavid@cco.com.mx', 'ae96543f7cb6b4a2147972256d1a9413', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(219, 'Arath', 'Rendon Acosta', 'AF-35', 'arath@cco.com.mx', '38b97b87b5a710285b22374ea50c0613', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(220, 'Emory', 'Reyes Martinez', 'AF-62', 'emory@cco.com.mx', '6931987dd5ed9635bbe2cd7ed3d3f497', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(221, 'Jose Manuel', 'Reyes Martinez', 'AF-222', 'josemanuel@cco.com.mx', '7747636666e7a01bfb909826efcba2ee', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(222, 'Edgar ', 'Rios Gonzlez', 'AF-258', 'edgar@cco.com.mx', '5594df958c53e0b46a8bd3a607a4787d', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(223, 'Victor Antonio ', 'Rivera Flores', 'AF-110', 'victorantonio@cco.com.mx', '2ccb13eb1286634bd5681b1d19b628c0', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(224, 'Juan de Dios ', 'Rivera Rodriguez', 'AF-172', 'juandedios@cco.com.mx', 'aa05f214407393028d4e79654f0219b9', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(225, 'Jose Luis', 'Rivera Tellez', 'AF-79', 'joseluis@cco.com.mx', 'c7b3f55b2b7339b7150e3666356a570e', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(226, 'Magali Lucero', 'Rodrigez Garcia', 'AF-56', 'magalilucero@cco.com.mx', '91fde816e968a6674dbee6a239799fe7', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(227, 'Mario Alberto ', 'Rodriguez Cruz', 'AF-117', 'marioalberto@cco.com.mx', 'cc76a9c4eb55dd531bc8bee893b96c30', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(228, 'Bryan ', 'Rodriguez Galvan', 'AF-216', 'bryan@cco.com.mx', '3b6ffdde6e909be34bad0fdfb9328f2f', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(229, 'Miguel Angel ', 'Rodriguez Garcia', 'AF-228', 'miguelangel@cco.com.mx', '50f247ce333c22f2e46609e2d4d46f2e', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(230, 'Arnold', 'Rodriguez Tagano', 'AF-159', 'arnold@cco.com.mx', 'b0558203fb21b1bf58ca0c0c8fdd7161', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(231, 'Christopher Cenorino', 'Rodriguez Tagano', 'AF-163', 'christophercenorino@cco.com.mx', '574025fa8dac31b70a478e095e5d79b7', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(232, 'Juan Carlos', 'Rojas Bautista', 'AF-165', 'juancarlos@cco.com.mx', '9a1285791e7b274631ddf6ef0328154e', 5, 11, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(233, 'Sergio ', 'Rojas Rivera', 'AF-181', 'sergio@cco.com.mx', '3e28cfadd66592726f3219df543acb4e', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(234, 'Concepcion', 'Roque Cruz', 'AF-160', 'concepcion@cco.com.mx', '1c1009060cf44d54b619faac8058a2c3', 3, 14, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(235, 'Ceron Jair David', 'Ruiz Velazco', 'AF-72', 'ceronjairdavid@cco.com.mx', '893ee191128ddb0582f8909c2ec6bfa7', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(236, 'Eduardo', 'Salazar Contreras', 'AF-259', 'eduardo@cco.com.mx', '51f49b9b014e3d567f110b6a8c7ede49', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(237, 'Giron Jovanny', 'Salazar Tellez', 'AF-169', 'gironjovanny@cco.com.mx', '9a69b6187cfe87fb4c7189e88680e48a', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(238, 'Juan Manuel ', 'Salguero Garcia', 'AF-260', 'juanmanuel@cco.com.mx', '4627741f1324eab1ea17f2d8aa94c197', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(239, 'Lorena', 'Salinas Ramirez', 'AF-143', 'lorena@cco.com.mx', '96ffb73413d3bd9a1c207df9eecc86d2', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(240, 'Hernandez Salvador', 'San Juan', 'AF-64', 'hernandezsalvador@cco.com.mx', 'f1ddcf27dc259684bae8360927ea0d7b', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(241, 'Jonathan Israel', 'Sanchez Aguilera', 'AF-19256', 'jonathanisrael@cco.com.mx', 'e0d679c70ba5ae74863d1e6054a93576', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(242, 'Jose Nicolas ', 'Sanchez Chavez', 'AF-220', 'josenicolas@cco.com.mx', '8b2faca07b99c3d56b44a4bd9ac042a1', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(243, 'Johan Mohamed', 'Sanchez Garay', 'AF-171', 'johanmohamed@cco.com.mx', 'b14bdf985b80513b29a8c030adecb354', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(244, 'Veronica ', 'Sanchez Hernandez', 'AF-112', 'veronica@cco.com.mx', '2ac2341bee90ed1baabe3ce3e912f526', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, '2023-11-19 08:36:58', 0),
-(245, 'Johan Miguel', 'Sanchez Jorge', 'AF-200', 'johanmiguel@cco.com.mx', '0ea5c95d082806b70ec7f7a731c87d07', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(246, 'Jose Luis', 'Sanchez Vara', 'AF-23109', 'joseluis@cco.com.mx', 'e4bf7d996466a7f74e01aad18e2b037d', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(247, 'Leopoldo', 'Sandoval alvarez', 'AF-23179', 'leopoldo@cco.com.mx', 'd531fe1fcd9471fa0cc6282476eafc3c', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(248, 'David Gerson ', 'Santiago Rodriguez', 'AF-78', 'davidgerson@cco.com.mx', '447c5764848238c3eb5d2e7e83bc8c44', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(249, 'Axel Alfredo', 'Santiago Sanchez', 'AF-49', 'axelalfredo@cco.com.mx', '3744e09b6e8934412472750a860bb2f4', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(250, 'Eva', 'Tellez Lopez', 'AF-152', 'eva@cco.com.mx', '491688e98de0657af771663415ca2855', 3, 14, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(251, 'Victor ', 'Torres Cruz', 'AF-229', 'victor@cco.com.mx', 'c38f457e15fbc7d23b848bd98071b8d4', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(252, 'Juan ', 'Torres Ibarra', 'AF-123', 'juan@cco.com.mx', 'dabe7f8c71b5a4c8f533b6cc9ac22b82', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(253, 'Jorge Osvaldo ', 'Torres Sanchez', 'AF-85', 'jorgeosvaldo@cco.com.mx', 'b25e88245c1a53a6bd0584866e7625e0', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(254, 'Jeronimo ', 'Ugalde Espino', 'AF-214', 'jeronimo@cco.com.mx', '2012f675263a24058bd7d6c3cf39e82b', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(255, 'Axel', 'Uribe Jimenez', 'AF-15', 'axel@cco.com.mx', '5a704e38064d50b8e678181a0c9d3360', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(256, 'Jose Eduardo ', 'Hernandez Vazquez', 'AF-140', 'joseeduardo@cco.com.mx', '9ffb29472ec8f9d41fef43f1dd3deb5e', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(257, 'Jose Francisco ', 'Perez Vallejo', 'AF-118', 'josefrancisco@cco.com.mx', '157076da44450af88035a71263c8d5cf', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(258, 'Jonathan Alejandro ', 'Reyes Perez', 'AF-121', 'jonathanalejandro@cco.com.mx', 'cf967db99b73b91e5cc8a87421ac245b', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(259, 'Jose Alberto ', 'Trejo Torres', 'AF-270', 'josealberto@cco.com.mx', 'ff98ff161e76e83c4084292faa68fbdc', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(260, 'Victor Hugo', 'Gonzalez Gomez', 'AF-265', 'victorhugo@cco.com.mx', '3f8854ef539b4283fc05d09d9a94053b', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(261, 'Cruz Jesus ', 'Valdez de', 'AF-209', 'cruzjesus@cco.com.mx', 'cacbd12bf4869e8bafce8f2242804cc2', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(262, 'Juan Pablo', 'Valladolid Habana', 'AF-146', 'juanpablo@cco.com.mx', '88ade7fed7bc020560e7afad650ad18b', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(263, 'Jorge Joel ', 'Vargas Acosta', 'AF-261', 'jorgejoel@cco.com.mx', 'c937064a43fa6210693cdd69644f8cbe', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(264, 'Daniel ', 'Vazquez Duran', 'AF-262', 'daniel@cco.com.mx', '11b5e6d119f4a28b3b55fc2baea8fc1d', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(265, 'Eduardo', 'Vazquez Lopez', 'AF-161', 'eduardo@cco.com.mx', '06fd71b6e0e505e8d3a6859ae66aea5c', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(266, 'Ulises Alejandro', 'Vazquez Lopez', 'AF-177', 'ulisesalejandro@cco.com.mx', 'f09f4aa60e97eea0fdf693e0addc9db7', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(267, 'Jacqueline', 'Vega Carrasco', 'SC-20', 'jacqueline@cco.com.mx', '7b6830dd929d899f716d9ee5c664384b', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(268, 'Alfonso', 'Martinez Perez', 'AF-225', 'alfonso@cco.com.mx', '18a04e816a9f3e1d40c776069add9d45', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(269, 'Hugo ', 'Vences Martinez', 'AF-80', 'hugo@cco.com.mx', '6c1160c0c8f2cbd1011b8bc3fe6fbe0e', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(270, 'Mario Alberto', 'Victoria Garcia', 'AF-71', 'marioalberto@cco.com.mx', '5b425a4b46654388b342bb3c07e55a67', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(271, 'Lucio', 'Zarate Lopez', 'AF-243', 'lucio@cco.com.mx', 'b3eb38fca805d6611266659a0651a0c8', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(272, 'Vianey', 'Alcantara Arroniz', 'OR-44', 'vianey@cco.com.mx', 'a7f5c41dc6891ce6e731e73ef77088e6', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(273, 'Julio Cesar', 'Cortes Lopez', 'OR-47', 'juliocesar@cco.com.mx', 'd10dafd1dc1ea97683e1839d8c917f93', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(274, 'Raul Sebastian', 'Hernandez Granados', 'OR-50', 'raulsebastian@cco.com.mx', 'febc51470c4e77fb5aa3a903a277aa99', 3, 3, 1, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(275, 'Joshua', 'Duran Amezcua', 'M-21', 'joshua@cco.com.mx', 'b0d2a4e4d0a5aaacf9e8053eb869469d', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(276, 'Ramon', 'Espitia Martinez', 'M-20971', 'ramon@cco.com.mx', '894795044f46b815630ca34a263136ed', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(277, 'Brenda Riccel', 'Flores Alcantara', 'M-2404', 'brendariccel@cco.com.mx', '459bc0354a7b4dd5c0c742065ed54f6b', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(278, 'Jesus Alejandro ', 'Garcia Huerta', 'M-02', 'jesusalejandro@cco.com.mx', 'b9bfb8d8e145c544941b2bcb27be1575', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(279, 'Juan Manuel', 'Hernandez Martinez', 'M-2413', 'juanmanuel@cco.com.mx', '0b52071d61f4ae15f0e30e74832c72d8', 5, 11, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(280, 'Reyes ', 'Lopez Lardizabal', 'M-2417', 'reyes@cco.com.mx', 'c0a4aa216d81914688d1fd4a9080ea4e', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(281, 'Christian Jibran', 'Rodriguez Ramirez', 'M-15', 'christianjibran@cco.com.mx', '9e2b4f0f27db6dc6400b9b3c931d0ded', 2, 5, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(282, 'Erick', 'Santos Victoria', 'M-21027', 'erick@cco.com.mx', '850550aecf2513bda19b4a24bf4e6064', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(283, 'Erick Uriel', 'Zepeda Flores', 'M-15978', 'erickuriel@cco.com.mx', '38b0a721b7fb0bc8f778c8ce761ef698', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
-(284, 'Haydee', 'Ortiz', '1574', 'auxsist5_solulogis@outlook.com', '0d4f4805c36dc6853edfa4c7e1638b48', 1, 1, 1, '9982421738', '2023-10-10 12:06:45', NULL, NULL, 1),
-(285, 'Gamaliel', 'Amaro', '12345', 'gamaliel.amaro@solulogis.net', '827ccb0eea8a706c4c34a16891f84e7b', 1, 1, 3, '018009998080', '2023-10-11 08:42:30', NULL, NULL, 1),
-(286, 'Chrysthian Isaury', 'Hernández', '1234', 'chrysthian@cco.com.mx', '81dc9bdb52d04dc20036dbd8313ed055', 2, 2, 3, '5512345678', '2023-10-16 12:51:19', NULL, NULL, 1),
-(287, 'Cesar', 'Padilla', '366047', 'cesar@cco.com.mx', '698c5816a425026ce39a9077192c7bf5', 2, 2, 2, '5512345678', '2023-10-16 15:59:13', NULL, NULL, 1),
-(290, 'Julio Cesar', 'Baez', '7676', 'julio@cco.com.mx', 'cfe8504bda37b575c70ee1a8276f3486', 2, 2, 3, '1', '2023-10-18 15:27:19', NULL, NULL, 1),
-(291, 'Brain Luna', 'Guzmán', '6363', 'brain@cco.com.mx', '075b051ec3d22dac7b33f788da631fd4', 2, 2, 3, '1', '2023-10-18 15:54:31', NULL, NULL, 1),
-(292, 'Brenda Joceline', 'Gutiérrez Tranquilino', '8990', 'brendajoceline@cco.com.mx', 'ce65f40e3a20ad19fe352c52ce3bcf51', 2, 2, 3, '1', '2023-10-23 18:15:51', NULL, NULL, 1),
-(293, 'Itzel', 'Hernández Tejeda', 'AF-63', 'itzel.hernandez@cco.com.mx', '87e4f13aa590cf093bab8ff4391c8e82', 2, 6, 3, '5544882881', '2023-10-26 10:43:25', NULL, '2023-10-26 14:03:24', 1),
-(294, 'prueba', 'asdf', '123456', 'prueba@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 2, 4, 3, '1', '2023-10-26 14:51:34', NULL, '2023-10-26 14:52:00', 0),
-(295, 'Emmanuel', 'Martínez Romo', '4554', 'emmanuel@cco.com.mx', 'e7023ba77a45f7e84c5ee8a28dd63585', 2, 6, 3, '1', '2023-10-27 14:10:12', NULL, NULL, 1),
-(297, 'Mariana Alejandra ', 'Feria Mendoza', '101', 'administracion-2@cco.com.mx', '38b3eff8baf56627478ec76a704e9b52', 2, 6, 3, '5530643155', '2023-11-18 12:11:13', NULL, NULL, 1),
-(298, 'Francisco Javier', 'Moreno Guerrero', '7898', 'franciscojavier@cco.com.mx', '0e080857e96278e6dba76ac029faf291', 2, 6, 3, '1', '2023-11-19 08:48:22', NULL, NULL, 1),
-(299, 'Miguel ', 'Maceda', '102', 'miguel.maceda@cco.com.mx', 'ec8956637a99787bd197eacd77acce5e', 2, 6, 3, '12345689', '2023-11-24 10:54:31', NULL, NULL, 1),
-(300, 'Jibran', 'Rodriguez Ramirez', '104', 'jibran@cco.com.mx', 'c9e1074f5b3f9fc8ea15d152add07294', 2, 4, 3, '12587496', '2023-12-27 09:16:04', NULL, NULL, 1),
-(301, 'Paola', 'Valencia', '2056', 'implementacion1@solulogis.com', 'a96d3afec184766bfeca7a9f989fc7e7', 1, 17, 3, '9851153386', '2023-12-28 12:33:04', NULL, NULL, 1),
-(302, 'Gabriela', 'Canul', '2059', 'implementacion2@solulogis.com', '2eace51d8f796d04991c831a07059758', 1, 17, 3, '9992622156', '2023-12-28 12:37:51', NULL, NULL, 1),
-(303, 'Jairo', 'Vazquez', '1765', 'implementacion4@solulogis.com', '8698ff92115213ab187d31d4ee5da8ea', 1, 17, 3, '2491464739', '2023-12-28 12:43:30', NULL, NULL, 1),
-(304, 'Sandra', 'Zarate', '145', 'sandra.zarate@solulogis.com', '2b24d495052a8ce66358eb576b8912c8', 1, 17, 1, '5569680887', '2023-12-28 15:07:13', NULL, NULL, 1);
+(4, 'Arby', 'Pat', '0088', 'arby.pat@solulogis.com', '0298f96c3bd7fc8f11bea5b8d6e562cf', 1, 1, 2, '9982424145', '2023-10-02 11:23:32', NULL, NULL, 1),
+(5, 'Gabriel', 'Mellado', '12345', 'gmellado@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 3, 3, '5512345678', '2023-10-06 12:39:12', NULL, NULL, 1),
+(6, 'Mildreth', 'Ponciano', '77', 'mildreth.ponciano@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '5566316591', '2023-10-06 14:19:50', NULL, NULL, 1),
+(7, 'Jocelin', 'Galván', '66', 'aux-sist-aifa2@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 2, 2, '5512345678', '2023-10-06 15:00:38', NULL, NULL, 1),
+(8, 'Christopher ', 'Durán', 'AF-144', 'cristopher.duran@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 2, 3, '5586161310', '2023-10-06 17:31:40', NULL, NULL, 1),
+(9, 'Diego', 'Rosas', '12345', 'aux-sist-aicm2@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 3, 2, '5546968170', '2023-10-09 14:12:35', NULL, NULL, 1),
+(11, 'Fernanda', 'Lopez', '12345', 'aux-sist-aicm1@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 3, 1, '5546968170', '2023-10-09 14:15:31', NULL, NULL, 1),
+(12, 'Rodrigo', 'Amaro', '1759', 'aux-sist1@solulogis.com', '0298f96c3bd7fc8f11bea5b8d6e562cf', 1, 1, 2, '018009998080', '2023-10-09 14:36:09', NULL, NULL, 1),
+(13, 'Jesus Francisco', 'Acuautla Sanchez', 'SC-42', 'jesusfrancisco@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(14, ' Alejandro ', 'Arango Gabriel', 'SC-48', 'alejandro@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(15, 'Gian Aldrick', 'Arguelles Franco', 'SC-27', 'gianaldrick@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(16, 'Cecilia', 'Arzate Diaz', 'SC-29', 'cecilia@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 9, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(17, 'Blanca Yanet', 'Barroso Castro', 'SC-52', 'blancayanet@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(18, 'Jose Alfredo', 'Becerril Marquez', 'SC-45', 'josealfredo@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 11, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(19, 'Abiram Shibolet', 'Bravo Miranda', 'SC-24', 'abiramshibolet@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(20, 'Erick Martin', 'Caballero Ramirez', 'SC-03', 'erickmartin@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 11, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(21, 'Cynthia Daniela', 'Caseres Lara', 'SC-19', 'cynthiadaniela@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(22, 'Gabriela Abigail', 'Castillo Castillo', 'SC-13', 'gabrielaabigail@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(23, 'Alvaro Adrian', 'Castro Arellano', 'SC-10', 'alvaroadrian@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 11, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(24, 'Brandon Cristopher', 'Cedillo Rodriguez', 'SC-53', 'brandoncristopher@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(25, 'Hector Miguel', 'Corona Rendon', 'SC-35', 'hectormiguel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 11, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(26, 'Jose Manuel', 'Cortes Vazquez', 'SC-04', 'josemanuel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(27, 'Miguel Angel', 'Cruz Ferreira', 'SC-25', 'miguelangel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(28, 'Karla Ximena', 'Diaz Salas', 'SC-50', 'karlaximena@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(29, 'Jesus', 'Dorado Hernandez', 'SC-32', 'jesus@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(30, 'Luis Edwin', 'Galindo Ramirez', 'SC-05', 'luisedwin@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 11, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(31, 'Ailyn Daniela ', 'Gutierrez Garcia', 'SC-39', 'ailyndaniela@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(32, 'Jose Ricardo', 'Gutierrez Sanchez', 'SC-06', 'josericardo@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(33, 'Alexis ', 'Hernandez Perez', 'SC-33', 'alexis@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(34, 'Brandon Antonio', 'Martinez Garcia', 'SC-11', 'brandonantonio@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(35, 'Oscar ', 'Martinez Valadez', 'SC-46', 'oscar@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 9, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(36, 'Gabriel Alejandro', 'Mellado Martinez', 'SC-07', 'gabrielalejandro@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(37, 'Myriam Sarai', 'Montor Pineda', 'SC-08', 'myriamsarai@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(38, 'Oscar', 'Nava Hernandez', 'SC-16', 'oscar@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(39, 'Jorge Antonio', 'Obregon Rodriguez', 'SC-09', 'jorgeantonio@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(40, 'Alejandro', 'Ochoa Serrano', 'SC-28', 'alejandro@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(41, 'Maria Yoali', 'Perez Rivera', 'SC-47', 'mariayoali@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(42, 'Jose Antonio', 'Piñon Ridriguez', 'SC-21', 'joseantonio@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(43, 'Damian Paul', 'Portilla Valencia', 'SC-43', 'damianpaul@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(44, 'Rocio', 'Ramirez Flores', 'SC-01', 'rocio@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(45, 'Jesus Vicente', 'Rendon Acosta', 'SC-14', 'jesusvicente@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(46, 'Jorge Osmain', 'Rivas Gonzalez', 'SC-40', 'jorgeosmain@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(47, 'Heriberto', 'Rodriguez Cortes', 'SC-30', 'heriberto@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(48, 'Rair Jesus', 'Rodriguez Ortiz', 'SC-12', 'rairjesus@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(49, 'Angel', 'Rodriguez Perez', 'SC-02', 'angel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(50, 'Diego Fabian', 'Segura Olvera', 'SC-44', 'diegofabian@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(51, 'Erik', 'Tapia Garcia', 'SC-49', 'erik@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(52, 'Mayte', 'Torres Arenas', 'SC-15', 'mayte@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(53, 'Fernanda', 'Torres Perales', 'SC-26', 'fernanda@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(54, 'Alan Daniel', 'Velazquez Uribe', 'SC-17', 'alandaniel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(55, 'Edgar Manuel', 'Villalba Caballero', 'SC-51', 'edgarmanuel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(56, 'David', 'Villegas Correa', 'SC-22', 'david@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(57, 'Emilio Felipe', 'Abarca Ortiz', 'AF-04', 'emiliofelipe@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(58, 'Vanessa Xaneiry', 'Aguilar Barrera', 'AF-41', 'vanessaxaneiry@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(59, ' Edgar Teodoro ', 'Andrade Torres', 'AF-264', 'edgarteodoro@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(60, 'Elda Sarahi', 'Arenas Martinez', 'AF-139', 'eldasarahi@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(61, 'Diana', 'Armendariz Sandoval', 'AF-42', 'diana@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(62, 'Omar Adrian', 'Arriaga Torres', 'AF-195', 'omaradrian@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(63, 'Jonathan Francisco ', 'Arrieta Gutierrez', 'AF-137', 'jonathanfrancisco@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(64, 'Jesus Enrique ', 'Arroyo Cazares', 'AF-233', 'jesusenrique@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(65, 'Brayan', 'Ayala Sanchez', 'AF-244', 'brayan@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(66, 'Yovanni Gaciel ', 'Ayehualtencatl Peña', 'AF-235', 'yovannigaciel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(67, 'Maria Daniel ', 'Badillo Santa', 'AF-246', 'mariadaniel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(68, 'Jonathan', 'Barragan Gonzalez', 'AF-58', 'jonathan@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(69, 'Rebeca Jazmine', 'Bermudez Galindo', 'AF-155', 'rebecajazmine@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(70, 'Gabriel', 'Bolañoz Martinez', 'AF-25', 'gabriel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(71, 'Margarita ', 'Botello Muñoz', 'AF-167', 'margarita@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 5, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(72, 'Eduardo', 'Brendel Rodriguez', 'AF-247', 'eduardo@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(73, 'Luis Angel ', 'Cabrera Santos', 'AF-111', 'luisangel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(74, 'Santiago de Jesus', 'Cabrera Vilchis', 'AF-199', 'santiagodejesus@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(75, 'Alan Manuel', 'Calderon Tello', 'AF-187', 'alanmanuel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(76, 'Victor Damian', 'Caloca Salvador', 'AF-32', 'victordamian@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(77, 'Ricardo Daniel ', 'Camacho Olvera', 'AF-132', 'ricardodaniel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(78, 'Cesar Tlatoani', 'Canales Cruz', 'AF-29', 'cesartlatoani@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(79, 'Alberto ', 'Cano Negrete', 'AF-84', 'alberto@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(80, 'Brayan Abdiel', 'Castro Caballero', 'AF-248', 'brayanabdiel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(81, 'Jean Israel', 'Castro Rodriguez', 'AF-09', 'jeanisrael@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(82, 'Abel Armando', 'Chavez Guzman', 'AF-3639', 'abelarmando@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(83, 'Victor Hugo ', 'Chavez Guzman', 'AF-2396', 'victorhugo@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(84, 'Daniel', 'Contreras Caballero', 'AF-191', 'daniel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(85, 'Julio Cesar', 'Cuevas Cerritos', 'AF-81', 'juliocesar@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(86, 'Roberto ', 'Davila Martinez', 'AF-98', 'roberto@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(87, 'Hernandez Christian', 'Del Campo', 'AF-156', 'hernandezchristian@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(88, 'Marin Hugo Cesar ', 'Del Rio', 'AF-204', 'marinhugocesar@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(89, 'Ariana ', 'Delgadillo Galvan', 'AF-89', 'ariana@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(90, 'Nelibeth Bibiana', 'Diaz Ledezma', 'AF-86', 'nelibethbibiana@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(91, 'Elizabeth ', 'Dominguez Gallardo', 'AF-2401', 'elizabeth@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(92, 'Rosa Araceli', 'Dominguez Hernandez', 'AF-44', 'rosaaraceli@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(93, 'Arturo Emanuel', 'Dorado Hernandez', 'AF-69', 'arturoemanuel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(94, 'Alejandro Alonso ', 'Duran Hipolito', 'AF-210', 'alejandroalonso@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(95, 'Michel', 'Duran Olmedo', 'AF-74', 'michel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(96, 'Mario', 'Espinosa Gomez', 'AF-196', 'mario@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(97, 'Francisco ', 'Espinosa Ramirez', 'AF-138', 'francisco@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(98, 'Jose Francisco', 'Flores Hernandez', 'AF-223', 'josefrancisco@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(99, 'Emanuel', 'Flores Salgado', 'AF-55', 'emanuel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(100, 'Jonathan Uriel ', 'Galicia Cruz', 'AF-218', 'jonathanuriel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(101, 'Xitlali', 'Gama Jimenez', 'AF-18', 'xitlali@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(102, 'Alan Uriel ', 'Garcia Alonso', 'AF-217', 'alanuriel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(103, 'Angel Martin ', 'Garcia Bautista', 'AF-207', 'angelmartin@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(104, 'Luis Roberto ', 'Garcia Bautista', 'AF-249', 'luisroberto@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(105, 'Eduardo Daniel ', 'Garcia Garcia', 'AF-250', 'eduardodaniel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(106, 'Andres', 'Garcia Hernandez', 'AF-93', 'andres@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(107, 'Mario Yahir', 'Garcia Juarez', 'AF-03', 'marioyahir@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(108, 'Manuel Arturo', 'Garcia Martinez', 'AF-22999', 'manuelarturo@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(109, 'Gloria', 'Garcia Serna', 'AF-21', 'gloria@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(110, 'Andrik Uriel', 'Garcia Serrano', 'AF-37', 'andrikuriel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(111, 'Ulises Adrian', 'Garcia Serrano', 'AF-08', 'ulisesadrian@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(112, 'Juan Carlos', 'Garcia Venegas', 'AF-22492', 'juancarlos@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(113, 'Juan Jose', 'Garcia Venegas', 'AF-190', 'juanjose@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(114, 'Victor Antonio ', 'Garcia Xicali', 'AF-237', 'victorantonio@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(115, 'Jose Maria', 'Garibay Aparicio', 'AF-23206', 'josemaria@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(116, 'Jesus Aldair', 'Garnica Hernandez', 'AF-23', 'jesusaldair@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(117, 'Jonathan ', 'Garrido Perez', 'AF-2396', 'jonathan@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(118, 'Valetin ', 'Gayosso Soto', 'AF-236', 'valetin@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(119, 'Alexis Aldair ', 'Gomez Chavez', 'AF-173', 'alexisaldair@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(120, 'Luis Alberto', 'Gonzalez Gutierres', 'AF-245', 'luisalberto@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(121, 'Alan Diego', 'Gonzalez Hernandez', 'AF-182', 'alandiego@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(122, 'Juan Carlos ', 'Gonzalez Lopez', 'AF-23035', 'juancarlos@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(123, 'Mario Walfred', 'Gonzalez Lopez', 'AF-251', 'mariowalfred@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(124, 'Erika Naivid', 'Gonzalez Maldonado', 'AF-153', 'erikanaivid@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(125, 'Armando Yair', 'Gonzalez Muñoz', 'AF-186', 'armandoyair@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(126, 'Josue Ismael ', 'Gonzalez Samaniego', 'AF-157', 'josueismael@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(127, 'Joel ', 'Gonzalez Ventura', 'AF-206', 'joel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(128, 'Eduardo', 'Guerrero Fuentes', 'AF-13', 'eduardo@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(129, 'Ricardo', 'Guerrero Garcia', 'AF-166', 'ricardo@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(130, 'Miguel Angel ', 'Gutierrez Brizuela', 'AF-125', 'miguelangel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(131, 'Edgar Martin', 'Gutierrez Diaz', 'AF-73', 'edgarmartin@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(132, 'Fernando ', 'Gutierrez Salinas', 'AF-113', 'fernando@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(133, 'Daniela', 'Gutierrez Tapia', 'AF-151', 'daniela@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(134, 'Jonathan Raul', 'Gutierrez Vazquez', 'AF-226', 'jonathanraul@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(135, 'Maria del Carmen ', 'Hernandez Cortes', 'AF-221', 'mariadelcarmen@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 5, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(136, 'Jurgen Michell ', 'Hernandez Flores', 'AF-119', 'jurgenmichell@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(137, 'Mario Antonio ', 'Hernandez Flores', 'AF-104', 'marioantonio@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(138, 'Ana Karen ', 'Hernandez Gomez', 'AF-114', 'anakaren@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(139, 'Edgar', 'Hernandez Lopez', 'AF-164', 'edgar@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(140, 'Isaac Armando ', 'Hernandez Lopez', 'AF-107', 'isaacarmando@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(141, 'Fernando', 'Hernandez Maya', '30100', 'fernando@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(142, 'Jazmin ', 'Hernandez Monter', 'AF-83', 'jazmin@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(143, 'Israel', 'Huerta Aranda', 'AF-75', 'israel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(144, 'Ismael', 'Iturbe Mendoza', 'AF-162', 'ismael@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(145, 'Kevin Omar', 'Jacuinde Salazar', 'AF-189', 'kevinomar@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(146, 'Marcos ', 'Jaime Lujano', '103', 'marcos.jaime@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 6, 3, '12135874', '2023-10-09 16:16:22', NULL, NULL, 1),
+(147, 'Pedro Angel', 'Jaimes Guzman', 'AF-242', 'pedroangel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(148, 'Luis Jeronimo', 'Jimenez Garcia', 'AF-23208', 'luisjeronimo@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(149, 'Hector', 'Jimenez Ibarra', 'AF-158', 'hector@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(150, 'Javier ', 'Jimenez Marques', 'AF-215', 'javier@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(151, 'Diana Belem', 'Jimenez Martinez', 'AF-150', 'dianabelem@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(152, 'Marcial ', 'Jimenez Rodriguez', 'AF-252', 'marcial@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(153, 'Jorge Abraham', 'Jimenez Rojo', 'AF-46', 'jorgeabraham@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(154, 'Imelda', 'Juarez Cruz', 'AF-22998', 'imelda@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(155, 'Luis Gael', 'Juarez Hernandez', 'AF-24', 'luisgael@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(156, 'Andres', 'Leyte Manrrique', 'AF-211', 'andres@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(157, 'Cesar Alexis ', 'Lopez Camacho', 'AF-201', 'cesaralexis@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(158, 'Cesar Ariel', 'Lopez Camacho', 'AF-203', 'cesarariel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(159, 'Agustina', 'Lopez Cruz', 'AF-23035', 'agustina@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(160, 'Armando', 'Lopez Gonzalez', 'AF-95', 'armando@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(161, 'Jorge Eduardo', 'Lopez Gonzalez', 'AF-192', 'jorgeeduardo@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(162, 'Enrique ', 'Lugo Martinez', 'AF-127', 'enrique@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(163, 'Berenice', 'Luna Allier', 'AF-88', 'berenice@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(164, 'Laura Angelica ', 'Luna Buendia', 'AF-129', 'lauraangelica@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(165, 'Nestor Ignacio', 'Macias Luna', 'AF-50', 'nestorignacio@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 2, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(166, 'Miguel ', 'Macias Maldonado', 'AF-253', 'miguel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(167, 'Omar Eduardo ', 'Macias Oble', 'AF-254', 'omareduardo@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(168, 'Luis Daniel', 'Magdaleno Baeza', 'AF-34', 'luisdaniel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(169, 'Jose Raymundo', 'Martinez Alvarez', 'AF-51', 'joseraymundo@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(170, 'Luis Alberto ', 'Martinez Casiano', 'AF-231', 'luisalberto@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(171, 'Francisco', 'Martinez Gallegos', 'AF-170', 'francisco@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(172, 'Ricardo ', 'Martinez Gaspar', 'AF-145', 'ricardo@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(173, 'Jorge Ivan ', 'Martinez Hernandez', 'AF-2420', 'jorgeivan@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(174, 'Juan Manuel', 'Martinez Hernandez', 'AF-47', 'juanmanuel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(175, 'Daniel ', 'Martinez Martinez', 'AF-202', 'daniel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(176, 'Gilberto ', 'Martinez Ortega', 'AF-255', 'gilberto@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(177, 'Edwin Emanuel', 'Martinez Sanchez', 'AF-256', 'edwinemanuel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(178, 'Julio Cesar ', 'Martinez Suarez', 'AF-96', 'juliocesar@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(179, 'Donovan', 'Medellin Patlan', 'AF-257', 'donovan@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(180, 'Miguel Angel', 'Medina Granados', 'AF-154', 'miguelangel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 14, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(181, 'Carlos ', 'Medina Vega Roberto', 'AF-240', 'carlos@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(182, 'Angel', 'Mendez Canales', 'AF-141', 'angel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(183, 'Marco Antonio', 'Mendoza Guzman', 'AF-185', 'marcoantonio@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(184, 'Ana Rosa ', 'Mendoza Quintero', 'AF-131', 'anarosa@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(185, 'Irving Francisco', 'Mondragon Mancilla', 'AF-19954', 'irvingfrancisco@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(186, 'Carlos Daniel ', 'Morales Gonzalez', 'AF-205', 'carlosdaniel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(187, 'Daniel Humberto', 'Moreno Alcantar', 'AF-76', 'danielhumberto@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 5, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(188, 'Hector Alejandro ', 'Moreno Reyna', 'AF-208', 'hectoralejandro@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(189, 'Miguel Angel', 'Muñoz Garcia', 'AF-219', 'miguelangel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(190, 'Jesus Antonio ', 'Nava Anaya', 'AF-213', 'jesusantonio@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(191, 'Abraham Alejandro', 'Nava Rojas', 'AF-53', 'abrahamalejandro@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(192, 'Erick Miguel ', 'Nava Sanchez', 'AF-174', 'erickmiguel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(193, 'Brenda Nataly', 'Nieto Castañeda', 'AF', 'brendanataly@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 2, 3, '1', '2023-10-09 16:16:22', NULL, '2023-10-26 14:00:15', 0),
+(194, 'Jose Marcos', 'Nuñez Dominguez', 'AF-59', 'josemarcos@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(195, 'Esteban ', 'Olguin Nolasco', 'AF-115', 'esteban@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(196, 'Brandon Axel', 'Oliva Robledo', 'AF-135', 'brandonaxel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(197, 'Lesli Yaremi', 'Olvera Rodriguez', 'AF-227', 'lesliyaremi@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(198, 'Maria del Rosario', 'Orozco Rosario', 'AF-94', 'mariadelrosario@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(199, 'Luis Alfredo ', 'Ortega Covarrubias', 'AF-183', 'luisalfredo@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(200, 'Ivan ', 'Ortega Diaz', 'AF-225', 'ivan@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(201, 'Jose Alexei', 'Ortega Molina', 'AF-212', 'josealexei@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(202, 'Joaquin ', 'Otañez Cazarez', 'AF-149', 'joaquin@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(203, 'Francisco Efrain', 'Parra Oropeza', 'AF-142', 'franciscoefrain@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(204, 'Itzmatl Damian', 'Peralta Perez', 'AF-05', 'itzmatldamian@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(205, 'Leonides Francisco ', 'Perez Acleto', 'AF-180', 'leonidesfrancisco@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(206, 'Owen Axel ', 'Perez Manzur', 'AF-92', 'owenaxel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(207, 'Julio', 'Perez Orta', 'AF-26', 'julio@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(208, 'Miguel Angel', 'Perez Orta', 'AF-12', 'miguelangel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(209, 'Victor Hugo ', 'Perez Padilla', 'AF-234', 'victorhugo@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(210, 'Gilberto ', 'Perez Ramirez', 'AF-116', 'gilberto@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(211, 'Jesus Angel', 'Pineda Arriaga', 'AF-241', 'jesusangel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(212, 'Yoman Francisco ', 'Piscil Fuentes', 'AF-238', 'yomanfrancisco@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(213, 'Fatima Yoselin', 'Quintero Corona', 'AF-60', 'fatimayoselin@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(214, 'Rogelio ', 'Ramiez Torres', 'AF-232', 'rogelio@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(215, 'Giovanni', 'Ramirez Nava', 'AF-23205', 'giovanni@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(216, 'Victor Enrique', 'Ramirez Rendon', 'AF-16', 'victorenrique@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(217, 'Christian Ivan', 'Real Ramirez', 'AF-194', 'christianivan@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(218, 'Juan David', 'Recoba Altamirano', 'AF-198', 'juandavid@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(219, 'Arath', 'Rendon Acosta', 'AF-35', 'arath@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(220, 'Emory', 'Reyes Martinez', 'AF-62', 'emory@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(221, 'Jose Manuel', 'Reyes Martinez', 'AF-222', 'josemanuel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(222, 'Edgar ', 'Rios Gonzlez', 'AF-258', 'edgar@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(223, 'Victor Antonio ', 'Rivera Flores', 'AF-110', 'victorantonio@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(224, 'Juan de Dios ', 'Rivera Rodriguez', 'AF-172', 'juandedios@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(225, 'Jose Luis', 'Rivera Tellez', 'AF-79', 'joseluis@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(226, 'Magali Lucero', 'Rodrigez Garcia', 'AF-56', 'magalilucero@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(227, 'Mario Alberto ', 'Rodriguez Cruz', 'AF-117', 'marioalberto@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(228, 'Bryan ', 'Rodriguez Galvan', 'AF-216', 'bryan@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(229, 'Miguel Angel ', 'Rodriguez Garcia', 'AF-228', 'miguelangel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(230, 'Arnold', 'Rodriguez Tagano', 'AF-159', 'arnold@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(231, 'Christopher Cenorino', 'Rodriguez Tagano', 'AF-163', 'christophercenorino@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(232, 'Juan Carlos', 'Rojas Bautista', 'AF-165', 'juancarlos@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 11, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(233, 'Sergio ', 'Rojas Rivera', 'AF-181', 'sergio@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(234, 'Concepcion', 'Roque Cruz', 'AF-160', 'concepcion@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 14, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(235, 'Ceron Jair David', 'Ruiz Velazco', 'AF-72', 'ceronjairdavid@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(236, 'Eduardo', 'Salazar Contreras', 'AF-259', 'eduardo@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(237, 'Giron Jovanny', 'Salazar Tellez', 'AF-169', 'gironjovanny@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(238, 'Juan Manuel ', 'Salguero Garcia', 'AF-260', 'juanmanuel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(239, 'Lorena', 'Salinas Ramirez', 'AF-143', 'lorena@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(240, 'Hernandez Salvador', 'San Juan', 'AF-64', 'hernandezsalvador@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(241, 'Jonathan Israel', 'Sanchez Aguilera', 'AF-19256', 'jonathanisrael@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 15, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(242, 'Jose Nicolas ', 'Sanchez Chavez', 'AF-220', 'josenicolas@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(243, 'Johan Mohamed', 'Sanchez Garay', 'AF-171', 'johanmohamed@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(244, 'Veronica ', 'Sanchez Hernandez', 'AF-112', 'veronica@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, '2023-11-19 08:36:58', 0),
+(245, 'Johan Miguel', 'Sanchez Jorge', 'AF-200', 'johanmiguel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(246, 'Jose Luis', 'Sanchez Vara', 'AF-23109', 'joseluis@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(247, 'Leopoldo', 'Sandoval alvarez', 'AF-23179', 'leopoldo@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(248, 'David Gerson ', 'Santiago Rodriguez', 'AF-78', 'davidgerson@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(249, 'Axel Alfredo', 'Santiago Sanchez', 'AF-49', 'axelalfredo@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(250, 'Eva', 'Tellez Lopez', 'AF-152', 'eva@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 14, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(251, 'Victor ', 'Torres Cruz', 'AF-229', 'victor@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(252, 'Juan ', 'Torres Ibarra', 'AF-123', 'juan@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(253, 'Jorge Osvaldo ', 'Torres Sanchez', 'AF-85', 'jorgeosvaldo@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(254, 'Jeronimo ', 'Ugalde Espino', 'AF-214', 'jeronimo@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(255, 'Axel', 'Uribe Jimenez', 'AF-15', 'axel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(256, 'Jose Eduardo ', 'Hernandez Vazquez', 'AF-140', 'joseeduardo@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(257, 'Jose Francisco ', 'Perez Vallejo', 'AF-118', 'josefrancisco@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(258, 'Jonathan Alejandro ', 'Reyes Perez', 'AF-121', 'jonathanalejandro@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(259, 'Jose Alberto ', 'Trejo Torres', 'AF-270', 'josealberto@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(260, 'Victor Hugo', 'Gonzalez Gomez', 'AF-265', 'victorhugo@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(261, 'Cruz Jesus ', 'Valdez de', 'AF-209', 'cruzjesus@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(262, 'Juan Pablo', 'Valladolid Habana', 'AF-146', 'juanpablo@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(263, 'Jorge Joel ', 'Vargas Acosta', 'AF-261', 'jorgejoel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(264, 'Daniel ', 'Vazquez Duran', 'AF-262', 'daniel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(265, 'Eduardo', 'Vazquez Lopez', 'AF-161', 'eduardo@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 13, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(266, 'Ulises Alejandro', 'Vazquez Lopez', 'AF-177', 'ulisesalejandro@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(267, 'Jacqueline', 'Vega Carrasco', 'SC-20', 'jacqueline@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(268, 'Alfonso', 'Martinez Perez', 'AF-225', 'alfonso@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 7, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(269, 'Hugo ', 'Vences Martinez', 'AF-80', 'hugo@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(270, 'Mario Alberto', 'Victoria Garcia', 'AF-71', 'marioalberto@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 16, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(271, 'Lucio', 'Zarate Lopez', 'AF-243', 'lucio@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(272, 'Vianey', 'Alcantara Arroniz', 'OR-44', 'vianey@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(273, 'Julio Cesar', 'Cortes Lopez', 'OR-47', 'juliocesar@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 6, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(274, 'Raul Sebastian', 'Hernandez Granados', 'OR-50', 'raulsebastian@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 3, 1, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(275, 'Joshua', 'Duran Amezcua', 'M-21', 'joshua@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(276, 'Ramon', 'Espitia Martinez', 'M-20971', 'ramon@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(277, 'Brenda Riccel', 'Flores Alcantara', 'M-2404', 'brendariccel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 10, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(278, 'Jesus Alejandro ', 'Garcia Huerta', 'M-02', 'jesusalejandro@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(279, 'Juan Manuel', 'Hernandez Martinez', 'M-2413', 'juanmanuel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 11, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(280, 'Reyes ', 'Lopez Lardizabal', 'M-2417', 'reyes@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(281, 'Christian Jibran', 'Rodriguez Ramirez', 'M-15', 'christianjibran@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 5, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(282, 'Erick', 'Santos Victoria', 'M-21027', 'erick@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(283, 'Erick Uriel', 'Zepeda Flores', 'M-15978', 'erickuriel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 5, 8, 3, '1', '2023-10-09 16:16:22', NULL, NULL, 1),
+(284, 'Haydee', 'Ortiz', '1574', 'auxsist5_solulogis@outlook.com', '0298f96c3bd7fc8f11bea5b8d6e562cf', 1, 1, 1, '9982421738', '2023-10-10 12:06:45', NULL, NULL, 1),
+(285, 'Gamaliel', 'Amaro', '12345', 'gamaliel.amaro@solulogis.net', '0298f96c3bd7fc8f11bea5b8d6e562cf', 1, 1, 3, '018009998080', '2023-10-11 08:42:30', NULL, NULL, 1),
+(286, 'Chrysthian Isaury', 'Hernández', '1234', 'chrysthian@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 2, 3, '5512345678', '2023-10-16 12:51:19', NULL, NULL, 1),
+(287, 'Cesar', 'Padilla', '366047', 'cesar@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 2, 2, '5512345678', '2023-10-16 15:59:13', NULL, NULL, 1),
+(290, 'Julio Cesar', 'Baez', '7676', 'julio@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 2, 3, '1', '2023-10-18 15:27:19', NULL, NULL, 1),
+(291, 'Brain Luna', 'Guzmán', '6363', 'brain@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 2, 3, '1', '2023-10-18 15:54:31', NULL, NULL, 1),
+(292, 'Brenda Joceline', 'Gutiérrez Tranquilino', '8990', 'brendajoceline@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 2, 3, '1', '2023-10-23 18:15:51', NULL, NULL, 1),
+(293, 'Itzel', 'Hernández Tejeda', 'AF-63', 'itzel.hernandez@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 6, 3, '5544882881', '2023-10-26 10:43:25', NULL, '2023-10-26 14:03:24', 1),
+(294, 'prueba', 'asdf', '123456', 'prueba@gmail.com', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '1', '2023-10-26 14:51:34', NULL, '2023-10-26 14:52:00', 0),
+(295, 'Emmanuel', 'Martínez Romo', '4554', 'emmanuel@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 6, 3, '1', '2023-10-27 14:10:12', NULL, NULL, 1),
+(297, 'Mariana Alejandra ', 'Feria Mendoza', '101', 'administracion-2@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 6, 3, '5530643155', '2023-11-18 12:11:13', NULL, NULL, 1),
+(298, 'Francisco Javier', 'Moreno Guerrero', '7898', 'franciscojavier@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 6, 3, '1', '2023-11-19 08:48:22', NULL, NULL, 1),
+(299, 'Miguel ', 'Maceda', '102', 'miguel.maceda@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 6, 3, '12345689', '2023-11-24 10:54:31', NULL, NULL, 1),
+(300, 'Jibran', 'Rodriguez Ramirez', '104', 'jibran@cco.com.mx', '0298f96c3bd7fc8f11bea5b8d6e562cf', 2, 4, 3, '12587496', '2023-12-27 09:16:04', NULL, NULL, 1),
+(301, 'Paola', 'Valencia', '2056', 'implementacion1@solulogis.com', '0298f96c3bd7fc8f11bea5b8d6e562cf', 1, 17, 3, '9851153386', '2023-12-28 12:33:04', NULL, NULL, 1),
+(302, 'Gabriela', 'Canul', '2059', 'implementacion2@solulogis.com', '0298f96c3bd7fc8f11bea5b8d6e562cf', 1, 17, 3, '9992622156', '2023-12-28 12:37:51', NULL, NULL, 1),
+(303, 'Jairo', 'Vazquez', '1765', 'implementacion4@solulogis.com', '0298f96c3bd7fc8f11bea5b8d6e562cf', 1, 17, 3, '2491464739', '2023-12-28 12:43:30', NULL, NULL, 1),
+(304, 'Sandra', 'Zarate', '145', 'sandra.zarate@solulogis.com', '0298f96c3bd7fc8f11bea5b8d6e562cf', 1, 17, 1, '5569680887', '2023-12-28 15:07:13', NULL, NULL, 1),
+(305, 'Prueba', 'prueba', '55555', 'prueba@gmail.com', '0298f96c3bd7fc8f11bea5b8d6e562cf', 3, 3, 1, '1', '2023-12-28 18:24:56', NULL, NULL, 1);
 
 --
 -- Índices para tablas volcadas
@@ -870,7 +1343,7 @@ ALTER TABLE `tm_usuario`
 -- AUTO_INCREMENT de la tabla `td_documento`
 --
 ALTER TABLE `td_documento`
-  MODIFY `doc_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `doc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `td_documento_detalle`
@@ -894,7 +1367,7 @@ ALTER TABLE `td_documento_tarea_detalle`
 -- AUTO_INCREMENT de la tabla `td_pausas_ticket`
 --
 ALTER TABLE `td_pausas_ticket`
-  MODIFY `pausas_ticket_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `pausas_ticket_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `td_tareadetalle`
@@ -930,7 +1403,7 @@ ALTER TABLE `tm_categoria`
 -- AUTO_INCREMENT de la tabla `tm_notificacion`
 --
 ALTER TABLE `tm_notificacion`
-  MODIFY `not_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `not_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `tm_prioridad`
@@ -942,7 +1415,7 @@ ALTER TABLE `tm_prioridad`
 -- AUTO_INCREMENT de la tabla `tm_subcategoria`
 --
 ALTER TABLE `tm_subcategoria`
-  MODIFY `cats_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
+  MODIFY `cats_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=83;
 
 --
 -- AUTO_INCREMENT de la tabla `tm_tarea`
@@ -954,19 +1427,19 @@ ALTER TABLE `tm_tarea`
 -- AUTO_INCREMENT de la tabla `tm_ticket`
 --
 ALTER TABLE `tm_ticket`
-  MODIFY `tick_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `tick_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `tm_usr_cat`
 --
 ALTER TABLE `tm_usr_cat`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=302;
 
 --
 -- AUTO_INCREMENT de la tabla `tm_usuario`
 --
 ALTER TABLE `tm_usuario`
-  MODIFY `usu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=305;
+  MODIFY `usu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=306;
 
 --
 -- Restricciones para tablas volcadas
