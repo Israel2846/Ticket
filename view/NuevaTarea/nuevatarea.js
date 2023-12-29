@@ -29,7 +29,7 @@ $(document).ready(function() {
             textoError.textContent = '';
         }
     });
-
+    
     console.log($('#usu_id').val())
     /* TODO: Inicializar SummerNote */
     $('#tarea_desc').summernote({
@@ -57,9 +57,9 @@ $(document).ready(function() {
 
 function guardaryeditar(e){
     e.preventDefault();
-
+    
     $('#btnGuardar').prop('disabled', true).text('Cargando...')
-
+    
     var tick_id = getUrlParameter('ID');
     /* TODO: Array del form tarea */
     var formData = new FormData($("#tarea_form")[0]);
@@ -98,7 +98,7 @@ function guardaryeditar(e){
                     closeOnConfirm: false,
                     closeOnCancel: false
                 }, function(){
-                    window.location.href = 'http://localhost/gestor-de-tickets/view/DetalleTicket/?ID=' + tick_id;
+                    window.location.href = 'https://localhost/tickets-support/view/DetalleTicket/?ID=' + tick_id;
                 });
             }
         });

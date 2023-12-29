@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html>
     <?php require_once("../MainHead/head.php");?>
-	<title>AnderCode</>:: Notificación</title>
+	<title>Notificaciones</title>
 </head>
 <body class="with-side-menu">
 
@@ -22,10 +22,10 @@
 				<div class="tbl">
 					<div class="tbl-row">
 						<div class="tbl-cell">
-							<h3>Notificación</h3>
+							<h3>Notificaciones</h3>
 							<ol class="breadcrumb breadcrumb-simple">
-								<li><a href="#">Home</a></li>
-								<li class="active">Notificación</li>
+								<li><a href="../Home/">Inicio</a></li>
+								<li class="active">Notificaciones</li>
 							</ol>
 						</div>
 					</div>

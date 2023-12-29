@@ -8,7 +8,7 @@ if(isset($_SESSION["usu_id"])){
     <?php require_once("../MainHead/head.php");?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AnderCode</>::Nueva Tarea</title>
+    <title>Nueva Tarea</title>
     <link rel="stylesheet" href="css/separate/vendor/tags_editor.min.css">
 	<link rel="stylesheet" href="css/separate/vendor/bootstrap-select/bootstrap-select.min.css">
 	<link rel="stylesheet" href="css/separate/vendor/select2.min.css">
@@ -31,7 +31,7 @@ if(isset($_SESSION["usu_id"])){
 						<div class="tbl-cell">
 							<h3>Nueva Tarea</h3>
 							<ol class="breadcrumb breadcrumb-simple">
-								<li><a href="#">Home</a></li>
+								<li><a href="../Home/">Inicio</a></li>
 								<li class="active">Nueva Tarea</li>
 							</ol>
 						</div>
@@ -60,7 +60,7 @@ if(isset($_SESSION["usu_id"])){
 
 						<div class="col-lg-6">
 							<fieldset class="form-group">
-								<label class="form-label semibold" for="tarea_titulo">Documentos adicionales</label>
+								<label class="form-label semibold" for="tarea_titulo">Documentos adicionales (MAX 3MB)</label>
 								<input type="file" name="fileElem" id="fileElem" class="form-control" multiple>
 								<p style="color: red;" id="errorText"></p>
 							</fieldset>

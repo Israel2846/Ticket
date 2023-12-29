@@ -9,7 +9,7 @@ $(document).ready(function(){
     const btnEnviar = document.getElementById('btnenviar');
     const tamanoMax = 3*1024*1024;
     var tick_id = getUrlParameter('ID');
-
+    
     // Restricción de tamaño en documentos 
     inputDocumentos.addEventListener('change', function() {
         const documentos = inputDocumentos.files;
@@ -91,7 +91,7 @@ $(document).ready(function(){
             dataType : "json",
             error: function(e){
                 console.log(e.responseText);
-            }
+            },
         },
         "bDestroy": true,
         "bFilter": false,
@@ -124,7 +124,7 @@ $(document).ready(function(){
                 "sSortDescending": ": Activar para ordenar la columna de manera descendente"
             }
         }
-    })
+    });
 
     $('#tarea_data').DataTable({
         "aProcessing": true,
@@ -154,14 +154,13 @@ $(document).ready(function(){
             { 
                 "data": "estado_tarea",
                 render: function (data, type, row) {
-                    switch (data) {
-                        case 1:
-                            html_estado = '<span class="label label-pill label-success">Abierto</span>';
-                            break;
-                        case 0:
-                            html_estado = '<span class="label label-pill label-danger">Cerrado</span>';
-                            break;
+                    
+                    if(data == 1) {
+                        html_estado = '<span class="label label-pill label-success">Abierto</span>';
+                    } else if(data == 0) {
+                        html_estado = '<span class="label label-pill label-danger">Cerrado</span>';
                     }
+                    
                     return html_estado
                 }
             },
@@ -224,13 +223,13 @@ $(document).ready(function(){
                 "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
                 "sSortDescending": ": Activar para ordenar la columna de manera descendente"
             }
-        }
+        } 
     })
 });
 
 // Link para ver el detalle de la tarea
 function ver(id_tarea){
-    window.location.href = 'http://localhost/Ticket/view/DetalleTarea/?ID='+ id_tarea +'';
+    window.location.href = 'https://localhost/tickets-support/view/DetalleTarea/?ID='+ id_tarea +'';
 }
 
 // Click del botón "Nueva tarea"
@@ -291,8 +290,8 @@ $(document).on(
                                 }
                             }
                         )
-                    } else if(data.tareas_abiertas === 0){
-                        window.location.href = 'http://localhost/Ticket/view/NuevaTarea/?ID='+ id_ticket +'';
+                    } else if(data.tareas_abiertas == 0){
+                        window.location.href = 'https://localhost/tickets-support/view/NuevaTarea/?ID='+ id_ticket +'';
                     }
                 },
                 error : function(error){
@@ -346,7 +345,7 @@ $(document).on(
                                     closeOnConfirm: false,
                                     closeOnCancel: false
                                 }, function() {
-                                    window.location.href = 'http://localhost/gestor-de-tickets/view/MisTickets/';
+                                    window.location.href = 'https://localhost/tickets-support/view/MisTickets/';
                                 });
                             } else {
                                 console.log(data);
@@ -418,14 +417,13 @@ $(document).on("click","#btnenviar", function(){
     var tick_id = getUrlParameter('ID');
     var usu_id = $('#user_idx').val();
     var tickd_descrip = $('#tickd_descrip').val();
-
+    
     // Se desabilita el botón y muestra cargando...
     $('#btnenviar').prop('disabled', true).text('Cargando...');
 
     /* TODO:Validamos si el summernote esta vacio antes de guardar */
     if ($('#tickd_descrip').summernote('isEmpty')){
         swal("Advertencia!", "Falta Descripción", "warning");
-        // Se desabilita el botón y muestra cargando...
         $('#btnenviar').prop('disabled', false).text('Enviar');
     }else{
         var formData = new FormData();
@@ -516,7 +514,7 @@ $(document).on("click","#btncerrarticket", function(){
                 closeOnConfirm: false,
                 closeOnCancel: false
             }, function() {
-                window.location.href = 'http://localhost/gestor-de-tickets/view/MisTickets/';
+                window.location.href = 'https://localhost/tickets-support/view/MisTickets/';
             });
         }
     });

@@ -18,8 +18,7 @@ require_once("../config/conexion.php");
 require_once("../models/Ticket.php");
 require_once("../models/Usuario.php");
 
-class Email extends PHPMailer
-{
+class Email extends PHPMailer{
 
     //TODO: variable que contiene el correo del destinatario
     protected $gCorreo = 'sistemas@solulogis.com';
@@ -27,11 +26,10 @@ class Email extends PHPMailer
     //TODO: variable que contiene la contraseña del destinatario
 
     /* TODO:Alertar al momento de generar un ticket */
-    public function ticket_abierto($tick_id)
-    {
+    public function ticket_abierto($tick_id){
         $ticket = new Ticket();
         $datos = $ticket->listar_ticket_x_id($tick_id);
-        foreach ($datos as $row) {
+        foreach ($datos as $row){
             $id = $row["tick_id"];
             $usu = $row["usu_nom"];
             $titulo = $row["tick_titulo"];
@@ -41,14 +39,14 @@ class Email extends PHPMailer
 
         //TODO: IGual//
         $this->IsSMTP();
-        $this->Host = 'mail.solulogis.com'; //Aqui el server
-        $this->Port = 465; //Aqui el puerto
+        $this->Host = 'mail.solulogis.com';//Aqui el server
+        $this->Port = 465;//Aqui el puerto
         $this->SMTPAuth = true;
         $this->SMTPSecure = 'ssl';
 
         $this->Username = $this->gCorreo;
         $this->Password = $this->gContrasena;
-        $this->setFrom($this->gCorreo, "Ticket Abierto " . $id);
+        $this->setFrom($this->gCorreo, "Ticket Abierto ".$id);
 
         $this->CharSet = 'UTF8';
         $this->addAddress($correo);
@@ -66,20 +64,19 @@ class Email extends PHPMailer
         $this->Body = $cuerpo;
         $this->AltBody = strip_tags("Ticket Abierto");
 
-        try {
+        try{
             $this->Send();
             return true;
-        } catch (Exception $e) {
+        }catch(Exception $e){
             return false;
         }
     }
 
     /* TODO:Alertar al momento de Cerrar un ticket */
-    public function ticket_cerrado($tick_id)
-    {
+    public function ticket_cerrado($tick_id){
         $ticket = new Ticket();
         $datos = $ticket->listar_ticket_x_id($tick_id);
-        foreach ($datos as $row) {
+        foreach ($datos as $row){
             $id = $row["tick_id"];
             $usu = $row["usu_nom"];
             $titulo = $row["tick_titulo"];
@@ -89,15 +86,15 @@ class Email extends PHPMailer
 
         //IGual//
         $this->IsSMTP();
-        $this->Host = 'mail.solulogis.com'; //Aqui el server
-        $this->Port = 465; //Aqui el puerto
+        $this->Host = 'mail.solulogis.com';//Aqui el server
+        $this->Port = 465;//Aqui el puerto
         $this->SMTPAuth = true;
         $this->Username = $this->gCorreo;
         $this->Password = $this->gContrasena;
         $this->SMTPSecure = 'ssl';
 
-        $this->setFrom($this->gCorreo, "Ticket Cerrado " . $id);
-
+        $this->setFrom($this->gCorreo, "Ticket Cerrado ".$id);
+        
         $this->CharSet = 'UTF8';
         $this->addAddress($correo);
         $this->WordWrap = 50;
@@ -113,21 +110,20 @@ class Email extends PHPMailer
 
         $this->Body = $cuerpo;
         $this->AltBody = strip_tags("Ticket Cerrado");
-
-        try {
+        
+        try{
             $this->Send();
             return true;
-        } catch (Exception $e) {
+        }catch(Exception $e){
             return false;
         }
     }
 
     /* TODO:Alertar al momento de Asignar un ticket */
-    public function ticket_asignado($tick_id)
-    {
+    public function ticket_asignado($tick_id){
         $ticket = new Ticket();
         $datos = $ticket->listar_ticket_x_id($tick_id);
-        foreach ($datos as $row) {
+        foreach ($datos as $row){
             $id = $row["tick_id"];
             $usu = $row["usu_nom"];
             $titulo = $row["tick_titulo"];
@@ -137,14 +133,14 @@ class Email extends PHPMailer
 
         //IGual//
         $this->IsSMTP();
-        $this->Host = 'mail.solulogis.com'; //Aqui el server
-        $this->Port = 465; //Aqui el puerto
+        $this->Host = 'mail.solulogis.com';//Aqui el server
+        $this->Port = 465;//Aqui el puerto
         $this->SMTPAuth = true;
         $this->Username = $this->gCorreo;
         $this->Password = $this->gContrasena;
         $this->SMTPSecure = 'ssl';
-
-        $this->setFrom($this->gCorreo, "Ticket Asignado " . $id);
+        
+        $this->setFrom($this->gCorreo, "Ticket Asignado ".$id);
 
         $this->CharSet = 'UTF8';
         $this->addAddress($correo);
@@ -161,12 +157,15 @@ class Email extends PHPMailer
 
         $this->Body = $cuerpo;
         $this->AltBody = strip_tags("Ticket Asignado");
-
-        try {
+        
+        try{
             $this->Send();
             return true;
-        } catch (Exception $e) {
+        }catch(Exception $e){
             return false;
         }
     }
+
 }
+
+?>

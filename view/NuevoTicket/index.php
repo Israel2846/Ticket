@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html>
     <?php require_once("../MainHead/head.php");?>
-	<title>AnderCode</>::Nuevo Ticket</title>
+	<title>Nuevo Ticket</title>
 </head>
 <body class="with-side-menu">
 
@@ -25,7 +25,7 @@
 						<div class="tbl-cell">
 							<h3>Nuevo Ticket</h3>
 							<ol class="breadcrumb breadcrumb-simple">
-								<li><a href="#">Home</a></li>
+								<li><a href="../Home/">Inicio</a></li>
 								<li class="active">Nuevo Ticket</li>
 							</ol>
 						</div>

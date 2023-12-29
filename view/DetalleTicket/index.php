@@ -5,7 +5,7 @@ if (isset($_SESSION["usu_id"])) {
   <!DOCTYPE html>
   <html>
   <?php require_once("../MainHead/head.php"); ?>
-  <title>AnderCode</>::Detalle Ticket</title>
+  <title>Detalle Tickets</title>
   </head>
 
   <body class="with-side-menu">
@@ -29,8 +29,8 @@ if (isset($_SESSION["usu_id"])) {
                 <span class="label label-pill label-primary" id="lblnomusuario"></span>
                 <span class="label label-pill label-default" id="lblfechcrea"></span>
                 <ol class="breadcrumb breadcrumb-simple">
-                  <li><a href="#">Home</a></li>
-                  <li class="active">Detalle Ticket</li>
+                  <li><a href="../Home/">Inicio</a></li>
+                  <li class="active">Detalle Tickets</li>
                 </ol>
               </div>
             </div>
@@ -67,7 +67,7 @@ if (isset($_SESSION["usu_id"])) {
                   <input type="text" class="form-control" id="prio_nom" name="prio_nom" readonly>
                 </fieldset>
               </div>
-
+              
               <div class="col-lg-12">
                 <fieldset class="form-group">
                   <label class="form-label semibold" for="tickd_descripusu">Descripción</label>
@@ -121,9 +121,6 @@ if (isset($_SESSION["usu_id"])) {
               <div class="col-lg-12">
                 <button type="button" id="btnNuevaTarea" class="btn btn-rounded btn-inline btn-primary">Nueva Tarea</button>
               </div>
-
-              
-
           </div>
 
 

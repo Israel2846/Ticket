@@ -25,34 +25,65 @@ $(document).ready(function(){
             { "data": "tarea_desc" },
             {
                 "data": 'estado_tarea' ,
-                createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                    if (cellData === 1) {
+                render: function (data, type, row) {
+                    if (data == 1) {
                         // Si el estado es 1 significa que está abierto
-                        $(cell).html('<span class="label label-pill label-success">Abierto</span>');
-                    }else if(cellData===0){
-                        $(cell).html('<span class="label label-pill label-danger">Cerrado</span>');
+                        return '<span class="label label-pill label-success">Abierto</span>';
+                    }else if(data==0){
+                        return '<span class="label label-pill label-danger">Cerrado</span>';
                     }
                 }
             },
             { "data": 'tiempo_finalizacion' },
             {
                 "data": 'fecha_finalizacion',
-                createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                    if (cellData === null) {
+                render: function (data, type, row) {
+                    if (data == null) {
                         // Si la fecha de finalización está vacía, agrega un botón amarillo
-                        $(cell).html('<span class="label label-pill label-danger">Sin finalizar</span>');
+                        return'<span class="label label-pill label-danger">Sin finalizar</span>';
                     }else{
-                        $(cell).html(cellData);
+                        return data;
                     }
                 }
             },
             { 
                 "data": 'id_tarea',
-                createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-                    $(cell).html('<button type="button" onClick="ver(' + rowData.id_tarea + ');"  id="' + rowData.id_tarea + '" class="btn btn-inline btn-primary btn-sm ladda-button"><i class="fa fa-eye"></i></button>');
+                render: function (data, type, row) {
+                    return '<button type="button" onClick="ver(' + row.id_tarea + ');"  id="' + row.id_tarea + '" class="btn btn-inline btn-primary btn-sm ladda-button"><i class="fa fa-eye"></i></button>';
                 }
             }
-        ]
+        ],
+        order : [],
+        "bPaginate": true,
+        "bDestroy": true,
+        "responsive": true,
+        "bInfo":true,
+        "iDisplayLength": 10,
+        "autoWidth": false,
+        "language": {
+            "sProcessing":     "Procesando...",
+            "sLengthMenu":     "Mostrar _MENU_ registros",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando un total de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando un total de 0 registros",
+            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+            "sInfoPostFix":    "",
+            "sSearch":         "Buscar:",
+            "sUrl":            "",
+            "sInfoThousands":  ",",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "Siguiente",
+                "sPrevious": "Anterior"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        }
     })
 })
 
@@ -99,7 +130,7 @@ function guardar(e){
 
 // Link para ver el detalle de la tarea
 function ver(id_tarea){
-    window.open('http://localhost/Ticket/view/DetalleTarea/?ID='+ id_tarea +'');
+    window.open('https://localhost/tickets-support/view/DetalleTarea/?ID='+ id_tarea +'');
 }
 
 init();

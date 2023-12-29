@@ -17,7 +17,7 @@
                             <span class="lbl">Nuevo Ticket</span>
                         </a>
                     </li>
-
+                    
                     <li class="blue-dirty">
                         <a href="..\MisTickets\">
                             <span class="glyphicon glyphicon-th"></span>
@@ -53,28 +53,30 @@
                             <span class="lbl">Nuevo Ticket</span>
                         </a>
                     </li>
-
                     <li class="blue-dirty">
                         <a href="..\MisTickets\">
                             <span class="glyphicon glyphicon-th"></span>
                             <span class="lbl">Mis Tickets</span>
                         </a>
                     </li>
-
+                    <li class="blue-dirty">
+                        <a href="..\ConsultarTicket\">
+                            <span class="glyphicon glyphicon-th"></span>
+                            <span class="lbl">Consultar Tickets</span>
+                        </a>
+                    </li>
+                    <li class="blue-dirty">
+                        <a href="..\ConsultarTarea\">
+                            <span class="glyphicon glyphicon-th"></span>
+                            <span class="lbl">Consultar Tareas</span>
+                        </a>
+                    </li>
                     <li class="blue-dirty">
                         <a href="..\MntUsuario\">
                             <span class="glyphicon glyphicon-th"></span>
                             <span class="lbl">Usuarios</span>
                         </a>
                     </li>
-
-                    <li class="blue-dirty">
-                        <a href="..\MntPrioridad\">
-                            <span class="glyphicon glyphicon-th"></span>
-                            <span class="lbl">Prioridad</span>
-                        </a>
-                    </li>
-
                     <li class="blue-dirty">
                         <a href="..\MntCategoria\">
                             <span class="glyphicon glyphicon-th"></span>
@@ -88,15 +90,13 @@
                             <span class="lbl">Sub Categorias</span>
                         </a>
                     </li>
-
                     <li class="blue-dirty">
-                        <a href="..\ConsultarTicket\">
+                        <a href="..\MntPrioridad\">
                             <span class="glyphicon glyphicon-th"></span>
-                            <span class="lbl">Consultar Ticket</span>
+                            <span class="lbl">Prioridad</span>
                         </a>
                     </li>
-
-                    <li class="blue-dirty">
+                    <!-- <li class="blue-dirty">
                         <a href="..\MonitorearTicket\">
                             <span class="glyphicon glyphicon-th"></span>
                             <span class="lbl">Monitoreo de Tickets</span>
@@ -107,14 +107,7 @@
                             <span class="glyphicon glyphicon-th"></span>
                             <span class="lbl">Nueva Tarea</span>
                         </a>
-                    </li>
-
-                    <li class="blue-dirty">
-                        <a href="..\ConsultarTarea\">
-                            <span class="glyphicon glyphicon-th"></span>
-                            <span class="lbl">Consultar Tarea</span>
-                        </a>
-                    </li>
+                    </li> -->
                 </ul>
             </nav>
         <?php

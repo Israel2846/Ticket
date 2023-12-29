@@ -1,8 +1,8 @@
 <header class="site-header">
     <div class="container-fluid">
 
-        <a href="#" class="site-logo">
-            <img src="../../public/slg-cco.png" alt="logo">
+        <a href="../Home/" class="site-logo">
+           <img src="../../public/slg-cco.png" alt="logo">
         </a>
 
         <button id="show-hide-sidebar-toggle" class="show-hide-sidebar">

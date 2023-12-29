@@ -60,5 +60,5 @@ $(document).ready(function(){
 
 /* TODO: Funcion para abrir detalle de ticket en una nueva ventana */
 function ver(tick_id){
-    window.open('https://solulogis.com/tickets-support/view/DetalleTicket/?ID='+ tick_id +'');
+    window.open('https://localhost/tickets-support/view/DetalleTicket/?ID='+ tick_id +'');
 }

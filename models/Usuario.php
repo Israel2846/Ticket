@@ -1,56 +1,45 @@
 <?php
 class Usuario extends Conectar
 {
+
     /* TODO: Funcion de login y generacion de session */
     public function login()
     {
         $conectar = parent::conexion();
         parent::set_names();
-
         if (isset($_POST["enviar"])) {
-
             $correo = $_POST["usu_correo"];
-
             $pass = $_POST["usu_pass"];
-
             $sql_rol = "SELECT tm_usuario.rol_id FROM tm_usuario where tm_usuario.usu_correo = ? or tm_usuario.num_colab = ? AND tm_usuario.usu_pass = MD5(?)";
             $sql_rol = $conectar->prepare($sql_rol);
             $sql_rol->bindParam(1, $correo);
             $sql_rol->bindParam(2, $correo);
             $sql_rol->bindParam(3, $pass);
             $sql_rol->execute();
-
             $resultado = $sql_rol->fetch();
-
             if (is_array($resultado) and count($resultado) > 0) {
                 $rol = $resultado["rol_id"];
             }
-
             // $rol = $_POST["rol_id"];
             if (empty($correo) and empty($pass)) {
                 header("Location:" . conectar::ruta() . "index.php?m=2");
                 exit();
             } else {
                 $sql = "SELECT * FROM tm_usuario INNER JOIN tm_usr_cat ON tm_usuario.usu_id = tm_usr_cat.usu_id WHERE (usu_correo= ? or num_colab = ?) and usu_pass=MD5(?) and tm_usuario.rol_id = ? and est=1";
-
                 $stmt = $conectar->prepare($sql);
                 $stmt->bindValue(1, $correo);
                 $stmt->bindValue(2, $correo);
                 $stmt->bindValue(3, $pass);
                 $stmt->bindValue(4, $rol);
                 $stmt->execute();
-
                 $resultado = $stmt->fetch();
-
                 if (is_array($resultado) and count($resultado) > 0) {
                     $_SESSION["usu_id"] = $resultado["usu_id"];
                     $_SESSION["usu_nom"] = $resultado["usu_nom"];
                     $_SESSION["usu_ape"] = $resultado["usu_ape"];
                     $_SESSION["rol_id"] = $resultado["rol_id"];
                     $_SESSION["cat_id"] = $resultado["cat_id"];
-
                     header("Location:" . Conectar::ruta() . "view/Home/");
-
                     exit();
                 } else {
                     header("Location:" . Conectar::ruta() . "index.php?m=1");
@@ -65,9 +54,7 @@ class Usuario extends Conectar
     {
         $conectar = parent::conexion();
         parent::set_names();
-
         $sql = "INSERT INTO tm_usuario (usu_id, usu_nom, usu_ape, usu_correo, usu_pass, usu_almacen, usu_area, rol_id, usu_telf, fech_crea, fech_modi, fech_elim, est, num_colab) VALUES (NULL,?,?,?,MD5(?),?,?,?,?,now(), NULL, NULL, '1', ?);";
-
         $sql = $conectar->prepare($sql);
         $sql->bindValue(1, $usu_nom);
         $sql->bindValue(2, $usu_ape);
@@ -79,7 +66,6 @@ class Usuario extends Conectar
         $sql->bindValue(8, $usu_telf);
         $sql->bindValue(9, $num_colab);
         $sql->execute();
-
         return $resultado = $sql->fetchAll();
     }
 

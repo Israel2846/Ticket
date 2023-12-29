@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html>
     <?php require_once("../MainHead/head.php");?>
-	<title>AnderCode</>::Mantenimiento SubCategoria</title>
+	<title>Sub-Categorias</title>
 </head>
 <body class="with-side-menu">
 
@@ -24,7 +24,7 @@
 						<div class="tbl-cell">
 							<h3>Mantenimiento SubCategoria</h3>
 							<ol class="breadcrumb breadcrumb-simple">
-								<li><a href="#">Home</a></li>
+								<li><a href="../Home/">Inicio</a></li>
 								<li class="active">Mantenimiento SubCategoria</li>
 							</ol>
 						</div>

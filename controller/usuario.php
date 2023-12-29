@@ -10,8 +10,10 @@ switch ($_GET["op"]) {
 
         // Llenar combo Almacen
     case "combo_almacen":
-        $html = "";
+        $html = '';
+
         $datos = $usuario->combo_almacen();
+
         if (is_array($datos) == true and count($datos) > 0) {
             $html .= "<option label='Seleccionar'></option>";
             foreach ($datos as $row) {
@@ -24,14 +26,19 @@ switch ($_GET["op"]) {
         // Llenar combo Area
     case "combo_area":
         $html = "";
+
         $datos = $usuario->combo_area($_POST['id_almacen']);
+
         if (is_array($datos) == true and count($datos) > 0) {
             $html .= "<option label='Seleccionar'></option>";
+
             foreach ($datos as $row) {
                 $html .= "<option value='" . $row['id_area_almacen'] . "'>" . $row['nombre_area'] . "</option>";
             }
+
             echo $html;
         }
+        
         break;
 
         /* TODO: Guardar y editar, guardar si el campo usu_id esta vacio */
@@ -145,7 +152,6 @@ switch ($_GET["op"]) {
 
         /* TODO: Formato para llenar combo en formato HTML */
     case "combo";
-        $html = "";
         $datos = $usuario->get_usuario_soporte();
         if (is_array($datos) == true and count($datos) > 0) {
             $html .= "<option label='Seleccionar'></option>";

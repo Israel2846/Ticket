@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html>
     <?php require_once("../MainHead/head.php");?>
-	<title>AnderCode</>::Mantenimiento Prioridad</title>
+	<title>Prioridad</title>
 </head>
 <body class="with-side-menu">
 
@@ -24,7 +24,7 @@
 						<div class="tbl-cell">
 							<h3>Mantenimiento Prioridad</h3>
 							<ol class="breadcrumb breadcrumb-simple">
-								<li><a href="#">Home</a></li>
+								<li><a href="../Homr/">Inicio</a></li>
 								<li class="active">Mantenimiento Prioridad</li>
 							</ol>
 						</div>

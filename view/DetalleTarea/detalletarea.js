@@ -35,16 +35,15 @@ function listardetalle(id_tarea){
         function(data){
             data = JSON.parse(data)
             console.log(data)
+            var elem_estado = '<span class="label label-pill label-success">Abierto</span>';
 
             // Devolver el estado de la tarea con formato
-            switch (data.estado_tarea) {
-                case 1:
-                    elem_estado = '<span class="label label-pill label-success">Abierto</span>'
-                    break;
-                
-                case 0:
-                    elem_estado = '<span class="label label-pill label-danger">Finalizado</span>'
-                    break;
+            if(data.estado_tarea == 1) {
+                elem_estado = '<span class="label label-pill label-success">Abierto</span>'
+            } else if(data.estado_tarea == 0) {
+                elem_estado = '<span class="label label-pill label-danger">Finalizado</span>'
+            } else {
+                elem_estado = 'error'
             }
 
             if (data.estado_tarea == 0) {
@@ -88,7 +87,7 @@ $(document).ready(function(){
             textoError.textContent = '';
         }
     });
-
+    
     listardetalle(id_tarea)
 
     if (rolUsuario == 3) {
@@ -250,7 +249,7 @@ $(document).on(
     "#btnEnviar",
     function(){
         var respuestaTarea = $('#respTarea').val();
-
+        
         // Se desabilita el botón y muestra Cargando...
         $('#btnEnviar').prop('disabled', true).text('Cargando...');
 
@@ -269,8 +268,8 @@ $(document).on(
             formData.append('id_usuario', idUsuario);
             formData.append('respuesta_tarea', respuestaTarea);
             var totalFiles = $('#fileElem').val().length;
-
-            // Agregar cada archivo al formulario
+            
+            //Agregar cada archivo al formulario
             for (let index = 0; index < totalFiles; index++) {
                 formData.append("files[]", $('#fileElem')[0].files[index]);
             }
@@ -283,12 +282,12 @@ $(document).on(
                     data : formData,
                     contentType: false,
                     processData: false,
-
+                    
                     success : function(data){
                         console.log(data);
                         listardetalle(idTarea);
                         $('#respTarea').summernote('reset');
-
+                        
                         swal({
                             title: "Correcto!",
                             text: "Registrado correctamente",
@@ -303,7 +302,7 @@ $(document).on(
                             $('#fileElem').val('');
                         });
                     },
-
+                    
                     error : function(e){
                         console.log("Error! ", e.responseText)
                     }
