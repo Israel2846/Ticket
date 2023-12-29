@@ -2,7 +2,7 @@
     <div class="container-fluid">
 
         <a href="#" class="site-logo">
-           <img src="../../public/slg-cco.png" alt="logo">
+            <img src="../../public/slg-cco.png" alt="logo">
         </a>
 
         <button id="show-hide-sidebar-toggle" class="show-hide-sidebar">
@@ -38,6 +38,7 @@
 
                 <input type="hidden" id="user_idx" value="<?php echo $_SESSION["usu_id"] ?>"><!-- ID del Usuario-->
                 <input type="hidden" id="rol_idx" value="<?php echo $_SESSION["rol_id"] ?>"><!-- Rol del Usuario-->
+                <input type="hidden" id="cat_idx" value="<?php echo $_SESSION["cat_id"] ?>"><!-- Categoría de usuario-->
 
                 <div class="dropdown dropdown-typical">
                     <a href="#" class="dropdown-toggle no-arr">

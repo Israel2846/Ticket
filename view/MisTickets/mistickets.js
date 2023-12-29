@@ -12,6 +12,7 @@ if (rol_id == 1 || rol_id == 2) {
 }
 
 $(document).ready(function () {
+    console.log(usu_id, rol_id);
     // Tabla de datos
     $('#mis_tickets').DataTable({
         "aProcessing": true,

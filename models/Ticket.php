@@ -108,37 +108,37 @@ class Ticket extends Conectar
             $conectar = parent::conexion();
             parent::set_names();
             $sql = "SELECT 
-                        tm_ticket.tick_id,
-                        tm_ticket.usu_id,
-                        tm_ticket.cat_id,
-                        tm_ticket.tick_titulo,
-                        tm_ticket.tick_descrip,
-                        tm_ticket.tick_estado,
-                        tm_ticket.fech_crea,
-                        tm_ticket.fech_cierre,
-                        tm_ticket.usu_asig,
-                        tm_ticket.fech_asig,
-                        tm_usuario.usu_nom,
-                        tm_usuario.usu_ape,
-                        tm_categoria.cat_nom,
-                        tm_ticket.prio_id,
-                        tm_prioridad.prio_nom,
-                        CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_crea, tm_ticket.fech_asig), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_crea, tm_ticket.fech_asig)%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_crea, tm_ticket.fech_asig)%60, ' minutos') AS timeresp,
-                        CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_crea, NOW()), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_crea, NOW())%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_crea, NOW())%60, ' minutos') AS timetransc,
-                        CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_asig, tm_ticket.fech_cierre), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_asig, tm_ticket.fech_cierre)%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_asig, tm_ticket.fech_cierre)%60, ' minutos') AS timetarea,
-                        CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_crea, tm_ticket.fech_cierre), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_crea, tm_ticket.fech_cierre)%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_crea, tm_ticket.fech_cierre)%60, ' minutos') AS tiempototal
-                    FROM 
-                    tm_ticket
-                    INNER join tm_categoria on tm_ticket.cat_id = tm_categoria.cat_id
-                    INNER join tm_usuario on tm_ticket.usu_id = tm_usuario.usu_id
-                    INNER join tm_prioridad on tm_ticket.prio_id = tm_prioridad.prio_id
-                    WHERE
-                    tm_ticket.est = 1 AND tm_usuario.usu_id in (
-                            select tm_usuario.usu_id from tm_usuario where tm_usuario.usu_almacen = (
-                                select tm_usuario.usu_almacen from tm_usuario where tm_usuario.usu_id = ?
-                            )
+                tm_ticket.tick_id,
+                tm_ticket.usu_id,
+                tm_ticket.cat_id,
+                tm_ticket.tick_titulo,
+                tm_ticket.tick_descrip,
+                tm_ticket.tick_estado,
+                tm_ticket.fech_crea,
+                tm_ticket.fech_cierre,
+                tm_ticket.usu_asig,
+                tm_ticket.fech_asig,
+                tm_usuario.usu_nom,
+                tm_usuario.usu_ape,
+                tm_categoria.cat_nom,
+                tm_ticket.prio_id,
+                tm_prioridad.prio_nom,
+                CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_crea, tm_ticket.fech_asig), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_crea, tm_ticket.fech_asig)%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_crea, tm_ticket.fech_asig)%60, ' minutos') AS timeresp,
+                CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_crea, NOW()), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_crea, NOW())%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_crea, NOW())%60, ' minutos') AS timetransc,
+                CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_asig, tm_ticket.fech_cierre), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_asig, tm_ticket.fech_cierre)%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_asig, tm_ticket.fech_cierre)%60, ' minutos') AS timetarea,
+                CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_crea, tm_ticket.fech_cierre), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_crea, tm_ticket.fech_cierre)%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_crea, tm_ticket.fech_cierre)%60, ' minutos') AS tiempototal
+                FROM 
+                tm_ticket
+                INNER join tm_categoria on tm_ticket.cat_id = tm_categoria.cat_id
+                INNER join tm_usuario on tm_ticket.usu_id = tm_usuario.usu_id
+                INNER join tm_prioridad on tm_ticket.prio_id = tm_prioridad.prio_id
+                WHERE
+                tm_ticket.est = 1 AND tm_ticket.usu_asig in (
+                        select tm_usuario.usu_id from tm_usuario where tm_usuario.usu_almacen = (
+                            select tm_usuario.usu_almacen from tm_usuario where tm_usuario.usu_id = ?
                         )
-                    ORDER BY FIELD(tm_ticket.tick_estado, 'Abierto', 'En proceso', 'Pausado', 'Cerrado') ASC, tm_ticket.prio_id DESC";
+                    )
+                ORDER BY FIELD(tm_ticket.tick_estado, 'Abierto', 'En proceso', 'Pausado', 'Cerrado') ASC, tm_ticket.prio_id DESC";
             $sql = $conectar->prepare($sql);
             $sql->bindValue(1, $usu_id);
             $sql->execute();
@@ -235,11 +235,21 @@ class Ticket extends Conectar
     }
 
     /* TODO: Mostrar todos los ticket */
-    public function listar_ticket_abierto()
+    public function listar_ticket_abierto($cat_id)
     {
+        $concat = "";
+
+        if ($cat_id == 0) {
+            $concat = " IN (SELECT DISTINCT tm_categoria.cat_id FROM tm_categoria) ";
+        } else {
+            $concat = " = {$cat_id} ";
+        }
+
         try {
             $conectar = parent::conexion();
+
             parent::set_names();
+
             $sql = "SELECT
                         tm_ticket.tick_id,
                         tm_ticket.usu_id,
@@ -272,8 +282,9 @@ class Ticket extends Conectar
                     INNER JOIN tm_area_almacen ON creador.usu_area = tm_area_almacen.id_area_almacen
                     INNER JOIN tm_almacen on creador.usu_almacen = tm_almacen.id_almacen
                     WHERE
-                        tm_ticket.est = 1 and tm_ticket.tick_estado = 'Abierto'
+                        tm_ticket.est = 1 and tm_ticket.tick_estado = 'Abierto' AND tm_ticket.cat_id {$concat}
                     ORDER BY tm_ticket.prio_id DESC";
+
             $sql = $conectar->prepare($sql);
             $sql->execute();
             return $sql->fetchAll();
@@ -282,11 +293,20 @@ class Ticket extends Conectar
         }
     }
 
-    public function listar_ticket_en_proceso()
+    public function listar_ticket_en_proceso($cat_id)
     {
+        $concat = "";
+
+        if ($cat_id == 0) {
+            $concat = " IN (SELECT DISTINCT tm_categoria.cat_id FROM tm_categoria) ";
+        } else {
+            $concat = " = {$cat_id} ";
+        }
+
         try {
             $conectar = parent::conexion();
             parent::set_names();
+
             $sql = "SELECT
                         tm_ticket.tick_id,
                         tm_ticket.usu_id,
@@ -316,6 +336,7 @@ class Ticket extends Conectar
                     INNER join tm_prioridad on tm_ticket.prio_id = tm_prioridad.prio_id
                     WHERE
                         tm_ticket.est = 1 and tm_ticket.tick_estado = 'En proceso'
+                        AND tm_ticket.cat_id {$concat}
                     ORDER BY tm_ticket.prio_id DESC";
             $sql = $conectar->prepare($sql);
             $sql->execute();
@@ -325,8 +346,16 @@ class Ticket extends Conectar
         }
     }
 
-    public function listar_ticket_pausados()
+    public function listar_ticket_pausados($cat_id)
     {
+        $concat = "";
+
+        if ($cat_id == 0) {
+            $concat = " IN (SELECT DISTINCT tm_categoria.cat_id FROM tm_categoria) ";
+        } else {
+            $concat = " = {$cat_id} ";
+        }
+
         try {
             $conectar = parent::conexion();
             parent::set_names();
@@ -359,6 +388,7 @@ class Ticket extends Conectar
                     INNER join tm_prioridad on tm_ticket.prio_id = tm_prioridad.prio_id
                     WHERE
                         tm_ticket.est = 1 and tm_ticket.tick_estado = 'Pausado'
+                        AND tm_ticket.cat_id {$concat}
                     ORDER BY tm_ticket.prio_id DESC";
             $sql = $conectar->prepare($sql);
             $sql->execute();
@@ -368,8 +398,16 @@ class Ticket extends Conectar
         }
     }
 
-    public function listar_ticket_cerrado()
+    public function listar_ticket_cerrado($cat_id)
     {
+        $concat = "";
+
+        if ($cat_id == 0) {
+            $concat = " IN (SELECT DISTINCT tm_categoria.cat_id FROM tm_categoria) ";
+        } else {
+            $concat = " = {$cat_id} ";
+        }
+
         try {
             $conectar = parent::conexion();
             parent::set_names();
@@ -402,6 +440,7 @@ class Ticket extends Conectar
                     INNER join tm_prioridad on tm_ticket.prio_id = tm_prioridad.prio_id
                     WHERE
                         tm_ticket.est = 1 and tm_ticket.tick_estado = 'Cerrado'
+                        AND tm_ticket.cat_id {$concat}
                     ORDER BY tm_ticket.prio_id DESC";
             $sql = $conectar->prepare($sql);
             $sql->execute();

@@ -32,25 +32,25 @@ switch ($_GET["op"]) {
 
         // Listar tickets abiertos
     case "listar_ticket_abierto":
-        $datos = $ticket->listar_ticket_abierto();
+        $datos = $ticket->listar_ticket_abierto($_POST['cat_id']);
         echo json_encode($datos);
         break;
 
         // Listar tickets en proceso
     case "listar_ticket_en_proceso":
-        $datos = $ticket->listar_ticket_en_proceso();
+        $datos = $ticket->listar_ticket_en_proceso($_POST['cat_id']);
         echo json_encode($datos);
         break;
 
         // Listar tickets pausados
     case "listar_ticket_pausado":
-        $datos = $ticket->listar_ticket_pausados();
+        $datos = $ticket->listar_ticket_pausados($_POST['cat_id']);
         echo json_encode($datos);
         break;
 
         // Listar tickets cerrados
     case "listar_ticket_cerrado":
-        $datos = $ticket->listar_ticket_cerrado();
+        $datos = $ticket->listar_ticket_cerrado($_POST['cat_id']);
         echo json_encode($datos);
         break;
 

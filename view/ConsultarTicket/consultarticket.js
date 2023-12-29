@@ -1,13 +1,14 @@
-const usu_id =  $('#user_idx').val();
-const rol_id =  $('#rol_idx').val();
+const usu_id = $('#user_idx').val();
+const rol_id = $('#rol_idx').val();
+const cat_id = $('#cat_idx').val();
 
-function init(){
-    $("#ticket_form").on("submit",function(e){
-        guardar(e);	
+function init() {
+    $("#ticket_form").on("submit", function (e) {
+        guardar(e);
     });
 }
 
-$(document).ready(function(){
+$(document).ready(function () {
     // Inicializamos datatables
     datatable_abiertos();
     datatable_en_proceso();
@@ -15,12 +16,12 @@ $(document).ready(function(){
     datatable_cerrado();
 
     /* TODO: Llenar Combo Categoria */
-    $.post("../../controller/categoria.php?op=combo",function(data, status){
+    $.post("../../controller/categoria.php?op=combo", function (data, status) {
         $('#cat_id').html(data);
     });
 
     /* TODO: llenar Combo Prioridad */
-    $.post("../../controller/prioridad.php?op=combo",function(data, status){
+    $.post("../../controller/prioridad.php?op=combo", function (data, status) {
         $('#prio_id').html(data);
     });
 
@@ -30,7 +31,7 @@ $(document).ready(function(){
     });
 
     // Intervalo de tiempo para actualizar datatables
-    setInterval(function(){
+    setInterval(function () {
         console.log('Recarga datatables');
         $('#ticket_abierto').DataTable().ajax.reload();
         $('#ticket_en_proceso').DataTable().ajax.reload();
@@ -40,13 +41,13 @@ $(document).ready(function(){
 });
 
 /* TODO: Link para poder ver el detalle de ticket en otra ventana */
-function ver(tick_id){
-    window.location.href = 'http://localhost/Ticket/view/DetalleTicket/?ID='+ tick_id +'';
+function ver(tick_id) {
+    window.location.href = 'http://localhost/gestor-de-tickets/view/DetalleTicket/?ID=' + tick_id + '';
 }
 
 /* TODO: Mostrar datos antes de asignar */
-function asignar(tick_id){
-    $.post("../../controller/ticket.php?op=mostrar", {tick_id : tick_id}, function (data) {
+function asignar(tick_id) {
+    $.post("../../controller/ticket.php?op=mostrar", { tick_id: tick_id }, function (data) {
         data = JSON.parse(data);
         $('#tick_id').val(data.tick_id);
 
@@ -56,9 +57,9 @@ function asignar(tick_id){
 }
 
 /* TODO: Guardar asignacion de usuario de soporte */
-function guardar(e){
+function guardar(e) {
     e.preventDefault();
-	var formData = new FormData($("#ticket_form")[0]);
+    var formData = new FormData($("#ticket_form")[0]);
     console.log(formData);
     $.ajax({
         url: "../../controller/ticket.php?op=asignar",
@@ -66,15 +67,15 @@ function guardar(e){
         data: formData,
         contentType: false,
         processData: false,
-        success: function(datos){
+        success: function (datos) {
             var tick_id = $('#tick_id').val();
             /* TODO: enviar Email de alerta de asignacion */
-            $.post("../../controller/email.php?op=ticket_asignado", {tick_id : tick_id}, function (data) {
+            $.post("../../controller/email.php?op=ticket_asignado", { tick_id: tick_id }, function (data) {
 
             });
 
             /* TODO: enviar Whaspp de alerta de asignacion */
-            $.post("../../controller/whatsapp.php?op=w_ticket_asignado", {tick_id : tick_id}, function (data) {
+            $.post("../../controller/whatsapp.php?op=w_ticket_asignado", { tick_id: tick_id }, function (data) {
 
             });
 
@@ -96,7 +97,7 @@ function guardar(e){
 }
 
 /* TODO:Reabrir ticket */
-function CambiarEstado(tick_id){
+function CambiarEstado(tick_id) {
     swal({
         title: "HelpDesk",
         text: "Esta seguro de Reabrir el Ticket?",
@@ -107,79 +108,83 @@ function CambiarEstado(tick_id){
         cancelButtonText: "No",
         closeOnConfirm: false
     },
-    function(isConfirm) {
-        if (isConfirm) {
-            /* TODO: Enviar actualizacion de estado */
-            $.post("../../controller/ticket.php?op=reabrir", {tick_id : tick_id,usu_id : usu_id}, function (data) {
+        function (isConfirm) {
+            if (isConfirm) {
+                /* TODO: Enviar actualizacion de estado */
+                $.post("../../controller/ticket.php?op=reabrir", { tick_id: tick_id, usu_id: usu_id }, function (data) {
 
-            });
+                });
 
-            /* TODO:Recargar datatable js */
-            $('#ticket_data').DataTable().ajax.reload();	
+                /* TODO:Recargar datatable js */
+                $('#ticket_data').DataTable().ajax.reload();
 
-            /* TODO: Mensaje de Confirmacion */
-            swal({
-                title: "HelpDesk!",
-                text: "Ticket Abierto.",
-                type: "success",
-                confirmButtonClass: "btn-success"
-            });
-        }
-    });
+                /* TODO: Mensaje de Confirmacion */
+                swal({
+                    title: "HelpDesk!",
+                    text: "Ticket Abierto.",
+                    type: "success",
+                    confirmButtonClass: "btn-success"
+                });
+            }
+        });
 }
 
 /* TODO:Filtro avanzado */
-$(document).on("click","#btnfiltrar", function(){
+$(document).on("click", "#btnfiltrar", function () {
     limpiar();
 
     var tick_titulo = $('#tick_titulo').val();
     var cat_id = $('#cat_id').val();
     var prio_id = $('#prio_id').val();
 
-    listardatatable(tick_titulo,cat_id,prio_id);
+    listardatatable(tick_titulo, cat_id, prio_id);
 
 });
 
 /* TODO: Restaurar Datatable js y limpiar */
-$(document).on("click","#btntodo", function(){
+$(document).on("click", "#btntodo", function () {
     limpiar();
 
     $('#tick_titulo').val('');
     $('#cat_id').val('').trigger('change');
     $('#prio_id').val('').trigger('change');
 
-    listardatatable('','','');
+    listardatatable('', '', '');
 });
 
 /* TODO: Listar datatable con filtro avanzado */
-function datatable_abiertos(){
+function datatable_abiertos() {
     $('#ticket_abierto').dataTable(
         {
             "aProcessing": true,
             "aServerSide": true,
             lengthChange: false,
             colReorder: true,
-            "ajax" : {
-                url : '../../controller/ticket.php?op=listar_ticket_abierto',
-                dataType : "json",
-                error: function(e){
+            "ajax": {
+                url: '../../controller/ticket.php?op=listar_ticket_abierto',
+                type: 'POST',
+                data: {
+                    cat_id: cat_id
+                },
+                dataType: "json",
+                error: function (e) {
                     console.log(e.responseText);
                 },
                 "dataSrc": ""
             },
-            "columns" : [
-                { 
-                    "data": "tick_id" ,
-                    render: function(data, type, row) {
+            "columns": [
+                {
+                    "data": "tick_id",
+                    render: function (data, type, row) {
                         return '<span class="label label-pill label-success">' + data + '</span>'
                     }
                 },
                 { "data": "cat_nom" },
                 { "data": "tick_titulo" },
                 { "data": "prio_nom" },
-                { 
+                {
                     "data": "tick_estado",
-                    render : function(data){
+                    render: function (data) {
                         return '<span class="label label-pill label-success">' + data + '</span>'
                     }
                 },
@@ -189,17 +194,17 @@ function datatable_abiertos(){
                 { "data": "timetransc" },
                 // { "data": "tiempototal" },
                 // { "data": "fech_cierre" },
-                { 
+                {
                     "data": "usu_id",
-                    render : function(data, type, row){
-                        return '<span class="label label-pill label-success">' + row.usu_nom +'</span>'
+                    render: function (data, type, row) {
+                        return '<span class="label label-pill label-success">' + row.usu_nom + '</span>'
                     }
                 },
-                { "data" : "nombre_almacen" },
-                { "data" : "nombre_area" },
-                { 
-                    "data": "tick_id" ,
-                    render : function(data, type, row){
+                { "data": "nombre_almacen" },
+                { "data": "nombre_area" },
+                {
+                    "data": "tick_id",
+                    render: function (data, type, row) {
                         if (row.usu_asig == null) {
                             return '<button type="button" onClick="asignar(' + row.tick_id + ');"  id="' + row.tick_id + '" class="btn btn-inline btn-danger btn-sm ladda-button">Sin asignar</i></button>'
                         } else {
@@ -207,42 +212,42 @@ function datatable_abiertos(){
                         }
                     }
                 },
-                { 
-                    "data": "tick_id" ,
-                    render : function(data, type, row){
+                {
+                    "data": "tick_id",
+                    render: function (data, type, row) {
                         return '<button type="button" onClick="ver(' + row.tick_id + ');"  id="' + row.tick_id + '" class="btn btn-inline btn-primary btn-sm ladda-button"><i class="fa fa-eye"></i></button>'
                     }
                 },
             ],
-            order : [],
+            order: [],
             "bDestroy": true,
             "bFilter": false,
             "paging": true,
             "responsive": true,
-            "bInfo":false,
+            "bInfo": false,
             "iDisplayLength": 10,
             "autoWidth": false,
             "language": {
-                "sProcessing":     "Procesando...",
-                "sLengthMenu":     "Mostrar _MENU_ registros",
-                "sZeroRecords":    "No se encontraron resultados",
-                "sEmptyTable":     "Ningún dato disponible en esta tabla",
-                "sInfo":           "Mostrando un total de _TOTAL_ registros",
-                "sInfoEmpty":      "Mostrando un total de 0 registros",
-                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-                "sInfoPostFix":    "",
-                "sSearch":         "Buscar:",
-                "sUrl":            "",
-                "sInfoThousands":  ",",
+                "sProcessing": "Procesando...",
+                "sLengthMenu": "Mostrar _MENU_ registros",
+                "sZeroRecords": "No se encontraron resultados",
+                "sEmptyTable": "Ningún dato disponible en esta tabla",
+                "sInfo": "Mostrando un total de _TOTAL_ registros",
+                "sInfoEmpty": "Mostrando un total de 0 registros",
+                "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                "sInfoPostFix": "",
+                "sSearch": "Buscar:",
+                "sUrl": "",
+                "sInfoThousands": ",",
                 "sLoadingRecords": "Cargando...",
                 "oPaginate": {
-                    "sFirst":    "Primero",
-                    "sLast":     "Último",
-                    "sNext":     "Siguiente",
+                    "sFirst": "Primero",
+                    "sLast": "Último",
+                    "sNext": "Siguiente",
                     "sPrevious": "Anterior"
                 },
                 "oAria": {
-                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                    "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
                     "sSortDescending": ": Activar para ordenar la columna de manera descendente"
                 }
             }
@@ -250,34 +255,38 @@ function datatable_abiertos(){
     )
 }
 
-function datatable_en_proceso(){
+function datatable_en_proceso() {
     $('#ticket_en_proceso').dataTable(
         {
             "aProcessing": true,
             "aServerSide": true,
             lengthChange: false,
             colReorder: true,
-            "ajax" : {
-                url : '../../controller/ticket.php?op=listar_ticket_en_proceso',
-                dataType : "json",
-                error: function(e){
+            "ajax": {
+                url: '../../controller/ticket.php?op=listar_ticket_en_proceso',
+                dataType: "json",
+                type: 'POST',
+                data: {
+                    cat_id: cat_id
+                },
+                error: function (e) {
                     console.log(e.responseText);
                 },
                 "dataSrc": ""
             },
-            "columns" : [
-                { 
-                    "data": "tick_id" ,
-                    render: function(data, type, row) {
+            "columns": [
+                {
+                    "data": "tick_id",
+                    render: function (data, type, row) {
                         return '<span class="label label-pill label-warning">' + data + '</span>'
                     }
                 },
                 { "data": "cat_nom" },
                 { "data": "tick_titulo" },
                 { "data": "prio_nom" },
-                { 
+                {
                     "data": "tick_estado",
-                    render : function(data){
+                    render: function (data) {
                         return '<span class="label label-pill label-warning">' + data + '</span>'
                     }
                 },
@@ -287,15 +296,15 @@ function datatable_en_proceso(){
                 { "data": "timetransc" },
                 // { "data": "tiempototal" },
                 // { "data": "fech_cierre" },
-                { 
+                {
                     "data": "usu_id",
-                    render : function(data, type, row){
-                        return '<span class="label label-pill label-success">' + row.usu_nom +'</span>'
+                    render: function (data, type, row) {
+                        return '<span class="label label-pill label-success">' + row.usu_nom + '</span>'
                     }
                 },
-                { 
-                    "data": "tick_id" ,
-                    render : function(data, type, row){
+                {
+                    "data": "tick_id",
+                    render: function (data, type, row) {
                         if (row.usu_asig == null) {
                             return '<button type="button" onClick="asignar(' + row.tick_id + ');"  id="' + row.tick_id + '" class="btn btn-inline btn-danger btn-sm ladda-button">Sin asignar</i></button>'
                         } else {
@@ -303,42 +312,42 @@ function datatable_en_proceso(){
                         }
                     }
                 },
-                { 
-                    "data": "tick_id" ,
-                    render : function(data, type, row){
+                {
+                    "data": "tick_id",
+                    render: function (data, type, row) {
                         return '<button type="button" onClick="ver(' + row.tick_id + ');"  id="' + row.tick_id + '" class="btn btn-inline btn-primary btn-sm ladda-button"><i class="fa fa-eye"></i></button>'
                     }
                 },
             ],
-            order : [],
+            order: [],
             "bDestroy": true,
             "bFilter": false,
             "paging": true,
             "responsive": true,
-            "bInfo":false,
+            "bInfo": false,
             "iDisplayLength": 10,
             "autoWidth": false,
             "language": {
-                "sProcessing":     "Procesando...",
-                "sLengthMenu":     "Mostrar _MENU_ registros",
-                "sZeroRecords":    "No se encontraron resultados",
-                "sEmptyTable":     "Ningún dato disponible en esta tabla",
-                "sInfo":           "Mostrando un total de _TOTAL_ registros",
-                "sInfoEmpty":      "Mostrando un total de 0 registros",
-                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-                "sInfoPostFix":    "",
-                "sSearch":         "Buscar:",
-                "sUrl":            "",
-                "sInfoThousands":  ",",
+                "sProcessing": "Procesando...",
+                "sLengthMenu": "Mostrar _MENU_ registros",
+                "sZeroRecords": "No se encontraron resultados",
+                "sEmptyTable": "Ningún dato disponible en esta tabla",
+                "sInfo": "Mostrando un total de _TOTAL_ registros",
+                "sInfoEmpty": "Mostrando un total de 0 registros",
+                "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                "sInfoPostFix": "",
+                "sSearch": "Buscar:",
+                "sUrl": "",
+                "sInfoThousands": ",",
                 "sLoadingRecords": "Cargando...",
                 "oPaginate": {
-                    "sFirst":    "Primero",
-                    "sLast":     "Último",
-                    "sNext":     "Siguiente",
+                    "sFirst": "Primero",
+                    "sLast": "Último",
+                    "sNext": "Siguiente",
                     "sPrevious": "Anterior"
                 },
                 "oAria": {
-                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                    "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
                     "sSortDescending": ": Activar para ordenar la columna de manera descendente"
                 }
             }
@@ -346,34 +355,38 @@ function datatable_en_proceso(){
     )
 }
 
-function datatable_pausado(){
+function datatable_pausado() {
     $('#ticket_pausado').dataTable(
         {
             "aProcessing": true,
             "aServerSide": true,
             lengthChange: false,
             colReorder: true,
-            "ajax" : {
-                url : '../../controller/ticket.php?op=listar_ticket_pausado',
-                dataType : "json",
-                error: function(e){
+            "ajax": {
+                url: '../../controller/ticket.php?op=listar_ticket_pausado',
+                dataType: "json",
+                type: 'POST',
+                data: {
+                    cat_id: cat_id
+                },
+                error: function (e) {
                     console.log(e.responseText);
                 },
                 "dataSrc": ""
             },
-            "columns" : [
-                { 
-                    "data": "tick_id" ,
-                    render: function(data, type, row) {
+            "columns": [
+                {
+                    "data": "tick_id",
+                    render: function (data, type, row) {
                         return '<span class="label label-pill label-primary">' + data + '</span>'
                     }
                 },
                 { "data": "cat_nom" },
                 { "data": "tick_titulo" },
                 { "data": "prio_nom" },
-                { 
+                {
                     "data": "tick_estado",
-                    render : function(data){
+                    render: function (data) {
                         return '<span class="label label-pill label-primary">' + data + '</span>'
                     }
                 },
@@ -383,15 +396,15 @@ function datatable_pausado(){
                 { "data": "timetransc" },
                 // { "data": "tiempototal" },
                 // { "data": "fech_cierre" },
-                { 
+                {
                     "data": "usu_id",
-                    render : function(data, type, row){
-                        return '<span class="label label-pill label-success">' + row.usu_nom +'</span>'
+                    render: function (data, type, row) {
+                        return '<span class="label label-pill label-success">' + row.usu_nom + '</span>'
                     }
                 },
-                { 
-                    "data": "tick_id" ,
-                    render : function(data, type, row){
+                {
+                    "data": "tick_id",
+                    render: function (data, type, row) {
                         if (row.usu_asig == null) {
                             return '<button type="button" onClick="asignar(' + row.tick_id + ');"  id="' + row.tick_id + '" class="btn btn-inline btn-danger btn-sm ladda-button">Sin asignar</i></button>'
                         } else {
@@ -399,42 +412,42 @@ function datatable_pausado(){
                         }
                     }
                 },
-                { 
-                    "data": "tick_id" ,
-                    render : function(data, type, row){
+                {
+                    "data": "tick_id",
+                    render: function (data, type, row) {
                         return '<button type="button" onClick="ver(' + row.tick_id + ');"  id="' + row.tick_id + '" class="btn btn-inline btn-primary btn-sm ladda-button"><i class="fa fa-eye"></i></button>'
                     }
                 },
             ],
-            order : [],
+            order: [],
             "bDestroy": true,
             "bFilter": false,
             "paging": true,
             "responsive": true,
-            "bInfo":false,
+            "bInfo": false,
             "iDisplayLength": 10,
             "autoWidth": false,
             "language": {
-                "sProcessing":     "Procesando...",
-                "sLengthMenu":     "Mostrar _MENU_ registros",
-                "sZeroRecords":    "No se encontraron resultados",
-                "sEmptyTable":     "Ningún dato disponible en esta tabla",
-                "sInfo":           "Mostrando un total de _TOTAL_ registros",
-                "sInfoEmpty":      "Mostrando un total de 0 registros",
-                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-                "sInfoPostFix":    "",
-                "sSearch":         "Buscar:",
-                "sUrl":            "",
-                "sInfoThousands":  ",",
+                "sProcessing": "Procesando...",
+                "sLengthMenu": "Mostrar _MENU_ registros",
+                "sZeroRecords": "No se encontraron resultados",
+                "sEmptyTable": "Ningún dato disponible en esta tabla",
+                "sInfo": "Mostrando un total de _TOTAL_ registros",
+                "sInfoEmpty": "Mostrando un total de 0 registros",
+                "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                "sInfoPostFix": "",
+                "sSearch": "Buscar:",
+                "sUrl": "",
+                "sInfoThousands": ",",
                 "sLoadingRecords": "Cargando...",
                 "oPaginate": {
-                    "sFirst":    "Primero",
-                    "sLast":     "Último",
-                    "sNext":     "Siguiente",
+                    "sFirst": "Primero",
+                    "sLast": "Último",
+                    "sNext": "Siguiente",
                     "sPrevious": "Anterior"
                 },
                 "oAria": {
-                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                    "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
                     "sSortDescending": ": Activar para ordenar la columna de manera descendente"
                 }
             }
@@ -442,34 +455,38 @@ function datatable_pausado(){
     )
 }
 
-function datatable_cerrado(){
+function datatable_cerrado() {
     $('#ticket_cerrado').dataTable(
         {
             "aProcessing": true,
             "aServerSide": true,
             lengthChange: false,
             colReorder: true,
-            "ajax" : {
-                url : '../../controller/ticket.php?op=listar_ticket_cerrado',
-                dataType : "json",
-                error: function(e){
+            "ajax": {
+                url: '../../controller/ticket.php?op=listar_ticket_cerrado',
+                dataType: "json",
+                type: 'POST',
+                data: {
+                    cat_id: cat_id
+                },
+                error: function (e) {
                     console.log(e.responseText);
                 },
                 "dataSrc": ""
             },
-            "columns" : [
-                { 
-                    "data": "tick_id" ,
-                    render: function(data, type, row) {
+            "columns": [
+                {
+                    "data": "tick_id",
+                    render: function (data, type, row) {
                         return '<span class="label label-pill label-danger">' + data + '</span>'
                     }
                 },
                 { "data": "cat_nom" },
                 { "data": "tick_titulo" },
                 { "data": "prio_nom" },
-                { 
+                {
                     "data": "tick_estado",
-                    render : function(data){
+                    render: function (data) {
                         return '<span class="label label-pill label-danger">' + data + '</span>'
                     }
                 },
@@ -478,15 +495,15 @@ function datatable_cerrado(){
                 { "data": "timeresp" },
                 { "data": "tiempototal" },
                 { "data": "fech_cierre" },
-                { 
+                {
                     "data": "usu_id",
-                    render : function(data, type, row){
-                        return '<span class="label label-pill label-success">' + row.usu_nom +'</span>'
+                    render: function (data, type, row) {
+                        return '<span class="label label-pill label-success">' + row.usu_nom + '</span>'
                     }
                 },
-                { 
-                    "data": "tick_id" ,
-                    render : function(data, type, row){
+                {
+                    "data": "tick_id",
+                    render: function (data, type, row) {
                         if (row.usu_asig == null) {
                             return '<button type="button" onClick="asignar(' + row.tick_id + ');"  id="' + row.tick_id + '" class="btn btn-inline btn-danger btn-sm ladda-button">Sin asignar</i></button>'
                         } else {
@@ -494,42 +511,42 @@ function datatable_cerrado(){
                         }
                     }
                 },
-                { 
-                    "data": "tick_id" ,
-                    render : function(data, type, row){
+                {
+                    "data": "tick_id",
+                    render: function (data, type, row) {
                         return '<button type="button" onClick="ver(' + row.tick_id + ');"  id="' + row.tick_id + '" class="btn btn-inline btn-primary btn-sm ladda-button"><i class="fa fa-eye"></i></button>'
                     }
                 },
             ],
-            order : [],
+            order: [],
             "bDestroy": true,
             "bFilter": false,
             "paging": true,
             "responsive": true,
-            "bInfo":false,
+            "bInfo": false,
             "iDisplayLength": 10,
             "autoWidth": false,
             "language": {
-                "sProcessing":     "Procesando...",
-                "sLengthMenu":     "Mostrar _MENU_ registros",
-                "sZeroRecords":    "No se encontraron resultados",
-                "sEmptyTable":     "Ningún dato disponible en esta tabla",
-                "sInfo":           "Mostrando un total de _TOTAL_ registros",
-                "sInfoEmpty":      "Mostrando un total de 0 registros",
-                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-                "sInfoPostFix":    "",
-                "sSearch":         "Buscar:",
-                "sUrl":            "",
-                "sInfoThousands":  ",",
+                "sProcessing": "Procesando...",
+                "sLengthMenu": "Mostrar _MENU_ registros",
+                "sZeroRecords": "No se encontraron resultados",
+                "sEmptyTable": "Ningún dato disponible en esta tabla",
+                "sInfo": "Mostrando un total de _TOTAL_ registros",
+                "sInfoEmpty": "Mostrando un total de 0 registros",
+                "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                "sInfoPostFix": "",
+                "sSearch": "Buscar:",
+                "sUrl": "",
+                "sInfoThousands": ",",
                 "sLoadingRecords": "Cargando...",
                 "oPaginate": {
-                    "sFirst":    "Primero",
-                    "sLast":     "Último",
-                    "sNext":     "Siguiente",
+                    "sFirst": "Primero",
+                    "sLast": "Último",
+                    "sNext": "Siguiente",
                     "sPrevious": "Anterior"
                 },
                 "oAria": {
-                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                    "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
                     "sSortDescending": ": Activar para ordenar la columna de manera descendente"
                 }
             }
@@ -538,30 +555,30 @@ function datatable_cerrado(){
 }
 
 /* TODO: Limpiamos restructurando el html del datatable js */
-function limpiar(){
+function limpiar() {
     $('#table').html(
-        "<table id='ticket_data' class='table table-bordered table-striped table-vcenter js-dataTable-full'>"+
-            "<thead>"+
-                "<tr>"+
-                    "<th style='width: 5%;'>Nro.Ticket</th>"+
-                    "<th style='width: 15%;'>Categoria</th>"+
-                    "<th class='d-none d-sm-table-cell' style='width: 30%;'>Titulo</th>"+
-                    "<th class='d-none d-sm-table-cell' style='width: 5%;'>Prioridad</th>"+
-                    "<th class='d-none d-sm-table-cell' style='width: 5%;'>Estado</th>"+
-                    "<th class='d-none d-sm-table-cell' style='width: 10%;'>Fecha Creación</th>"+
-                    "<th class='d-none d-sm-table-cell' style='width: 10%;'>Fecha Asignación</th>"+
-                    "<th class='d-none d-sm-table-cell' style='width: 5%;'>T. Respuesta</th>"+
-                    "<th class='d-none d-sm-table-cell' style='width: 5%;'>T. Transcurrido</th>"+
-                    "<th class='d-none d-sm-table-cell' style='width: 5%;'>T. Tarea</th>"+
-                    "<th class='d-none d-sm-table-cell' style='width: 5%;'>T. Total</th>"+
-                    "<th class='d-none d-sm-table-cell' style='width: 10%;'>Fecha Cierre</th>"+
-                    "<th class='d-none d-sm-table-cell' style='width: 10%;'>Soporte</th>"+
-                    "<th class='text-center' style='width: 5%;'></th>"+
-                "</tr>"+
-            "</thead>"+
-            "<tbody>"+
+        "<table id='ticket_data' class='table table-bordered table-striped table-vcenter js-dataTable-full'>" +
+        "<thead>" +
+        "<tr>" +
+        "<th style='width: 5%;'>Nro.Ticket</th>" +
+        "<th style='width: 15%;'>Categoria</th>" +
+        "<th class='d-none d-sm-table-cell' style='width: 30%;'>Titulo</th>" +
+        "<th class='d-none d-sm-table-cell' style='width: 5%;'>Prioridad</th>" +
+        "<th class='d-none d-sm-table-cell' style='width: 5%;'>Estado</th>" +
+        "<th class='d-none d-sm-table-cell' style='width: 10%;'>Fecha Creación</th>" +
+        "<th class='d-none d-sm-table-cell' style='width: 10%;'>Fecha Asignación</th>" +
+        "<th class='d-none d-sm-table-cell' style='width: 5%;'>T. Respuesta</th>" +
+        "<th class='d-none d-sm-table-cell' style='width: 5%;'>T. Transcurrido</th>" +
+        "<th class='d-none d-sm-table-cell' style='width: 5%;'>T. Tarea</th>" +
+        "<th class='d-none d-sm-table-cell' style='width: 5%;'>T. Total</th>" +
+        "<th class='d-none d-sm-table-cell' style='width: 10%;'>Fecha Cierre</th>" +
+        "<th class='d-none d-sm-table-cell' style='width: 10%;'>Soporte</th>" +
+        "<th class='text-center' style='width: 5%;'></th>" +
+        "</tr>" +
+        "</thead>" +
+        "<tbody>" +
 
-            "</tbody>"+
+        "</tbody>" +
         "</table>"
     );
 }
