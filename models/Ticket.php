@@ -169,6 +169,57 @@ class Ticket extends Conectar
         }
     }
 
+    /* TODO: Listar ticket segun almacen de usuario asignado */
+    function listar_ticket_x_almacen($usu_id)
+    {
+        try {
+            $conectar = parent::conexion();
+
+            parent::set_names();
+
+            $sql = "SELECT 
+                    tm_ticket.tick_id,
+                    tm_ticket.usu_id,
+                    tm_ticket.cat_id,
+                    tm_ticket.tick_titulo,
+                    tm_ticket.tick_descrip,
+                    tm_ticket.tick_estado,
+                    tm_ticket.fech_crea,
+                    tm_ticket.fech_cierre,
+                    tm_ticket.usu_asig,
+                    tm_ticket.fech_asig,
+                    tm_usuario.usu_nom,
+                    tm_usuario.usu_ape,
+                    tm_categoria.cat_nom,
+                    tm_ticket.prio_id,
+                    tm_prioridad.prio_nom,
+                    CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_crea, tm_ticket.fech_asig), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_crea, tm_ticket.fech_asig)%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_crea, tm_ticket.fech_asig)%60, ' minutos') AS timeresp,
+                    CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_crea, NOW()), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_crea, NOW())%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_crea, NOW())%60, ' minutos') AS timetransc,
+                    CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_asig, tm_ticket.fech_cierre), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_asig, tm_ticket.fech_cierre)%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_asig, tm_ticket.fech_cierre)%60, ' minutos') AS timetarea,
+                    CONCAT(TIMESTAMPDIFF (DAY, tm_ticket.fech_crea, tm_ticket.fech_cierre), ' dias ', TIMESTAMPDIFF (HOUR, tm_ticket.fech_crea, tm_ticket.fech_cierre)%24, ' horas ', TIMESTAMPDIFF (MINUTE, tm_ticket.fech_crea, tm_ticket.fech_cierre)%60, ' minutos') AS tiempototal
+                FROM 
+                tm_ticket
+                INNER join tm_categoria on tm_ticket.cat_id = tm_categoria.cat_id
+                INNER join tm_usuario on tm_ticket.usu_id = tm_usuario.usu_id
+                INNER join tm_prioridad on tm_ticket.prio_id = tm_prioridad.prio_id
+                WHERE
+                tm_ticket.est = 1 AND tm_ticket.usu_asig IN (
+                    SELECT tm_usuario.usu_id FROM tm_usuario WHERE tm_usuario.usu_almacen = (
+                        SELECT tm_usuario.usu_almacen FROM tm_usuario WHERE tm_usuario.usu_id = ?
+                    )
+                ) AND (tm_ticket.tick_estado != 'Cerrado')
+                ORDER BY FIELD(tm_ticket.tick_estado, 'Abierto', 'En proceso', 'Pausado') ASC, tm_ticket.prio_id ASC";
+
+            $sql = $conectar->prepare($sql);
+            $sql->bindValue(1, $usu_id);
+            $sql->execute();
+
+            return $sql->fetchAll();
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
     /* TODO: Listar ticket segun id de usuario creador */
     public function listar_ticket_x_creador($usu_id)
     {
