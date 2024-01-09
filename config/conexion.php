@@ -8,7 +8,7 @@
         protected function Conexion(){
             try {
                 //TODO: Cadena de Conexion Local (dB = solutickets)
-				$conectar = $this->dbh = new PDO("mysql:local=localhost;dbname=tickets","root","");
+				$conectar = $this->dbh = new PDO("mysql:local=localhost;dbname=tickets2","root","");
                 //TODO: Cadenad e Conexion Produccion
                 //$conectar = $this->dbh = new PDO("mysql:host=localhost;dbname=andercode_helpdesk1","andercode","contraseña");
 				return $conectar;
