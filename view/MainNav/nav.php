@@ -102,6 +102,12 @@ if ($_SESSION["rol_id"] == 1 || $_SESSION["rol_id"] == 3) {
                     <span class="lbl">Prioridad</span>
                 </a>
             </li>
+            <li class="blue-dirty">
+                <a href="..\Reporte\">
+                    <span class="glyphicon glyphicon-th"></span>
+                    <span class="lbl">Reporte mensual</span>
+                </a>
+            </li>
             <!-- <li class="blue-dirty">
                         <a href="..\MonitorearTicket\">
                             <span class="glyphicon glyphicon-th"></span>

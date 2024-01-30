@@ -13,6 +13,12 @@
 
     /*TODO: opciones del controlador Ticket*/
     switch ($_GET["op"]) {
+            //Reporte mensual
+        case 'reporte_mensual':
+            $resultado = $ticket->reporte_mensual($_POST['fecha_inicio'], $_POST['fecha_fin']);
+            echo json_encode($resultado);
+            break;
+
             // Pausar ticket
         case 'pausar_ticket':
             $resultado = $ticket->pause_ticket($_POST['tick_id'], $_POST['id_usuario']);
@@ -438,7 +444,7 @@
             }
             break;
 
-        /* TODO: Total de ticket Abierto para vista de soporte */
+            /* TODO: Total de ticket Abierto para vista de soporte */
         case "totalabierto";
             $datos = $ticket->get_ticket_totalabierto();
             if (is_array($datos) == true and count($datos) > 0) {
@@ -449,7 +455,7 @@
             }
             break;
 
-        /* TODO: Total de ticket Cerrados para vista de soporte */
+            /* TODO: Total de ticket Cerrados para vista de soporte */
         case "totalcerrado";
             $datos = $ticket->get_ticket_totalcerrado();
             if (is_array($datos) == true and count($datos) > 0) {
@@ -460,13 +466,13 @@
             }
             break;
 
-        /* TODO: Formato Json para grafico de soporte */
+            /* TODO: Formato Json para grafico de soporte */
         case "grafico";
             $datos = $ticket->get_ticket_grafico();
             echo json_encode($datos);
             break;
 
-         /* TODO: Insertar valor de encuesta,estrellas y comentarios */
+            /* TODO: Insertar valor de encuesta,estrellas y comentarios */
         case "encuesta":
             $ticket->insert_encuesta($_POST["tick_id"], $_POST["tick_estre"], $_POST["tick_coment"]);
             break;

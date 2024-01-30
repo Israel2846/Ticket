@@ -846,4 +846,37 @@ class Ticket extends Conectar
 
         return $sql->fetchAll();
     }
+
+    public function reporte_mensual($fecha_inicio, $fecha_fin)
+    {
+        $conectar = parent::conexion();
+
+        $sql = 'CALL reporte_mensual(?, ?)';
+
+        $sql = $conectar->prepare($sql);
+        $sql->bindValue(1, $fecha_inicio);
+        $sql->bindValue(2, $fecha_fin);
+        $sql->execute();
+
+        $data = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+        $filename = 'reporte.csv';
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $output = fopen('php://output', 'w');
+
+        $columnHeaders = array_keys($data[0]);
+
+        fputcsv($output, $columnHeaders);
+
+        foreach ($data as $row) {
+            fputcsv($output, $row);
+        }
+
+        fclose($output);
+
+        exit;
+    }
 }
