@@ -1,22 +1,22 @@
 
-function init(){
-    $("#ticket_form").on("submit",function(e){
+function init() {
+    $("#ticket_form").on("submit", function (e) {
         guardaryeditar(e);
     });
 }
 
-$(document).ready(function() {
+$(document).ready(function () {
     const inputDocumento = document.getElementById('fileElem');
     const textoError = document.getElementById('errorFiles');
     const btnGuardar = document.getElementById('btnGuardar');
-    const tamanoMax = 3*1024*1024;
-    
+    const tamanoMax = 3 * 1024 * 1024;
+
     /* TODO: Inicializar SummerNote */
     $('#tick_descrip').summernote({
         height: 150,
         lang: "es-ES",
         callbacks: {
-            onImageUpload: function(image) {
+            onImageUpload: function (image) {
                 console.log("Image detect...");
                 myimagetreat(image[0]);
             },
@@ -35,31 +35,39 @@ $(document).ready(function() {
     });
 
     /* TODO: Llenar Combo categoria */
-    $.post("../../controller/categoria.php?op=combo",function(data, status){
+    $.post("../../controller/categoria.php?op=combo", function (data, status) {
         $('#cat_id').html(data);
     });
 
-    $("#cat_id").change(function(){
+    if ($('#usuReporta')) {
+        $.post("../../controller/usuario.php?op=combo_usuarios",
+            function (data, textStatus, jqXHR) {
+                $('#usuReporta').html(data);
+            }
+        );
+    }
+
+    $("#cat_id").change(function () {
         cat_id = $(this).val();
         /* TODO: llenar Combo subcategoria segun cat_id */
-        $.post("../../controller/subcategoria.php?op=combo",{cat_id : cat_id},function(data, status){
+        $.post("../../controller/subcategoria.php?op=combo", { cat_id: cat_id }, function (data, status) {
             console.log(data);
             $('#cats_id').html(data);
         });
     });
 
     /* TODO: Llenar combo Prioridad  */
-    $.post("../../controller/prioridad.php?op=combo",function(data, status){
+    $.post("../../controller/prioridad.php?op=combo", function (data, status) {
         $('#prio_id').html(data);
     });
 
     // Comprobamos si los documentos no exceden el tamaño maximo
-    inputDocumento.addEventListener('change', function() {
+    inputDocumento.addEventListener('change', function () {
         const documentos = inputDocumento.files;
         let tamanoTotal = 0;
 
         for (let index = 0; index < documentos.length; index++) {
-            tamanoTotal += documentos[index].size;        
+            tamanoTotal += documentos[index].size;
         }
 
         if (tamanoTotal > tamanoMax) {
@@ -73,18 +81,18 @@ $(document).ready(function() {
     })
 });
 
-function guardaryeditar(e){
+function guardaryeditar(e) {
     e.preventDefault();
-    
+
     $('#btnGuardar').prop('disabled', true).text('Cargando...');
-    
+
     /* TODO: Array del form ticket */
     var formData = new FormData($("#ticket_form")[0]);
     /* TODO: validamos si los campos tienen informacion antes de guardar */
-    if ($('#tick_descrip').summernote('isEmpty') || $('#tick_titulo').val()=='' || $('#cats_id').val() == 0 || $('#cat_id').val() == 0 || $('#prio_id').val() == 0){
+    if ($('#tick_descrip').summernote('isEmpty') || $('#tick_titulo').val() == '' || $('#cats_id').val() == 0 || $('#cat_id').val() == 0 || $('#prio_id').val() == 0) {
         swal("Advertencia!", "Campos Vacios", "warning");
         $('#btnGuardar').prop('disabled', false).text('Guardar');
-    }else{
+    } else {
         var totalfiles = $('#fileElem').val().length;
         for (var i = 0; i < totalfiles; i++) {
             formData.append("files[]", $('#fileElem')[0].files[i]);
@@ -97,18 +105,18 @@ function guardaryeditar(e){
             data: formData,
             contentType: false,
             processData: false,
-            success: function(data){
+            success: function (data) {
                 console.log(data);
                 data = JSON.parse(data);
                 console.log(data[0].tick_id);
 
                 /* TODO: Envio de alerta Email de ticket Abierto */
-                $.post("../../controller/email.php?op=ticket_abierto", {tick_id : data[0].tick_id}, function (data) {
+                $.post("../../controller/email.php?op=ticket_abierto", { tick_id: data[0].tick_id }, function (data) {
 
                 });
 
                 /* TODO: Envio de alerta Whaspp de ticket Abierto */
-                $.post("../../controller/whatsapp.php?op=w_ticket_abierto", {tick_id : data[0].tick_id}, function (data) {
+                $.post("../../controller/whatsapp.php?op=w_ticket_abierto", { tick_id: data[0].tick_id }, function (data) {
 
                 });
 
@@ -125,7 +133,7 @@ function guardaryeditar(e){
                     confirmButtonText: "Aceptar",
                     closeOnConfirm: false,
                     closeOnCancel: false
-                }, function(){
+                }, function () {
                     window.location.href = 'https://localhost/tickets-support/view/Home/';
                 });
             }

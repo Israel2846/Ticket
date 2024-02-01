@@ -1,121 +1,135 @@
 <?php
-  require_once("../../config/conexion.php"); 
-  if(isset($_SESSION["usu_id"])){ 
+
+require_once("../../config/conexion.php");
+
+if (isset($_SESSION["usu_id"])) :
+
 ?>
-<!DOCTYPE html>
-<html>
-    <?php require_once("../MainHead/head.php");?>
+	<!DOCTYPE html>
+	<html>
+	<?php require_once("../MainHead/head.php"); ?>
 	<title>Nuevo Ticket</title>
-</head>
-<body class="with-side-menu">
+	</head>
 
-    <?php require_once("../MainHeader/header.php");?>
+	<body class="with-side-menu">
 
-    <div class="mobile-menu-left-overlay"></div>
+		<?php require_once("../MainHeader/header.php"); ?>
 
-    <?php require_once("../MainNav/nav.php");?>
+		<div class="mobile-menu-left-overlay"></div>
 
-	<!-- Contenido -->
-	<div class="page-content">
-		<div class="container-fluid">
+		<?php require_once("../MainNav/nav.php"); ?>
 
-			<header class="section-header">
-				<div class="tbl">
-					<div class="tbl-row">
-						<div class="tbl-cell">
-							<h3>Nuevo Ticket</h3>
-							<ol class="breadcrumb breadcrumb-simple">
-								<li><a href="../Home/">Inicio</a></li>
-								<li class="active">Nuevo Ticket</li>
-							</ol>
+		<!-- Contenido -->
+		<div class="page-content">
+			<div class="container-fluid">
+
+				<header class="section-header">
+					<div class="tbl">
+						<div class="tbl-row">
+							<div class="tbl-cell">
+								<h3>Nuevo Ticket</h3>
+								<ol class="breadcrumb breadcrumb-simple">
+									<li><a href="../Home/">Inicio</a></li>
+									<li class="active">Nuevo Ticket</li>
+								</ol>
+							</div>
 						</div>
 					</div>
-				</div>
-			</header>
+				</header>
 
-			<div class="box-typical box-typical-padding">
-				<p>
-					Desde esta ventana podra generar nuevos tickets de HelpDesk.
-				</p>
+				<div class="box-typical box-typical-padding">
+					<p>
+						Desde esta ventana podra generar nuevos tickets de HelpDesk.
+					</p>
 
-				<h5 class="m-t-lg with-border">Ingresar Información</h5>
+					<h5 class="m-t-lg with-border">Ingresar Información</h5>
 
-				<div class="row">
-					<form method="post" id="ticket_form">
+					<div class="row">
 
-						<input type="hidden" id="usu_id" name="usu_id" value="<?php echo $_SESSION["usu_id"] ?>">
+						<form method="post" id="ticket_form">
+							<input type="hidden" id="usu_id" name="usu_id" value="<?php echo $_SESSION["usu_id"] ?>">
 
-						<div class="col-lg-12">
-							<fieldset class="form-group">
-								<label class="form-label semibold" for="tick_titulo">Titulo</label>
-								<input type="text" class="form-control" id="tick_titulo" name="tick_titulo" placeholder="Ingrese Titulo">
-							</fieldset>
-						</div>
+							<div class="col-lg-12">
+								<fieldset class="form-group">
+									<label class="form-label semibold" for="tick_titulo">Titulo</label>
+									<input type="text" class="form-control" id="tick_titulo" name="tick_titulo" placeholder="Ingrese Titulo">
+								</fieldset>
+							</div>
 
-						<div class="col-lg-6">
-							<fieldset class="form-group">
-								<label class="form-label semibold" for="exampleInput">Categoria</label>
-								<select id="cat_id" name="cat_id" class="form-control">
+							<div class="col-lg-6">
+								<fieldset class="form-group">
+									<label class="form-label semibold" for="exampleInput">Categoria</label>
+									<select id="cat_id" name="cat_id" class="form-control">
 
-								</select>
-							</fieldset>
-						</div>
+									</select>
+								</fieldset>
+							</div>
 
-						<div class="col-lg-6">
-							<fieldset class="form-group">
-								<label class="form-label semibold" for="exampleInput">SubCategoria</label>
-								<select id="cats_id" name="cats_id" class="form-control">
+							<div class="col-lg-6">
+								<fieldset class="form-group">
+									<label class="form-label semibold" for="exampleInput">SubCategoria</label>
+									<select id="cats_id" name="cats_id" class="form-control">
 
-								</select>
-							</fieldset>
-						</div>
+									</select>
+								</fieldset>
+							</div>
 
-						<div class="col-lg-6">
-							<fieldset class="form-group">
-								<label class="form-label semibold" for="exampleInput">Prioridad</label>
-								<select id="prio_id" name="prio_id" class="form-control">
+							<div class="col-lg-6">
+								<fieldset class="form-group">
+									<label class="form-label semibold" for="exampleInput">Prioridad</label>
+									<select id="prio_id" name="prio_id" class="form-control">
 
-								</select>
-							</fieldset>
-						</div>
+									</select>
+								</fieldset>
+							</div>
 
-						<div class="col-lg-6">
-							<fieldset class="form-group">
-								<label class="form-label semibold" for="exampleInput">Documentos Adicionales (MAX 3MB)</label>
-								<input type="file" name="fileElem" id="fileElem" class="form-control" multiple>
-								<p id="errorFiles" style="color: red;"></p>
-							</fieldset>
-						</div>
+							<div class="col-lg-6">
+								<fieldset class="form-group">
+									<label class="form-label semibold" for="exampleInput">Documentos Adicionales (MAX 3MB)</label>
+									<input type="file" name="fileElem" id="fileElem" class="form-control" multiple>
+									<p id="errorFiles" style="color: red;"></p>
+								</fieldset>
+							</div>
 
-						<div class="col-lg-12">
-							<fieldset class="form-group">
-								<label class="form-label semibold" for="tick_descrip">Descripción</label>
-								<div class="summernote-theme-1">
-									<textarea id="tick_descrip" name="tick_descrip" class="summernote" name="name"></textarea>
+							<?php if ($_SESSION['rol_id'] == 1 || $_SESSION['rol_id'] == 2) : ?>
+								<div class="col-lg-6">
+									<fieldset class="form-group">
+										<label class="form-label semibold">Usuario que reporta</label>
+										<select name="usu_reporta" id="usuReporta" class="select2"></select>
+									</fieldset>
 								</div>
-							</fieldset>
-						</div>
-						<div class="col-lg-12">
-							<button type="submit" name="action" value="add" class="btn btn-rounded btn-inline btn-primary" id="btnGuardar">Guardar</button>
-						</div>
-					</form>
-				</div>
+							<?php endif ?>
 
+							<div class="col-lg-12">
+								<fieldset class="form-group">
+									<label class="form-label semibold" for="tick_descrip">Descripción</label>
+									<div class="summernote-theme-1">
+										<textarea id="tick_descrip" name="tick_descrip" class="summernote" name="name"></textarea>
+									</div>
+								</fieldset>
+							</div>
+							<div class="col-lg-12">
+								<button type="submit" name="action" value="add" class="btn btn-rounded btn-inline btn-primary" id="btnGuardar">Guardar</button>
+							</div>
+						</form>
+					</div>
+
+				</div>
 			</div>
 		</div>
-	</div>
-	<!-- Contenido -->
+		<!-- Contenido -->
 
-	<?php require_once("../MainJs/js.php");?>
+		<?php require_once("../MainJs/js.php"); ?>
 
-	<script type="text/javascript" src="nuevoticket.js"></script>
+		<script type="text/javascript" src="nuevoticket.js"></script>
 
-	<script type="text/javascript" src="../notificacion.js"></script>
+		<script type="text/javascript" src="../notificacion.js"></script>
 
-</body>
-</html>
+	</body>
+
+	</html>
 <?php
-  } else {
-    header("Location:".Conectar::ruta()."index.php");
-  }
+else :
+	header("Location:" . Conectar::ruta() . "index.php");
+endif
 ?>

@@ -38,7 +38,7 @@ switch ($_GET["op"]) {
 
             echo $html;
         }
-        
+
         break;
 
         /* TODO: Guardar y editar, guardar si el campo usu_id esta vacio */
@@ -155,6 +155,16 @@ switch ($_GET["op"]) {
         $datos = $usuario->get_usuario_soporte();
         if (is_array($datos) == true and count($datos) > 0) {
             $html .= "<option label='Seleccionar'></option>";
+            foreach ($datos as $row) {
+                $html .= "<option value='" . $row['usu_id'] . "'>" . $row['usu_nom'] . " " . $row['usu_ape'] . "</option>";
+            }
+            echo $html;
+        }
+        break;
+    case "combo_usuarios":
+        $datos = $usuario->get_usuario();
+        if (is_array($datos) == true and count($datos) > 0) {
+            $html .= "<option label='Seleccionar' value='" . $_SESSION['usu_id'] . "'></option>";
             foreach ($datos as $row) {
                 $html .= "<option value='" . $row['usu_id'] . "'>" . $row['usu_nom'] . " " . $row['usu_ape'] . "</option>";
             }

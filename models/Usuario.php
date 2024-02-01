@@ -121,7 +121,7 @@ class Usuario extends Conectar
         $sql = "call sp_l_usuario_01()";
         $sql = $conectar->prepare($sql);
         $sql->execute();
-        return $resultado = $sql->fetchAll();
+        return $sql->fetchAll();
     }
 
     // Obtener usuarios de soporte

@@ -15,8 +15,7 @@
     switch ($_GET["op"]) {
             //Reporte mensual
         case 'reporte_mensual':
-            $resultado = $ticket->reporte_mensual($_POST['fecha_inicio'], $_POST['fecha_fin']);
-            echo json_encode($resultado);
+            $ticket->reporte_mensual($_POST['fecha_inicio'], $_POST['fecha_fin']);
             break;
 
             // Pausar ticket
@@ -75,7 +74,7 @@
 
             /* TODO: Insertar nuevo Ticket */
         case "insert":
-            $datos = $ticket->insert_ticket($_POST["usu_id"], $_POST["cat_id"], $_POST["cats_id"], $_POST["tick_titulo"], $_POST["tick_descrip"], $_POST["prio_id"]);
+            $datos = $ticket->insert_ticket($_POST["usu_id"], $_POST["cat_id"], $_POST["cats_id"], $_POST["tick_titulo"], $_POST["tick_descrip"], $_POST["prio_id"], $_POST['usu_reporta']);
             /* TODO: Obtener el ID del ultimo registro insertado */
             if (is_array($datos) == true and count($datos) > 0) {
                 foreach ($datos as $row) {
