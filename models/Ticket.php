@@ -106,6 +106,10 @@ class Ticket extends Conectar
 
         parent::set_names();
 
+        if ( is_null($usu_reporta)) {
+            $usu_reporta = $usu_id;
+        }
+
         $sql = "INSERT INTO tm_ticket (tick_id,usu_id,cat_id,cats_id,tick_titulo,tick_descrip,tick_estado,fech_crea,usu_asig,fech_asig,prio_id,est, usu_reporta) VALUES (NULL,?,?,?,?,?,'Abierto',now(),NULL,NULL,?,'1', ?);";
         $sql = $conectar->prepare($sql);
         $sql->bindValue(1, $usu_id);
